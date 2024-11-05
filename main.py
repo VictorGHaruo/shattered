@@ -18,8 +18,8 @@ class Player:
         self.jump_count_max = 2
         
         self.speed_x = 0
-        self.speed_x_max = 15
-        self.speed_x_min = -15
+        self.speed_x_max = 10
+        self.speed_x_min = -10
         self.is_running = False
         self.to_left = False
         self.to_right = False
@@ -35,6 +35,7 @@ class Player:
     def update(self):
         self.speed_y += self.gravity_y
         self.rect.y += self.speed_y
+        
         if self.speed_x > 0:
             # Se no pulo estivar apertando para o outro lado, ao tocar no chão zera a velocidade
             if self.to_left:
@@ -47,7 +48,7 @@ class Player:
             self.rect.x += max(self.speed_x, self.speed_x_min)
         
         # Se tiver no ar is_running é True, para manter constante a velocidade
-        if self.is_running == False:
+        if not self.is_running:
             self.speed_x = 0
         
     def on_event(self, event: pygame.event.Event):
@@ -88,15 +89,19 @@ class Player:
             delta_speeds *= 1 if delta_speeds > 0 else -1
             
             if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top and self.speed_y > 0:
-                ground_y = other.rect.top
-                self.rect.bottom = ground_y
+                self.rect.bottom = other.rect.top
                 self.speed_y = 0
                 self.jump_count = 0
                 self.on_ground = True
-            elif self.rect.left < other.rect.right and self.speed_x < 0 :
+            elif self.rect.left < other.rect.right and self.rect.right > other.rect.right and self.speed_x < 0 :
                 self.rect.left = other.rect.right
-            elif self.rect.right > other.rect.left and self.speed_x > 0 :
+                self.speed_x = 0
+            elif self.rect.right > other.rect.left and self.rect.left < other.rect.left and self.speed_x > 0 :
                 self.rect.right = other.rect.left
+                self.speed_x = 0
+            elif self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
+                self.rect.top = other.rect.bottom
+                self.speed_y = 0
     
 class Ground:
     
@@ -104,6 +109,10 @@ class Ground:
         self.rect = pygame.Rect(x, y, width, height) 
         self.rect.x = x
         self.rect.y = y
+        
+        self.speed_x = 0
+        self.is_pushing_r = False
+        self.is_pushing_l = False
         self.rect_color = (0,255,0)
      
     def draw(self, screen, camera):
@@ -113,10 +122,30 @@ class Ground:
 
     def update(self):
         pass
-
+        
     def on_collision(self, other):
         pass
-
+               
+class Block(Ground):
+    
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height)
+        
+    def update(self):
+        if self.is_pushing_r:
+            self.rect.x += 1
+            self.is_pushing_r = False
+        if self.is_pushing_l:
+            self.rect.x -= 1
+            self.is_pushing_l = False
+            
+    def on_collision(self, other):
+        if isinstance(other, Player):
+            if self.rect.left < other.rect.right and self.rect.top < other.rect.bottom:
+                self.is_pushing_l = True
+            if self.rect.right > other.rect.left and self.rect.top < other.rect.bottom:
+                self.is_pushing_r = True
+                
 class Camera:
     
     def __init__(self, x_init, margin):
@@ -133,18 +162,20 @@ class Camera:
 class GameManager:
 
     def __init__(self):
-        self.WIDTH = 800
-        self.HEIGHT = 600
+        self.WIDTH = 1400
+        self.HEIGHT = 800
         screen_size = (self.WIDTH, self.HEIGHT)
         self.screen = pygame.display.set_mode(screen_size)
         self.screen.fill([0, 0, 0])
         
         self.hero = Player(self.WIDTH // 2, self.HEIGHT // 2, 40, 50)
-        self.camera = Camera(0, 200)
+        self.camera = Camera(0, 50)
     
         self.grounds = [
-            Ground(-self.WIDTH, self.HEIGHT - 30, 3*self.WIDTH, 30), 
-            Ground(self.WIDTH // 2, self.HEIGHT // 2 + 100, 100, self.HEIGHT // 2 - 130)
+            Ground(-20, self.HEIGHT - 30, 3*self.WIDTH, 500),
+            Ground(self.WIDTH // 2, self.HEIGHT // 2 + 100, 1000, self.HEIGHT // 2 - 130),
+            Ground(-10 , self.HEIGHT // 2, 100, self.HEIGHT // 2 - 130),
+            Block(0, self.HEIGHT - 80, 50, 50)
         ]
         
     def run (self):
@@ -171,12 +202,15 @@ class GameManager:
     def update(self):
         self.hero.update()
         self.camera.update_coods(self.hero, self.WIDTH)
+        for ground in self.grounds:
+            ground.update()
     
     def collision_decetion(self):
         for ground in self.grounds:
-            collining_ground = self.hero.rect.colliderect(ground)
-            if collining_ground:
+            is_collision = self.hero.rect.colliderect(ground)
+            if is_collision:
                 self.hero.on_collision(ground)
+                ground.on_collision(self.hero) 
     
     def draw(self):
         self.screen.fill([0,0,0])
