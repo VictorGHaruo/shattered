@@ -1,5 +1,6 @@
 import pygame
 from weapon import Projectile
+import random
 
 class Monsters:
     def __init__(self, x, y, width, height):
@@ -47,6 +48,7 @@ class Monsters:
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
                 if not other.who == "Monster":   
                     self.life -= 40
+    
 
 class Dummy(Monsters):
     def __init__(self, x, y, width, height):
@@ -59,8 +61,9 @@ class Dummy(Monsters):
         
     def move(self):
         self.rect.x = self.rect.x + self.speed_x
+    
 
-class Flying(Monsters):
+class Mage(Monsters):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
         self.width = width
@@ -83,4 +86,56 @@ class Flying(Monsters):
             else:
                 new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG)
                 projectiles.append(new_projectile)
+            self.projectile_cooldown = self.cool_down
+
+class Flying(Monsters):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height)
+        self.speed_x = 3
+        self.gravity = 0
+
+        self.probability = 0.5
+        self.randomic = 0.5
+
+        self.cool_down_max = 50
+        self.cool_down_min = 20
+
+        self.cool_down = 0
+        self.move_cooldown = 0
+
+        self.projectile_cooldown = 0
+
+        self.color = (0, 255, 0)
+
+    def move(self):
+        if self.move_cooldown <= 0:
+            
+            self.randomic = random.random()
+            self.cool_down = random.randint(self.cool_down_min, self.cool_down_max)
+            print(self.randomic) 
+            print (self.cool_down)       
+            self.move_cooldown = self.cool_down
+        
+        if self.randomic >= self.probability:
+            self.rect.x = self.rect.x + self.speed_x
+
+        else:
+            self.rect.x = self.rect.x - self.speed_x
+
+
+    def update(self):
+        self.move()
+        if self.move_cooldown > 0:
+            self.move_cooldown -= 1
+
+        if self.projectile_cooldown > 0:
+            self.projectile_cooldown -= 1
+
+        return super().update()
+    
+    def attack(self, projectiles):
+        if self.projectile_cooldown <= 0:
+            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 20, self.TAG)
+            projectiles.append(new_projectile)
+
             self.projectile_cooldown = self.cool_down

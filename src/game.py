@@ -3,6 +3,7 @@ from player import Knight, Yokai, Ninja
 from camera import Camera
 from ground import Ground, Block
 from enemy import Dummy
+from enemy import Mage
 from enemy import Flying
 
 pygame.init()
@@ -37,7 +38,8 @@ class GameManager:
         self.enemies = [
             Dummy(100, 0, 40, 50),
             Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50),
-            Flying(200,0,40,50)
+            Mage(200,0,40,50),
+            Flying(200, 50, 40, 50)
         ]
         
     def run (self):
@@ -76,8 +78,10 @@ class GameManager:
             ground.update()
         for monster in self.enemies:
             monster.update()
-            if isinstance(monster, Flying):
+            if isinstance(monster, Mage):
                 monster.attack(self.projectiles, self.hero.rect.x)
+            if isinstance(monster, Flying):
+                monster.attack(self.projectiles)
         for projectile in self.projectiles:
                 projectile.update()
 
