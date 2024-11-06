@@ -58,8 +58,7 @@ class Player:
             self.speed_x = 0
         
         ##Updating trade_cooldonw
-        if self.trade_cooldown > 0:
-            print(self.trade_cooldown)       
+        if self.trade_cooldown > 0:   
             self.trade_cooldown -= 1    
                 
     def on_event(self, event: pygame.event.Event):

@@ -1,4 +1,5 @@
 import pygame
+from weapon import Projectile
 
 class Monsters:
     def __init__(self, x, y, width, height):
@@ -39,6 +40,14 @@ class Monsters:
         if other.TAG == "Player": #Mata o monstro
             if self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.life = 0
+        if isinstance(other, Projectile):
+            if self.rect.left < other.rect.right and self.rect.right > other.rect.right:
+                print ("oi")
+                self.life -= 40
+            if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
+                
+                self.life -= 40
+                print ("oi")
 
 class Dummy(Monsters):
     def __init__(self, x, y, width, height):

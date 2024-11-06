@@ -91,15 +91,28 @@ class GameManager:
                     enemie.on_collision(ground)
                     ground.on_collision(enemie) 
 
+            for projectile in self.projectiles:
+                is_collision_projectile = projectile.rect.colliderect(ground)
+                if is_collision_projectile:
+                    self.projectiles.remove(projectile)
+
         for enemie in self.enemies:
             is_collision_hero = self.hero.rect.colliderect(enemie)
             if is_collision_hero:
                 self.hero.on_collision(enemie)
                 enemie.on_collision(self.hero)
+            
+            for projectile in self.projectiles:
+                is_collision_p_m = projectile.rect.colliderect(enemie)
+                if is_collision_p_m:
+                    enemie.on_collision(projectile)
+                    self.projectiles.remove(projectile)
+                    
+        
 
     def elimination(self):
         for monster in self.enemies:
-            if monster.life == 0:
+            if monster.life <= 0:
                 self.enemies.remove(monster)
         
         for projectile in self.projectiles:
