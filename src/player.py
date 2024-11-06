@@ -132,13 +132,13 @@ class Yokai(Player):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0:
             if key_map[pygame.K_UP]:  
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG)
                 projectiles.append(new_projectile)
             elif self.to_left: 
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG)
                 projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG)
                 projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cooldown_time
@@ -147,8 +147,7 @@ class Yokai(Player):
         super().update()
         
         if self.projectile_cooldown > 0:
-            self.projectile_cooldown -= 1
-        
+            self.projectile_cooldown -= 1       
                 
 class Ninja(Player):
     

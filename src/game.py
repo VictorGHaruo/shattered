@@ -3,6 +3,7 @@ from player import Knight, Yokai, Ninja
 from camera import Camera
 from ground import Ground, Block
 from enemy import Dummy
+from enemy import Flying
 
 pygame.init()
            
@@ -35,7 +36,8 @@ class GameManager:
         
         self.enemies = [
             Dummy(100, 0, 40, 50),
-            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50)
+            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50),
+            Flying(200,0,40,50)
         ]
         
     def run (self):
@@ -74,9 +76,12 @@ class GameManager:
             ground.update()
         for monster in self.enemies:
             monster.update()
+            if isinstance(monster, Flying):
+                monster.attack(self.projectiles, self.hero.rect.x)
         for projectile in self.projectiles:
                 projectile.update()
-    
+
+        
     def collision_decetion(self):
         for ground in self.grounds:
             is_collision_hero = self.hero.rect.colliderect(ground)
@@ -104,8 +109,9 @@ class GameManager:
             
             for projectile in self.projectiles:
                 is_collision_p_m = projectile.rect.colliderect(enemie)
+                
                 if is_collision_p_m:
-                    enemie.on_collision(projectile)
+                    enemie.on_collision(projectile)        
                     self.projectiles.remove(projectile)
                     
         

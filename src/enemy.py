@@ -41,13 +41,12 @@ class Monsters:
             if self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.life = 0
         if isinstance(other, Projectile):
-            if self.rect.left < other.rect.right and self.rect.right > other.rect.right:
-                print ("oi")
-                self.life -= 40
+            if self.rect.left < other.rect.right and self.rect.right > other.rect.right: 
+                if not other.who == "Monster":             
+                    self.life -= 40
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
-                
-                self.life -= 40
-                print ("oi")
+                if not other.who == "Monster":   
+                    self.life -= 40
 
 class Dummy(Monsters):
     def __init__(self, x, y, width, height):
@@ -60,3 +59,28 @@ class Dummy(Monsters):
         
     def move(self):
         self.rect.x = self.rect.x + self.speed_x
+
+class Flying(Monsters):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height)
+        self.width = width
+        self.speed_x = 3
+        self.color = (0,0, 255)
+        self.life = 40
+        self.projectile_cooldown = 0
+        self.cool_down = 20      
+    
+    def update(self):
+        if self.projectile_cooldown > 0:
+            self.projectile_cooldown -= 1
+        return super().update()
+    
+    def attack(self, projectiles, x_player):
+        if self.projectile_cooldown <= 0:
+            if x_player <= self.rect.x:
+                new_projectile = Projectile(self.rect.left, self.rect.y - self.width/2, - 20, 0, self.TAG)
+                projectiles.append(new_projectile)
+            else:
+                new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG)
+                projectiles.append(new_projectile)
+            self.projectile_cooldown = self.cool_down
