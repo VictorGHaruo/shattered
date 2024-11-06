@@ -85,8 +85,6 @@ class Player:
             
     def on_collision(self, other):
         if isinstance(other, Ground):
-            delta_speeds = self.speed_y - self.speed_x
-            delta_speeds *= 1 if delta_speeds > 0 else -1
             
             if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top and self.speed_y > 0:
                 self.rect.bottom = other.rect.top
@@ -161,28 +159,28 @@ class Camera:
 
 class Monsters:
     def __init__(self, x, y, width, height):
-        self.monster = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(x, y, width, height)
         self.color = (255, 0, 0)
         self.gravity = 2
         self.speed = 0
         self.speed_x = 0
     def on_key_pressed(self, key_map):
         if key_map[pygame.K_RIGHT]:
-            self.monster.x += 10
+            self.rect.x += 10
         if key_map[pygame.K_LEFT]:
-            self.monster.x -= 10
+            self.rect.x -= 10
     def update(self):
         self.speed = self.gravity + self.speed
-        self.monster.y = self.speed + self.monster.y
+        self.rect.y = self.speed + self.rect.y
 
-        if self.monster.y > 800 - self.monster.height:
-            self.monster.y = 800 - self.monster.height
+        if self.rect.y > 800 - self.rect.height:
+            self.rect.y = 800 - self.rect.height
             self.speed = 0
         
     
     def on_collision(self, other : pygame.Rect):
 
-        if self.monster.colliderect(other):
+        if self.rect.colliderect(other):
             if isinstance(other, Player):
                 if other.speed_x > 0 or self.speed:
                     print ("bateu pela esquerda")
@@ -192,13 +190,7 @@ class Monsters:
                 return True  
         
     def draw (self, screen):
-        pygame.draw.rect(screen, self.color, self.monster)
-        
-    def border (self):
-        if self.monster.x > 1400 - self.monster.width:
-            self.monster.x = 1400 - self.monster.width
-        if self.monster.x < 0:
-            self.monster.x = 0
+        pygame.draw.rect(screen, self.color, self.rect)
 
 class Dummy(Monsters):
     def __init__(self, x, y, width, height):
@@ -209,18 +201,18 @@ class Dummy(Monsters):
         return super().update()
         
     def move(self):
-        self.monster.x = self.monster.x + self.speed_x
+        self.rect.x = self.rect.x + self.speed_x
 
     def on_collision(self, other : pygame.Rect):
         if not isinstance(other, Player):
-            if self.monster.bottom > other.rect.top and self.monster.top < other.rect.top:
-                    self.monster.bottom = other.rect.top
+            if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
+                    self.rect.bottom = other.rect.top
                     self.on_ground = True
-            elif self.monster.left < other.rect.right and self.monster.right > other.rect.right:
+            elif self.rect.left < other.rect.right and self.rect.right > other.rect.right:
                 # self.monster.left = other.rect.right
                 self.speed_x = -self.speed_x
                 # self.speed_x = 0
-            elif self.monster.right > other.rect.left and self.monster.left < other.rect.left:
+            elif self.rect.right > other.rect.left and self.rect.left < other.rect.left:
                 # self.monster.right = other.rect.left
                 self.speed_x = -self.speed_x
                 # self.speed_x = 0
@@ -229,8 +221,8 @@ class Dummy(Monsters):
             #     self.speed = 0
         if isinstance(other, Player):
             print ("oi")
-            if self.monster.top < other.rect.bottom and self.monster.bottom > other.rect.bottom:
-                self.monster.top = other.rect.bottom
+            if self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
+                self.rect.top = other.rect.bottom
                 self.speed = 0
         # if self.monster.colliderect(other):
         #     if isinstance(other, Player):
@@ -300,13 +292,15 @@ class GameManager:
             if is_collision:
                 self.hero.on_collision(ground)
                 ground.on_collision(self.hero) 
-            m_is_collision = self.monster.monster.colliderect(ground)
+                
+            m_is_collision = self.monster.rect.colliderect(ground)
             if m_is_collision:
                 self.monster.on_collision(ground)
-                
-                self.monster.on_collision(self.hero)
-
                 ground.on_collision(self.monster) 
+        
+        m_h_collision = self.hero.rect.colliderect(self.monster)
+        if m_h_collision:
+            self.monster.on_collision(self.hero)
     
     def draw(self):
         self.screen.fill([0,0,0])

@@ -27,7 +27,7 @@ class Player:
         self.on_ground = False
         
         
-        self.trade_cooldown_time = 300
+        self.trade_cooldown_time = 60
         self.trade_cooldown = self.trade_cooldown_time
         self.rect_color = (255, 0, 0)
     
@@ -117,9 +117,6 @@ class Player:
             
     def on_collision(self, other):
         if isinstance(other, Ground):
-            delta_speeds = self.speed_y - self.speed_x
-            delta_speeds *= 1 if delta_speeds > 0 else -1
-            
             if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top and self.speed_y > 0:
                 self.rect.bottom = other.rect.top
                 self.speed_y = 0
@@ -134,7 +131,7 @@ class Player:
             elif self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.rect.top = other.rect.bottom
                 self.speed_y = 0
-
+            
 class Knight(Player):
     
     def __init__(self, x, y, width, height):
