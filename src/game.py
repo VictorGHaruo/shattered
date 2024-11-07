@@ -42,15 +42,18 @@ class GameManager:
             Mage(200,0,40,50),
             Flying(200, 50, 40, 50)
         ]
-        
+
         self.texts = [
-            Text('Hero', type(self.hero), self.screen, 0, 0,pygame.font.SysFont("Times New Roman", 22) ),
-            Text('Life', self.hero.life, self.screen,0, 20,pygame.font.SysFont("Times New Roman", 22) )
+        Text('Hero', type(self.hero).__name__, self.screen, 0, 0, pygame.font.SysFont("Times New Roman", 22)),
+        Text('Life', self.hero.life, self.screen, 0, 20, pygame.font.SysFont("Times New Roman", 22))
         ]
+
+        self.Values = [type(self.hero).__name__, self.hero.life]
+
         
     def run (self):
         clock = pygame.time.Clock()
-        
+
         is_running = True
         while is_running:
         
@@ -95,8 +98,13 @@ class GameManager:
             if isinstance(monster, Flying):
                 monster.attack(self.projectiles)
         for projectile in self.projectiles:
-                projectile.update()
+            projectile.update()
 
+        self.Values[0] = type(self.hero).__name__  
+        self.Values[1] = self.hero.life 
+
+        for i, text in enumerate(self.texts):
+            text.update(value=self.Values[i])
         
     def collision_decetion(self):
         for ground in self.grounds:
@@ -145,8 +153,9 @@ class GameManager:
         self.screen.fill([0,0,0])
         self.hero.draw(self.screen, self.camera)
 
-        for text in self.texts :
-            text.draw()
+        for text in self.texts:  
+            text.draw()  
+
             
         for ground in self.grounds:
             ground.draw(self.screen, self.camera)
@@ -156,6 +165,7 @@ class GameManager:
             
         for projectile in self.projectiles:
                 projectile.draw(self.screen)
+
                 
         pygame.display.flip()
         

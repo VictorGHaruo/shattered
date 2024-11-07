@@ -2,7 +2,7 @@ import pygame
    
 class Text:
 
-    def __init__(self , text, Value, screen,width, height ,font):
+    def __init__(self , text ,Value , screen,width, height ,font):
 
         self.text = text
         self.Value = Value
@@ -16,4 +16,8 @@ class Text:
         message = f"{self.text} : {self.Value}"
         text_format = self.font.render(message, True, (255, 255, 255))
         self.screen.blit(text_format, ( self.width, self.height ))
-                
+
+    def update(self, value=None):
+        
+        if value is not None:
+            self.Value = value  
