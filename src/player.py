@@ -1,5 +1,7 @@
 import pygame
 from weapon import Projectile
+from weapon import Shield
+from weapon import Attack
 
 class Player:
     
@@ -25,6 +27,7 @@ class Player:
         self.to_left = False
         self.to_right = False
         self.on_ground = False
+        self.from_the_front = True
         
         
         self.trade_cooldown_time = 60
@@ -78,11 +81,13 @@ class Player:
             if key_map[pygame.K_RIGHT] or key_map[pygame.K_d]:
                 self.speed_x += 5
                 self.to_right = True
+                self.from_the_front = True
             else:
                 self.to_right = False
             if key_map[pygame.K_LEFT] or key_map[pygame.K_a]:
                 self.speed_x -= 5
                 self.to_left = True
+                self.from_the_front = False
             else:
                 self.to_left = False
             
@@ -116,7 +121,29 @@ class Knight(Player):
         super().__init__(x, y, width, height)
         self.jump_count_max = 1
         self.rect_color = (255, 0, 0)
-        
+        self.shield = None  
+
+    def actions(self, key_map, other):
+
+        if key_map[pygame.K_v] and self.on_ground:
+            if self.shield is None: 
+
+                shield_x = self.rect.x + (30 if self.from_the_front else -15)  
+                shield_y = self.rect.y
+                self.shield = Shield(shield_x, shield_y, 15, 70)  
+                self.speed_x_max = 0
+                self.speed_x_min = 0
+                self.speed_y_max = 0
+
+        else:
+            self.shield = None
+            self.speed_x_max = 10
+            self.speed_x_min = -10
+            self.speed_y_max = 40
+            
+        if self.shield is not None:
+            for projectile in other:
+                self.shield.reflect(self.TAG ,projectile)
         
 class Yokai(Player):
     
@@ -134,11 +161,11 @@ class Yokai(Player):
             if key_map[pygame.K_UP]:  
                 new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG)
                 projectiles.append(new_projectile)
-            elif self.to_left: 
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG)
+            elif self.from_the_front: 
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG)
                 projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG)
                 projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cooldown_time
@@ -155,3 +182,22 @@ class Ninja(Player):
         super().__init__(x, y, width, height)
         self.jump_count_max = 3
         self.rect_color = (255, 255, 255)
+        self.attack_cooldown = 0
+        self.cooldown_time = 20
+
+    def actions(self, key_map, other):
+
+        if key_map[pygame.K_v] and self.attack_cooldown <= 0:
+
+            attack_x = self.rect.x + (50 if self.from_the_front else - 50)  
+            attack = Attack(attack_x, self.rect.y, 50, 15)
+            for monster in other:
+                attack.strike(100, monster)  
+
+            self.attack_cooldown = self.cooldown_time
+
+    def update(self):
+        super().update()
+
+        if self.attack_cooldown > 0:
+            self.attack_cooldown -= 1    

@@ -5,6 +5,7 @@ from ground import Ground, Block
 from enemy import Dummy
 from enemy import Mage
 from enemy import Flying
+from text import Text
 
 pygame.init()
            
@@ -42,6 +43,11 @@ class GameManager:
             Flying(200, 50, 40, 50)
         ]
         
+        self.texts = [
+            Text('Hero', type(self.hero), self.screen, 0, 0,pygame.font.SysFont("Times New Roman", 22) ),
+            Text('Life', self.hero.life, self.screen,0, 20,pygame.font.SysFont("Times New Roman", 22) )
+        ]
+        
     def run (self):
         clock = pygame.time.Clock()
         
@@ -54,7 +60,7 @@ class GameManager:
                     is_running = False
                 self.trade(event)
                 self.hero.on_event(event)
-                    
+
             key_map = pygame.key.get_pressed()
             self.hero.on_key_pressed(key_map)
             # for monster in self.enemies:
@@ -63,6 +69,12 @@ class GameManager:
             #TO CHANGE EVERY HERO DO SMT
             if type(self.hero) == Yokai:
                 self.hero.actions(key_map, self.projectiles)
+
+            if type(self.hero) == Knight:
+                self.hero.actions(key_map, self.projectiles)
+
+            if type(self.hero) == Ninja:
+                self.hero.actions(key_map, self.enemies)
                 
             self.update()
             self.collision_decetion()
@@ -132,6 +144,9 @@ class GameManager:
     def draw(self):
         self.screen.fill([0,0,0])
         self.hero.draw(self.screen, self.camera)
+
+        for text in self.texts :
+            text.draw()
             
         for ground in self.grounds:
             ground.draw(self.screen, self.camera)
