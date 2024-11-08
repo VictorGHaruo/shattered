@@ -29,9 +29,11 @@ class Player:
         self.on_ground = False
         self.from_the_front = True
         
+        
         self.trade_cooldown_time = 60
         self.trade_cooldown = self.trade_cooldown_time
         self.invincibility_time = 30
+        self.collision_damage = 50
         self.invincibility_cooldown = self.invincibility_time
         self.rect_color = (255, 0, 0)
         
@@ -117,6 +119,18 @@ class Player:
             elif self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.rect.top = other.rect.bottom
                 self.speed_y = 0
+
+        if other.TAG == "Monster":
+
+            if self.rect.colliderect(other) and self.invincibility_cooldown <= 0:
+                self.life -= self.collision_damage
+                self.invincibility_cooldown = self.invincibility_time
+
+        if other.TAG == "Projectile":
+
+            if self.rect.colliderect(other) and self.invincibility_cooldown <= 0:
+                self.life -= other.damage
+                self.invincibility_cooldown = self.invincibility_time
 
             
 class Knight(Player):

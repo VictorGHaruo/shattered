@@ -1,4 +1,5 @@
 import pygame
+import sys
 from player import Knight, Yokai, Ninja
 from camera import Camera
 from ground import Ground, Block
@@ -55,31 +56,40 @@ class GameManager:
         self.Values = [type(self.hero).__name__, self.hero.life]
 
         
-    def run (self):
+    def run(self):
+
         clock = pygame.time.Clock()
+        is_running = True
+        game_over = False
 
         is_running = True
         while is_running:
-        
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
                     is_running = False
                 self.trade(event)
                 self.hero.on_event(event)
-
-            key_map = pygame.key.get_pressed()
-            self.hero.on_key_pressed(key_map)
             
-            #TO CHANGE EVERY HERO DO SMT
-            self.hero.actions(key_map)
+            if not game_over:
+                key_map = pygame.key.get_pressed()
+                self.hero.on_key_pressed(key_map)
+                self.hero.actions(key_map)
                 
-            self.update()
-            self.collision_decetion()
-            self.elimination()
-            self.draw()
+                self.update()
+                self.collision_decetion()
+                self.elimination()
+                self.draw()
 
+                if self.hero.life <= 0 or self.hero.rect.y > 1400:  
+                    game_over = True
+                    self.gameover() 
+            else:
+                self.gameover()  
+                
             clock.tick(30)
+        
+        pygame.quit()
             
     def update(self):
         self.hero.update()
@@ -250,6 +260,38 @@ class GameManager:
         self.hero.to_right = to_right_actual
         self.hero.trade_cooldown = trade_cooldonw_actual
         self.hero.from_the_front = from_the_front_actual
+
+    
+    def gameover(self):
+        
+        self.screen.fill([100, 100, 100])
+        font_gameover = pygame.font.Font(None, 74)
+        font_control = pygame.font.Font(None, 36)
+        
+        text_gameover = font_gameover.render("GAME OVER", True, (255, 255, 255))
+        text_rect = text_gameover.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 3))
+        self.screen.blit(text_gameover, text_rect)
+
+        text_control = font_control.render("Press 'R' to restart or 'Q' to exit.", True, (50, 50, 50))
+        control_rect = text_control.get_rect(center=(self.WIDTH// 2, self.HEIGHT // 2))
+        self.screen.blit(text_control, control_rect)
+
+        pygame.display.flip()
+
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:  
+                        waiting = False
+                        self.__init__()
+                        self.run()
+                    elif event.key == pygame.K_q:  
+                        pygame.quit()
+                        sys.exit()
 
 if __name__ == "__main__":
     Game = GameManager()
