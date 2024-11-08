@@ -119,8 +119,6 @@ class Player:
                 self.rect.top = other.rect.bottom
                 self.speed_y = 0
 
-        if other.TAG == "Monster":
-
             
 class Knight(Player):
     

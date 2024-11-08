@@ -61,6 +61,9 @@ class Balrog(Bosses):
 
         self.projectile_cooldown = 0
 
+        self.cooldown_atk = 40
+
+
         self.color = (255, 192, 203)
 
     def move(self):
@@ -87,23 +90,32 @@ class Balrog(Bosses):
 
         return super().update()
     
-    def attack(self):
-         pass
+    def attack(self, x, y, width, height, screen):
+        self.atk = pygame.Rect(x, y, width, height)
+        self.color_atk = (0, 0, 255)  
+        pygame.draw.rect(screen, self.color, self.rect) 
+
 
 class Ganon(Bosses):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
+        self.TAG = "Ganon"
         self.width = width
         self.speed_x = 3
-        self.color = (0,0, 255)
+
+        self.color = (160, 32, 240)
+        self.color_secundary = (255, 68, 51)
+        self.color_aux = ()
+        self.color_change = False
+
         self.life = 60
         self.projectile_cooldown = 0
         self.cool_down = 20
 
     def update(self):
+
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
-
         return super().update()
 
     def attack(self, projectiles, x_player):
@@ -117,16 +129,21 @@ class Ganon(Bosses):
             self.projectile_cooldown = self.cool_down
 
     def distance(self, other):
-        delta_x = self.rect.x - other.rect.x
-        delta_y = self.rect.y - other.rect.y
+        delta_x = self.rect.centerx - other.rect.centerx
+        delta_y = self.rect.centery - other.rect.centery
 
-        distance = math.sqrt(math.pow(delta_x) + math.pow(delta_y))
+        distance = math.sqrt(math.pow(delta_x, 2) + math.pow(delta_y, 2))
         return distance
+    
 
-    def move(self, x_player, distance):
-        if distance():
-            self.rect.x = 0
-        else:
-            self.rect.x = 1300
+    def move(self, player):
 
-        pass
+        if self.distance(player) <= 110:
+            if player.rect.centerx - self.rect.centerx < 0:
+                print (player.rect.centerx - self.rect.centerx)
+                self.rect.x = 100
+                self.rect.y = 0
+            elif player.rect.centerx - self.rect.centerx > 0:
+                self.rect.x = 1200
+                self.rect.y = 0
+        

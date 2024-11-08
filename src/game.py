@@ -6,6 +6,7 @@ from enemy import Dummy
 from enemy import Mage
 from enemy import Flying
 from boss import Balrog
+from boss import Ganon
 from text import Text
 
 pygame.init()
@@ -44,7 +45,8 @@ class GameManager:
         ]
 
         self.bosses = [
-            Balrog(200, 0, 80, 100)
+            Balrog(200, 0, 80, 100),
+            Ganon(300, 0, 80, 100)
         ]
 
         self.texts = [
@@ -89,16 +91,20 @@ class GameManager:
 
         for monster in self.enemies:
             monster.update()
-            if isinstance(monster, Mage):
+            if monster.TAG == "Mage":
                 monster.attack(self.projectiles, self.hero.rect.x)
-            if isinstance(monster, Flying):
+            if monster.TAG == "Flying":
                 monster.attack(self.projectiles)
+
 
         for projectile in self.projectiles:
             projectile.update()
 
         for boss in self.bosses:
             boss.update()
+            if boss.TAG =="Ganon":
+                boss.move(self.hero)
+                boss.attack(self.projectiles, self.hero.rect.x)
 
         self.Values[0] = type(self.hero).__name__  
         self.Values[1] = self.hero.life 
