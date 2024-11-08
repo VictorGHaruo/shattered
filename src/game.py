@@ -5,6 +5,7 @@ from ground import Ground, Block
 from enemy import Dummy
 from enemy import Mage
 from enemy import Flying
+from boss import Balrog
 from text import Text
 
 pygame.init()
@@ -37,10 +38,13 @@ class GameManager:
         ]
         
         self.enemies = [
-            Dummy(100, 0, 40, 50),
             Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50),
             Mage(200,0,40,50),
             Flying(200, 50, 40, 50)
+        ]
+
+        self.bosses = [
+            Balrog(200, 0, 80, 100)
         ]
 
         self.texts = [
@@ -66,8 +70,6 @@ class GameManager:
 
             key_map = pygame.key.get_pressed()
             self.hero.on_key_pressed(key_map)
-            # for monster in self.enemies:
-            #     monster.on_key_pressed(key_map)
             
             #TO CHANGE EVERY HERO DO SMT
             if type(self.hero) == Yokai:
@@ -91,14 +93,19 @@ class GameManager:
         self.camera.update_coods(self.hero, self.WIDTH)
         for ground in self.grounds:
             ground.update()
+
         for monster in self.enemies:
             monster.update()
             if isinstance(monster, Mage):
                 monster.attack(self.projectiles, self.hero.rect.x)
             if isinstance(monster, Flying):
                 monster.attack(self.projectiles)
+
         for projectile in self.projectiles:
             projectile.update()
+
+        for boss in self.bosses:
+            boss.update()
 
         self.Values[0] = type(self.hero).__name__  
         self.Values[1] = self.hero.life 
@@ -125,6 +132,14 @@ class GameManager:
                 if is_collision_projectile:
                     self.projectiles.remove(projectile)
 
+            for boss in self.bosses:
+                is_collision_boss = boss.rect.colliderect(ground)
+                if is_collision_boss:
+                    ground.on_collision(ground)
+                    boss.on_collision(ground)
+
+   
+
         for enemie in self.enemies:
             is_collision_hero = self.hero.rect.colliderect(enemie)
             if is_collision_hero:
@@ -144,6 +159,10 @@ class GameManager:
         for monster in self.enemies:
             if monster.life <= 0:
                 self.enemies.remove(monster)
+
+        for boss in self.bosses:
+            if boss.life <= 0:
+                self.bosses.remove(boss)
         
         for projectile in self.projectiles:
                 if not self.screen.get_rect().colliderect(projectile.rect):
@@ -165,6 +184,9 @@ class GameManager:
             
         for projectile in self.projectiles:
                 projectile.draw(self.screen)
+
+        for boss in self.bosses:
+            boss.draw(self.screen, self.camera)
 
                 
         pygame.display.flip()

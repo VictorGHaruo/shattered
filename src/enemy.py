@@ -13,11 +13,8 @@ class Monsters:
         self.speed_x = 0
         self.life = 50
 
-    def on_key_pressed(self, key_map):
-        if key_map[pygame.K_RIGHT]:
-            self.rect.x += 10
-        if key_map[pygame.K_LEFT]:
-            self.rect.x -= 10
+    def move(self):
+        pass
 
     def update(self):
         self.speed_y += self.gravity
@@ -41,13 +38,14 @@ class Monsters:
         if other.TAG == "Player": #Mata o monstro
             if self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.life = 0
-        if isinstance(other, Projectile):
+                
+        if other.TAG == "Projectile":
             if self.rect.left < other.rect.right and self.rect.right > other.rect.right: 
                 if not other.who == "Monster":             
-                    self.life -= 40
+                    self.life -= other.damage
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
                 if not other.who == "Monster":   
-                    self.life -= 40
+                    self.life -= other.damage
     
 
 class Dummy(Monsters):
@@ -69,7 +67,7 @@ class Mage(Monsters):
         self.width = width
         self.speed_x = 3
         self.color = (0,0, 255)
-        self.life = 40
+        self.life = 60
         self.projectile_cooldown = 0
         self.cool_down = 20      
     
@@ -81,10 +79,10 @@ class Mage(Monsters):
     def attack(self, projectiles, x_player):
         if self.projectile_cooldown <= 0:
             if x_player <= self.rect.x:
-                new_projectile = Projectile(self.rect.left, self.rect.y - self.width/2, - 20, 0, self.TAG)
+                new_projectile = Projectile(self.rect.left, self.rect.y - self.width/2, - 20, 0, self.TAG, damage= 20)
                 projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG)
+                new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG, damage= 20)
                 projectiles.append(new_projectile)
             self.projectile_cooldown = self.cool_down
 
@@ -111,9 +109,7 @@ class Flying(Monsters):
         if self.move_cooldown <= 0:
             
             self.randomic = random.random()
-            self.cool_down = random.randint(self.cool_down_min, self.cool_down_max)
-            print(self.randomic) 
-            print (self.cool_down)       
+            self.cool_down = random.randint(self.cool_down_min, self.cool_down_max)       
             self.move_cooldown = self.cool_down
         
         if self.randomic >= self.probability:
@@ -121,7 +117,6 @@ class Flying(Monsters):
 
         else:
             self.rect.x = self.rect.x - self.speed_x
-
 
     def update(self):
         self.move()
@@ -135,7 +130,7 @@ class Flying(Monsters):
     
     def attack(self, projectiles):
         if self.projectile_cooldown <= 0:
-            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 20, self.TAG)
+            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 20, self.TAG, damage= 20)
             projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cool_down

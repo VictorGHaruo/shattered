@@ -125,21 +125,20 @@ class Knight(Player):
 
     def actions(self, key_map, other):
 
-        if key_map[pygame.K_v] and self.on_ground:
+        if key_map[pygame.K_v]:
             if self.shield is None: 
-
-                shield_x = self.rect.x + (30 if self.from_the_front else -15)  
+                
+                shield_x = self.rect.right if self.from_the_front else self.rect.x - 15  
                 shield_y = self.rect.y
-                self.shield = Shield(shield_x, shield_y, 15, 70)  
-                self.speed_x_max = 0
-                self.speed_x_min = 0
-                self.speed_y_max = 0
+                self.shield = Shield(shield_x, shield_y, 15, 70)
+                if self.on_ground:
+                    self.speed_x_max = 0
+                    self.speed_x_min = 0
 
         else:
             self.shield = None
             self.speed_x_max = 10
             self.speed_x_min = -10
-            self.speed_y_max = 40
             
         if self.shield is not None:
             for projectile in other:
@@ -159,13 +158,13 @@ class Yokai(Player):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0:
             if key_map[pygame.K_UP]:  
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG, damage= 10)
                 projectiles.append(new_projectile)
             elif self.from_the_front: 
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG, damage= 10)
                 projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG, damage=10)
                 projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cooldown_time
