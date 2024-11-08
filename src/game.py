@@ -2,11 +2,8 @@ import pygame
 from player import Knight, Yokai, Ninja
 from camera import Camera
 from ground import Ground, Block
-from enemy import Dummy
-from enemy import Mage
-from enemy import Flying
-from boss import Balrog
-from boss import Ganon
+from enemy import Dummy, Mage, Flying
+from boss import Balrog, Ganon
 from text import Text
 
 pygame.init()
@@ -32,11 +29,12 @@ class GameManager:
         self.camera = Camera(0, 50)
     
         self.grounds = [
-            Ground(-20, self.HEIGHT - 30, 3*self.WIDTH, 500),
-            Ground(self.WIDTH // 2, self.HEIGHT // 2 + 100, 1000, self.HEIGHT // 2 - 130),
-            Ground(-10 , self.HEIGHT // 2, 100, self.HEIGHT // 2 - 130),
-            Block(0, self.HEIGHT - 80, 50, 50)
+            # Ground(-20, self.HEIGHT - 30, 3*self.WIDTH, 500),
+            # Ground(self.WIDTH // 2, self.HEIGHT // 2 + 100, 1000, self.HEIGHT // 2 - 130),
+            # Ground(-10 , self.HEIGHT // 2, 100, self.HEIGHT // 2 - 130),
+            # Block(0, self.HEIGHT - 80, 50, 50)
         ]
+        self.maping()
         
         self.enemies = [
             Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50),
@@ -154,7 +152,24 @@ class GameManager:
                     enemie.on_collision(projectile)        
                     self.projectiles.remove(projectile)
                     
-        
+    def maping(self):
+        grid = [
+            "                       XXXXXXX",
+            "                       X     X",
+            "                       X     X",
+            "                       X     X",
+            "                             X",
+            "      XXX      X             X",
+            "XXXXXXXXXXXX   X   XXXXXXXXXXX",
+            "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        ]
+        i_range = len(grid)
+        j_range = len(grid[0])
+        for i in range(i_range):
+            for j in range(j_range):
+                if grid[i][j] == "X":
+                    self.grounds.append(Ground(j*300, i*(self.HEIGHT / i_range), 300, 100))
+                
 
     def elimination(self):
         for monster in self.enemies:
@@ -220,6 +235,7 @@ class GameManager:
         to_left_actual = self.hero.to_left
         to_right_actual = self.hero.to_right
         trade_cooldonw_actual  = self.hero.trade_cooldown
+        from_the_front_actual = self.hero.from_the_front
             
         self.hero = self.heros[self.atual_hero]
         
@@ -233,6 +249,7 @@ class GameManager:
         self.hero.to_left = to_left_actual
         self.hero.to_right = to_right_actual
         self.hero.trade_cooldown = trade_cooldonw_actual
+        self.hero.from_the_front = from_the_front_actual
 
 if __name__ == "__main__":
     Game = GameManager()
