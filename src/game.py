@@ -72,14 +72,7 @@ class GameManager:
             self.hero.on_key_pressed(key_map)
             
             #TO CHANGE EVERY HERO DO SMT
-            if type(self.hero) == Yokai:
-                self.hero.actions(key_map, self.projectiles)
-
-            if type(self.hero) == Knight:
-                self.hero.actions(key_map, self.projectiles)
-
-            if type(self.hero) == Ninja:
-                self.hero.actions(key_map, self.enemies)
+            self.hero.actions(key_map)
                 
             self.update()
             self.collision_decetion()
@@ -122,6 +115,7 @@ class GameManager:
                 
             for enemie in self.enemies:
                 is_collision_monster = enemie.rect.colliderect(ground)
+                self.hero.on_collision(enemie)
 
                 if is_collision_monster:
                     enemie.on_collision(ground)
@@ -129,6 +123,7 @@ class GameManager:
 
             for projectile in self.projectiles:
                 is_collision_projectile = projectile.rect.colliderect(ground)
+                self.hero.on_collision(projectile)
                 if is_collision_projectile:
                     self.projectiles.remove(projectile)
 

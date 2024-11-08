@@ -18,22 +18,36 @@ class Projectile:
         pygame.draw.rect(screen, self.color, self.rect)
 
 class Shield:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, damage):
         self.TAG = "Shield"
-        self.rect = pygame.Rect(x, y, width, height) 
+        self.width = width
+        self.height = height
+        self.rect = pygame.Rect(x, y, self.width, self.height) 
+        self.damage = damage
+        self.test_color = (100, 100, 100)
     
     def reflect(self, user,other):
 
         if other.TAG == "Projectile" and self.rect.colliderect(other.rect):
             other.speed_x = -other.speed_x
             other.TAG = user
+            other.damage = other.damage * self.damage
+
+    def update(self, x, y):
+        self.rect  = pygame.Rect(x, y, self.width, self.height) 
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.test_color, self.rect)
+
 
 class Attack:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, damage):
         self.TAG = "Attack"
         self.rect = pygame.Rect(x, y, width, height)
+        self.test_color = (100, 100, 100)
+        self.damage = damage
 
-    def strike(self, damage, other):
-        if other.TAG == "Monster" and self.rect.colliderect(other.rect):
-            other.life =  other.life - damage
+    def draw(self,screen):
+        pygame.draw.rect(screen, self.test_color, self.rect)
+
                         

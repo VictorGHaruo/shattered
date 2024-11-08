@@ -46,7 +46,7 @@ class Monsters:
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
                 if not other.who == "Monster":   
                     self.life -= other.damage
-    
+
 
 class Dummy(Monsters):
     def __init__(self, x, y, width, height):

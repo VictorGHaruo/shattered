@@ -7,8 +7,8 @@ class Player:
     
     def __init__(self, x, y, width, height):
         self.TAG = "Player"
-        self.max_life = 0
-        self.life = 0 
+        self.max_life = 200
+        self.life = 200
         
         self.rect = pygame.Rect(x, y, width, height)
         self.rect.x = x
@@ -32,6 +32,8 @@ class Player:
         
         self.trade_cooldown_time = 60
         self.trade_cooldown = self.trade_cooldown_time
+        self.invincibility_time = 30
+        self.invincibility_cooldown = self.invincibility_time
         self.rect_color = (255, 0, 0)
         
     def draw(self, screen, camera):
@@ -61,8 +63,10 @@ class Player:
             self.speed_x = 0
         
         ##Updating trade_cooldonw
-        if self.trade_cooldown > 0:   
+        if self.trade_cooldown > 0 or self.invincibility_cooldown > 0 :
             self.trade_cooldown -= 1    
+            self.invincibility_cooldown -= 1
+
                 
     def on_event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -114,6 +118,9 @@ class Player:
             elif self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.rect.top = other.rect.bottom
                 self.speed_y = 0
+
+        if other.TAG == "Monster":
+
             
 class Knight(Player):
     
@@ -121,59 +128,111 @@ class Knight(Player):
         super().__init__(x, y, width, height)
         self.jump_count_max = 1
         self.rect_color = (255, 0, 0)
+        self.shield_width = 15
+        self.shield_height = 70
+        self.shield_x = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 50
+        self.shield_y = self.rect.y
+        self.shield_damage = 0,7
         self.shield = None  
 
-    def actions(self, key_map, other):
+
+
+    def actions(self, key_map):
 
         if key_map[pygame.K_v]:
             if self.shield is None: 
-                
-                shield_x = self.rect.right if self.from_the_front else self.rect.x - 15  
-                shield_y = self.rect.y
-                self.shield = Shield(shield_x, shield_y, 15, 70)
-                if self.on_ground:
-                    self.speed_x_max = 0
-                    self.speed_x_min = 0
+                self.shield = Shield(self.shield_x, self.shield_y, self.shield_width, self.shield_height, self.shield_damage)
 
+            if self.on_ground:
+                self.speed_x_max = 0
+                self.speed_x_min = 0
+                    
         else:
             self.shield = None
             self.speed_x_max = 10
             self.speed_x_min = -10
             
+
+    def on_collision(self, other):
+        super().on_collision(other)
+
         if self.shield is not None:
-            for projectile in other:
-                self.shield.reflect(self.TAG ,projectile)
+
+            self.shield.reflect(self.TAG ,other)
+
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+
+        if self.shield is not None:
+            self.shield.draw(screen)
+
         
+    def update(self):
+
+        super().update()
+
+        self.shield_x = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 50
+
+        self.shield_y = self.rect.y
+
+        if self.shield is not None:
+            self.shield.update(self.shield_x, self.shield_y)
+
 class Yokai(Player):
     
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
         self.jump_count_max = 2
         self.rect_color = (255, 255, 0)
+        self.damage = 20
         
         self.projectile_cooldown = 0
         self.cooldown_time = 20
+        self.projectiles = []
         
-    def actions(self, key_map, projectiles):
+    def actions(self, key_map):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0:
             if key_map[pygame.K_UP]:  
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG, damage= 10)
-                projectiles.append(new_projectile)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG, self.damage)
+                self.projectiles.append(new_projectile)
             elif self.from_the_front: 
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG, damage= 10)
-                projectiles.append(new_projectile)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG, self.damage)
+                self.projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG, damage=10)
-                projectiles.append(new_projectile)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG, self.damage)
+                self.projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cooldown_time
                 
     def update(self):
         super().update()
         
+        for projectile in self.projectiles:
+            projectile.update()
+
         if self.projectile_cooldown > 0:
-            self.projectile_cooldown -= 1       
+            self.projectile_cooldown -= 1
+
+    def on_collision(self, other):
+        super().on_collision(other)
+
+        for projectile in self.projectiles:
+                if other.TAG == "Monster" and projectile.rect.colliderect(other):
+                    other.life -= self.damage
+                    self.projectiles.remove(projectile)
+
+                    
+                if other.TAG == "Block" and projectile.rect.colliderect(other):
+                    self.projectiles.remove(projectile)
+
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+
+        for projectile in self.projectiles:
+            projectile.draw(screen)
+            if not screen.get_rect().colliderect(projectile.rect):
+                self.projectiles.remove(projectile)
                 
 class Ninja(Player):
     
@@ -181,22 +240,42 @@ class Ninja(Player):
         super().__init__(x, y, width, height)
         self.jump_count_max = 3
         self.rect_color = (255, 255, 255)
+        self.range = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 60
         self.attack_cooldown = 0
         self.cooldown_time = 20
+        self.damage = 100
+        self.attack = None
 
-    def actions(self, key_map, other):
+    def actions(self, key_map):
 
         if key_map[pygame.K_v] and self.attack_cooldown <= 0:
 
-            attack_x = self.rect.x + (50 if self.from_the_front else - 50)  
-            attack = Attack(attack_x, self.rect.y, 50, 15)
-            for monster in other:
-                attack.strike(100, monster)  
-
+            self.attack = Attack(self.range, self.rect.y, 25, 15, self.damage)
             self.attack_cooldown = self.cooldown_time
+
+        else:
+            self.attack = None
+
+    def on_collision(self, other):
+        super().on_collision(other)
+
+        if self.attack is not None:
+
+            if other.TAG == "Monster" and self.attack.rect.colliderect(other):
+                other.life -= self.damage
+
+
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+
+        if self.attack is not None:
+            self.attack.draw(screen)
+
 
     def update(self):
         super().update()
+
+        self.range = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 60
 
         if self.attack_cooldown > 0:
             self.attack_cooldown -= 1    
