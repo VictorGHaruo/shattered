@@ -6,6 +6,8 @@ from ground import Ground, Block
 from enemy import Dummy, Mage, Flying
 from boss import Balrog, Ganon
 from text import Text
+import os
+import sys
 
 pygame.init()
            
@@ -29,12 +31,7 @@ class GameManager:
         self.projectiles = []
         self.camera = Camera(0, 50)
     
-        self.grounds = [
-            # Ground(-20, self.HEIGHT - 30, 3*self.WIDTH, 500),
-            # Ground(self.WIDTH // 2, self.HEIGHT // 2 + 100, 1000, self.HEIGHT // 2 - 130),
-            # Ground(-10 , self.HEIGHT // 2, 100, self.HEIGHT // 2 - 130),
-            # Block(0, self.HEIGHT - 80, 50, 50)
-        ]
+        self.grounds = []
         self.maping()
         
         self.enemies = [
@@ -162,23 +159,41 @@ class GameManager:
                     enemie.on_collision(projectile)        
                     self.projectiles.remove(projectile)
                     
+
     def maping(self):
+        
         grid = [
-            "                       XXXXXXX",
-            "                       X     X",
-            "                       X     X",
-            "                       X     X",
-            "                             X",
-            "      XXX      X             X",
-            "XXXXXXXXXXXX   X   XXXXXXXXXXX",
-            "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "                                                             XXXXXXXXX",
+            "                                                             XXXXXXXXX",
+            "                                                             X       X",
+            "                                                             X       X",
+            "                                                             X       X",
+            "                                                             X       X",
+            "                                                             X       X",
+            "                                                             X       X",
+            "                                                             X       X",
+            "         XXXXXXX                                                     X",
+            "         X     X                                                     X",
+            "      XXX       XX                   XX                              X",
+            "      X          X                   XX                              X",
+            "XXXXXX            XXXXXXXXXXXXX   XXX  X   XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "                              X   X X  X   X                          ",
+            "                               XXX      XXX                           ",
         ]
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        imagem_chão = os.path.join(path_game, os.pardir, "assets", "piso_terra_crop.png")
+        imagem_chão = os.path.abspath(imagem_chão)
+        print(imagem_chão)
+        self.grounds_apend(grid, imagem_chão)
+        
+    def grounds_apend(self, grid, image_path):
+        
         i_range = len(grid)
         j_range = len(grid[0])
         for i in range(i_range):
             for j in range(j_range):
                 if grid[i][j] == "X":
-                    self.grounds.append(Ground(j*300, i*(self.HEIGHT / i_range), 300, 100))
+                    self.grounds.append(Ground(j*150, i*50, 150, 50, image_path))
                 
 
     def elimination(self):

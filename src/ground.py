@@ -2,9 +2,11 @@ import pygame
 
 class Ground:
     
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, image_path):
         self.TAG = "Ground"
-        self.rect = pygame.Rect(x, y, width, height) 
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         
@@ -16,7 +18,7 @@ class Ground:
     def draw(self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            pygame.draw.rect(screen, self.rect_color, self.rect)
+            screen.blit(self.image, self.rect)
 
     def update(self):
         pass
