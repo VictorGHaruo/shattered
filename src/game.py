@@ -286,12 +286,38 @@ class GameManager:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:  
+                        self.reset()
                         waiting = False
-                        self.__init__()
                         self.run()
                     elif event.key == pygame.K_q:  
                         pygame.quit()
                         sys.exit()
+
+    def reset(self):
+
+        self.hero = self.heros[self.atual_hero]  
+        self.hero.life = 200  
+        self.hero.rect.x = self.WIDTH // 2  
+        self.hero.rect.y = self.HEIGHT // 2  
+        self.hero.speed_x = 0  
+        self.hero.speed_y = 0  
+        self.hero.jump_count = 0  
+        self.hero.is_running = False  
+        self.hero.on_ground = True  
+        
+        self.projectiles = []
+        self.camera = Camera(0, 50)
+        
+        self.enemies = [
+            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50),
+            Mage(200,0,40,50),
+            Flying(200, 50, 40, 50)
+        ]
+
+        self.bosses = [
+            Balrog(200, 0, 80, 100),
+            Ganon(300, 0, 80, 100)
+        ]
 
 if __name__ == "__main__":
     Game = GameManager()
