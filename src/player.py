@@ -29,7 +29,6 @@ class Player:
         self.on_ground = False
         self.from_the_front = True
         
-        
         self.trade_cooldown_time = 60
         self.trade_cooldown = self.trade_cooldown_time
         self.invincibility_time = 30
