@@ -4,7 +4,7 @@ from player import Knight, Yokai, Ninja
 from camera import Camera
 from ground import Ground, Block
 from enemy import Dummy, Mage, Flying
-from boss import Balrog, Ganon
+from boss import Balrog, Ganon, Demagorgon
 from text import Text
 import os
 import sys
@@ -29,14 +29,15 @@ class GameManager:
         self.maping()
         
         self.enemies = [
-            # Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50, self.hero),
+            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50, self.hero),
             Mage(200,0,40,50,self.hero),
-            # Flying(200, 50, 40, 50,self.hero)
+            Flying(200, 50, 40, 50,self.hero)
         ]
 
         self.bosses = [
             Balrog(200, 0, 80, 100, self.hero),
-            Ganon(300, 0, 80, 100, self.hero)
+            Ganon(300, 0, 80, 100, self.hero),
+            Demagorgon(400, 0, 80, 100, self.hero)
         ]
 
         self.texts = [
@@ -63,15 +64,14 @@ class GameManager:
 
         for monster in self.enemies:
             monster.update()
+            monster.new_hero(self.hero)
 
         for projectile in self.projectiles:
             projectile.update()
 
         for boss in self.bosses:
             boss.update()
-            # if boss.TAG =="Ganon":
-            #     boss.move(self.hero)
-            #     boss.attack(self.projectiles, self.hero.rect.x)
+            boss.new_hero(self.hero)
 
         self.Values[0] = type(self.hero).__name__  
         self.Values[1] = self.hero.life 

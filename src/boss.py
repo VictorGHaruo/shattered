@@ -1,5 +1,6 @@
 import pygame
 from weapon import Projectile
+from weapon import Attack
 import random
 import math
 
@@ -15,6 +16,10 @@ class Bosses:
         self.life = 50
         self.hero = hero
         self.projectiles = []
+        self.screen_width = pygame.display.Info().current_w
+
+    def new_hero(self, hero):
+        self.hero = hero
 
     def move(self):
         pass
@@ -69,13 +74,45 @@ class Balrog(Bosses):
 
         self.projectile_cooldown = 0
 
-        self.cooldown_atk = 40
+        self.atk_cooldown = 100
+        self.atk_cooldowns = 100
+        
+        self.atk_time = 110
+        self.atk_counter = self.atk_time
+        self.damage_timer = 0
+        self.atk_when = 30
+        self.probability_atk = 0
+        self.warning_sign = 20
 
+
+        self.number_bars = 5
+        self.weapon_damage = 100
+
+        self.attacks = []
+        self.all_atks = []
+        
+        for atks in range(self.number_bars):
+            self.all_atks.append(Attack(self.screen_width/self.number_bars * atks, 10 + atks, self.screen_width / self.number_bars, 200, self.weapon_damage))
 
         self.color = (255, 192, 203)
 
+    def attack(self):
+        if self.atk_cooldown == self.warning_sign:
+            self.probability_atk = random.randint(0, len(self.all_atks) - 1)
+            self.rect.x = self.screen_width/self.number_bars * self.probability_atk + self.screen_width/(2*self.number_bars)
+
+        if self.atk_cooldown <= 0:
+            for atks in range(len(self.all_atks)):
+                if atks != self.probability_atk:
+                    self.attacks.append(self.all_atks[atks])
+                    self.atk_cooldown = self.atk_cooldowns
+        if self.atk_cooldown < self.atk_time - self.atk_when and len(self.attacks) != 0:
+
+            self.attacks.clear()
+
+
     def move(self):
-        
+
         if self.move_cooldown <= 0 :
             
             self.randomic = random.random()
@@ -89,23 +126,38 @@ class Balrog(Bosses):
             self.rect.x = self.rect.x - self.speed_x
 
     def draw(self, screen, camera):
+        if len(self.attacks) != 0:
+            for atks in self.attacks:
+                atks.draw(screen)
+
+
         return super().draw(screen, camera)
+
+    def on_collision(self, other: pygame.Rect):
+        for atks in self.attacks:
+            if other.TAG == "Player":
+                if atks.rect.colliderect(other) and self.damage_timer == 0:
+                    other.life -= atks.damage
+                    self.damage_timer = self.atk_cooldowns
+        return super().on_collision(other)
 
     def update(self):
         self.move()
+        self.attack()
+
+        if self.damage_timer > 0:
+            self.damage_timer -=1
+
         if self.move_cooldown > 0:
             self.move_cooldown -= 1
+        
+        if self.atk_cooldown > 0:
+            self.atk_cooldown -= 1
 
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
 
         return super().update()
-    
-    def attack(self, x, y, width, height, screen):
-        self.atk = pygame.Rect(x, y, width, height)
-        self.color_atk = (0, 0, 255)  
-        pygame.draw.rect(screen, self.color, self.rect) 
-
 
 class Ganon(Bosses):
     def __init__(self, x, y, width, height, hero):
@@ -142,16 +194,15 @@ class Ganon(Bosses):
         return super().draw(screen, camera)
 
     def on_collision(self, other: pygame.Rect):
-
         return super().on_collision(other)
 
     def attack(self):
         if self.projectile_cooldown <= 0:
             if self.hero.rect.x <= self.rect.x:
-                new_projectile = Projectile(self.rect.left, self.rect.y - self.width/2, - 20, 0, self.TAG, damage= 20)
+                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, damage= 20)
                 self.projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG, damage= 20)
+                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, damage= 20)
                 self.projectiles.append(new_projectile)
             self.projectile_cooldown = self.cool_down
 
@@ -163,13 +214,72 @@ class Ganon(Bosses):
         return distance
 
     def move(self):
-
         if self.distance(self.hero) <= 110:
             if self.hero.rect.centerx - self.rect.centerx < 0:
-                print (self.hero.rect.centerx - self.rect.centerx)
-                self.rect.x = 0.9 * self.width
-                self.rect.y = 0
+                self.rect.x = 0.1 * self.screen_width
+                self.rect.y = 0 #retirar dps
             elif self.hero.rect.centerx - self.rect.centerx > 0:
-                self.rect.x = 0.1 * self.width
-                self.rect.y = 0
+                self.rect.x = 0.9 * self.screen_width
+                self.rect.y = 0 #retirar dps
         
+class Demagorgon(Bosses):
+    def __init__(self, x, y, width, height, hero):
+        super().__init__(x, y, width, height, hero)
+        self.color = (255, 255, 0)
+        self.speed_x = 3
+        self.attacks = None
+        self.atk_cooldown = 100
+        self.atk_timer = self.atk_cooldown
+        self.weapon_width = 400
+        self.weapon_height = 20
+        self.weapon_damage = 100
+        self.damage_timer = 0
+
+        self.atk_long = 50
+
+
+    def attack(self):
+        if self.atk_timer <= 0:
+            if self.rect.x - self.hero.rect.x <= 0:
+                self.attacks = Attack(self.rect.right, self.rect.centery, self.weapon_width, self.weapon_height, self.weapon_damage)
+                self.atk_timer = self.atk_cooldown
+            if self.rect.x - self.hero.rect.x > 0:
+                self.attacks = Attack(self.rect.left - self.weapon_width, self.rect.centery, self.weapon_width, self.weapon_height, self.weapon_damage)
+                self.atk_timer = self.atk_cooldown
+        if self.atk_timer < self.atk_cooldown - self.atk_long and self.attacks != None:
+            self.attacks = None
+
+    def on_collision(self, other: pygame.Rect):
+        if other.TAG == "Player":
+            if self.attacks != None:
+                if self.attacks.rect.colliderect(other) and self.damage_timer == 0:
+                        print(self.attacks.damage)
+                        other.life -= self.attacks.damage
+                        self.damage_timer = self.atk_timer
+        return super().on_collision(other)
+
+    def draw(self, screen, camera):
+        if self.attacks != None:
+            self.attacks.draw(screen)
+        return super().draw(screen, camera)
+    
+    def move(self):
+        if self.atk_timer > self.atk_cooldown - self.atk_long:
+            if self.rect.x - self.hero.rect.x <= 0:
+                if self.rect.colliderect(self.hero) == False:
+                    self.rect.x = self.rect.x + self.speed_x
+            elif self.rect.x - self.hero.rect.x > 0:
+                if self.rect.colliderect(self.hero) == False:
+                    self.rect.x = self.rect.x - self.speed_x
+        return super().move()
+    
+    def update(self):
+        self.move()
+        self.attack()
+        if self.atk_timer > 0:
+            self.atk_timer -= 1
+        
+        if self.damage_timer > 0:
+            self.damage_timer -=1
+
+        return super().update()
