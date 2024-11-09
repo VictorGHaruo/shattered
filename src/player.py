@@ -7,8 +7,8 @@ class Player:
     
     def __init__(self, x, y, width, height):
         self.TAG = "Player"
-        self.max_life = 200
-        self.life = 200
+        self.max_life = 2000
+        self.life = self.max_life
         
         self.rect = pygame.Rect(x, y, width, height)
         self.rect.x = x
@@ -170,8 +170,6 @@ class Knight(Player):
         self.shield_damage = 0.7
         self.shield = None  
 
-
-
     def actions(self, key_map):
 
         if key_map[pygame.K_v]:
@@ -181,11 +179,13 @@ class Knight(Player):
             if self.on_ground:
                 self.speed_x_max = 0
                 self.speed_x_min = 0
+                self.speed_y_max = 0
                     
         else:
             self.shield = None
             self.speed_x_max = 10
             self.speed_x_min = -10
+            self.speed_y_max = 40
             
 
     def on_collision(self, other):
