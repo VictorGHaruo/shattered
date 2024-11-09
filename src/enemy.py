@@ -52,7 +52,7 @@ class Dummy(Monsters):
 
     def on_collision(self, other):
         super().on_collision(other)
-        if other.TAG == "Ground":
+        if other.TAG == "Ground" and self.rect.colliderect(other):
             if self.rect.left < other.rect.right and self.rect.right > other.rect.right:
                 self.speed_x *= -1
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:

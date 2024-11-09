@@ -4,7 +4,7 @@ import random
 import math
 
 class Bosses:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, hero):
         self.TAG = "Boss"
         self.rect = pygame.Rect(x, y, width, height)
         self.color = (255, 0, 0)
@@ -13,6 +13,8 @@ class Bosses:
         self.speed_y_max = 40
         self.speed_x = 0
         self.life = 50
+        self.hero = hero
+        self.projectiles = []
 
     def move(self):
         pass
@@ -20,6 +22,9 @@ class Bosses:
     def update(self):
         self.speed_y += self.gravity
         self.rect.y += min(self.speed_y, self.speed_y_max)
+
+        for projectile in self.projectiles:
+            projectile.update()
         
     def draw (self, screen, camera):
         if camera.TAG == "Camera":
@@ -28,25 +33,28 @@ class Bosses:
 
     def on_collision(self, other : pygame.Rect):  
 
-        if other.TAG == "Ground":
-            if self.rect.left < other.rect.right and self.rect.right > other.rect.right:
-                self.speed_x *= -1
-            if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
-                self.speed_x *= -1
-            if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
-                    self.rect.bottom = other.rect.top
+        if other.TAG == "Ground" and self.rect.colliderect(other) and self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
+                self.rect.bottom = other.rect.top
 
-        if isinstance(other, Projectile):
+        if other.TAG == "Monster" :
             if self.rect.left < other.rect.right and self.rect.right > other.rect.right: 
                 if not other.who == "Monster":             
                     self.life -= other.damage
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
                 if not other.who == "Monster":   
                     self.life -= other.damage
+        for projectile in self.projectiles:
+            if other.TAG == "Ground":
+                if projectile.rect.colliderect(other):
+                    self.projectiles.remove(projectile)
+            if other.TAG == "Player":
+                if projectile.rect.colliderect(other):
+                    other.life -= projectile.damage
+                    self.projectiles.remove(projectile)
 
 class Balrog(Bosses):
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, hero):
+        super().__init__(x, y, width, height, hero)
         self.speed_x = 3
         self.gravity = 0
 
@@ -80,6 +88,9 @@ class Balrog(Bosses):
         else:
             self.rect.x = self.rect.x - self.speed_x
 
+    def draw(self, screen, camera):
+        return super().draw(screen, camera)
+
     def update(self):
         self.move()
         if self.move_cooldown > 0:
@@ -97,8 +108,8 @@ class Balrog(Bosses):
 
 
 class Ganon(Bosses):
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, hero):
+        super().__init__(x, y, width, height, hero)
         self.TAG = "Ganon"
         self.width = width
         self.speed_x = 3
@@ -116,16 +127,32 @@ class Ganon(Bosses):
 
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
-        return super().update()
 
-    def attack(self, projectiles, x_player):
+        for projectile in self.projectiles:
+            projectile.update()
+        
+        self.attack()
+        self.move()
+        return super().update()
+    
+    def draw(self, screen, camera):
+        for projectile in self.projectiles:
+            projectile.draw(screen)
+
+        return super().draw(screen, camera)
+
+    def on_collision(self, other: pygame.Rect):
+
+        return super().on_collision(other)
+
+    def attack(self):
         if self.projectile_cooldown <= 0:
-            if x_player <= self.rect.x:
+            if self.hero.rect.x <= self.rect.x:
                 new_projectile = Projectile(self.rect.left, self.rect.y - self.width/2, - 20, 0, self.TAG, damage= 20)
-                projectiles.append(new_projectile)
+                self.projectiles.append(new_projectile)
             else:
                 new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG, damage= 20)
-                projectiles.append(new_projectile)
+                self.projectiles.append(new_projectile)
             self.projectile_cooldown = self.cool_down
 
     def distance(self, other):
@@ -134,16 +161,15 @@ class Ganon(Bosses):
 
         distance = math.sqrt(math.pow(delta_x, 2) + math.pow(delta_y, 2))
         return distance
-    
 
-    def move(self, player):
+    def move(self):
 
-        if self.distance(player) <= 110:
-            if player.rect.centerx - self.rect.centerx < 0:
-                print (player.rect.centerx - self.rect.centerx)
-                self.rect.x = 100
+        if self.distance(self.hero) <= 110:
+            if self.hero.rect.centerx - self.rect.centerx < 0:
+                print (self.hero.rect.centerx - self.rect.centerx)
+                self.rect.x = 0.9 * self.width
                 self.rect.y = 0
-            elif player.rect.centerx - self.rect.centerx > 0:
-                self.rect.x = 1200
+            elif self.hero.rect.centerx - self.rect.centerx > 0:
+                self.rect.x = 0.1 * self.width
                 self.rect.y = 0
         
