@@ -34,13 +34,22 @@ class Player:
         self.trade_cooldown = self.trade_cooldown_time
         self.invincibility_time = 30
         self.collision_damage = 50
+        self.damage = 0
         self.invincibility_cooldown = self.invincibility_time
+        self.projectiles = []
+        self.projectile_cooldown = 0
+        self.cooldown_time = 20
         self.rect_color = (255, 0, 0)
         
     def draw(self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
             pygame.draw.rect(screen, self.rect_color, self.rect)
+
+        for projectile in self.projectiles:
+            projectile.draw(screen)
+            if not screen.get_rect().colliderect(projectile.rect):
+                self.projectiles.remove(projectile)
         
     def update(self):
         ##Updating Y:
@@ -67,6 +76,12 @@ class Player:
         if self.trade_cooldown > 0 or self.invincibility_cooldown > 0 :
             self.trade_cooldown -= 1    
             self.invincibility_cooldown -= 1
+
+        for projectile in self.projectiles:
+            projectile.update()
+
+        if self.projectile_cooldown > 0:
+            self.projectile_cooldown -= 1
 
                 
     def on_event(self, event: pygame.event.Event):
@@ -126,11 +141,20 @@ class Player:
                 self.life -= self.collision_damage
                 self.invincibility_cooldown = self.invincibility_time
 
-        if other.TAG == "Projectile":
+            for projectile in other.projectiles:
 
-            if self.rect.colliderect(other) and self.invincibility_cooldown <= 0:
-                self.life -= other.damage
-                self.invincibility_cooldown = self.invincibility_time
+                if self.rect.colliderect(projectile) and self.invincibility_cooldown <= 0:
+                    self.life -= projectile.damage
+                    self.invincibility_cooldown = self.invincibility_time
+
+        for projectile in self.projectiles:
+                if other.TAG == "Monster" and projectile.rect.colliderect(other):
+                    other.life -= self.damage
+                    self.projectiles.remove(projectile)
+
+                    
+                if other.TAG == "Block" and projectile.rect.colliderect(other):
+                    self.projectiles.remove(projectile)
 
             
 class Knight(Player):
@@ -143,7 +167,7 @@ class Knight(Player):
         self.shield_height = 70
         self.shield_x = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 50
         self.shield_y = self.rect.y
-        self.shield_damage = 0,7
+        self.shield_damage = 0.7
         self.shield = None  
 
 
@@ -165,11 +189,14 @@ class Knight(Player):
             
 
     def on_collision(self, other):
+
         super().on_collision(other)
 
         if self.shield is not None:
-
-            self.shield.reflect(self.TAG ,other)
+            if other.TAG == "Monster":
+                for projectile in other.projectiles:
+                    self.damage = self.shield.damage * projectile.damage
+                    self.shield.reflect(self.TAG, projectile, self.projectiles, other.projectiles)
 
     def draw(self, screen, camera):
         super().draw(screen, camera)
@@ -197,10 +224,6 @@ class Yokai(Player):
         self.rect_color = (255, 255, 0)
         self.damage = 20
         
-        self.projectile_cooldown = 0
-        self.cooldown_time = 20
-        self.projectiles = []
-        
     def actions(self, key_map):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0:
@@ -216,34 +239,6 @@ class Yokai(Player):
 
             self.projectile_cooldown = self.cooldown_time
                 
-    def update(self):
-        super().update()
-        
-        for projectile in self.projectiles:
-            projectile.update()
-
-        if self.projectile_cooldown > 0:
-            self.projectile_cooldown -= 1
-
-    def on_collision(self, other):
-        super().on_collision(other)
-
-        for projectile in self.projectiles:
-                if other.TAG == "Monster" and projectile.rect.colliderect(other):
-                    other.life -= self.damage
-                    self.projectiles.remove(projectile)
-
-                    
-                if other.TAG == "Block" and projectile.rect.colliderect(other):
-                    self.projectiles.remove(projectile)
-
-    def draw(self, screen, camera):
-        super().draw(screen, camera)
-
-        for projectile in self.projectiles:
-            projectile.draw(screen)
-            if not screen.get_rect().colliderect(projectile.rect):
-                self.projectiles.remove(projectile)
                 
 class Ninja(Player):
     

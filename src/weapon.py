@@ -26,12 +26,14 @@ class Shield:
         self.damage = damage
         self.test_color = (100, 100, 100)
     
-    def reflect(self, user,other):
+    def reflect(self, user,other, list1, list2):
 
         if other.TAG == "Projectile" and self.rect.colliderect(other.rect):
             other.speed_x = -other.speed_x
-            other.TAG = user
+            other.who = user
             other.damage = other.damage * self.damage
+            list1.append(other)
+            list2.remove(other)
 
     def update(self, x, y):
         self.rect  = pygame.Rect(x, y, self.width, self.height) 
