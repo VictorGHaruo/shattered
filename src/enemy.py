@@ -3,7 +3,7 @@ from weapon import Projectile
 import random
 
 class Monsters:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, hero):
         self.TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
         self.color = (255, 0, 0)
@@ -12,6 +12,8 @@ class Monsters:
         self.speed_y_max = 40
         self.speed_x = 0
         self.life = 50
+        self.hero = hero
+        self.projectiles = []   
 
     def move(self):
         pass
@@ -27,31 +29,34 @@ class Monsters:
 
     def on_collision(self, other : pygame.Rect):  
 
+        if other.TAG == "Ground" and self.rect.colliderect(other) and self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
+                self.rect.bottom = other.rect.top
+                
+        if other.TAG == "Projectile":
+            if self.rect.colliderect(other):       
+                    self.life -= other.damage
+        
+        for projectile in self.projectiles:
+            if other.TAG == "Ground":
+                if projectile.rect.colliderect(other):
+                    self.projectiles.remove(projectile)
+            if other.TAG == "Player":
+                if projectile.rect.colliderect(other):
+                    other.life -= projectile.damage
+                    self.projectiles.remove(projectile)
+
+class Dummy(Monsters):
+    def __init__(self, x, y, width, height, hero):
+        super().__init__(x, y, width, height, hero)
+        self.speed_x = 3
+
+    def on_collision(self, other):
+        super().on_collision(other)
         if other.TAG == "Ground":
             if self.rect.left < other.rect.right and self.rect.right > other.rect.right:
                 self.speed_x *= -1
             if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
                 self.speed_x *= -1
-            if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
-                    self.rect.bottom = other.rect.top
-
-        if other.TAG == "Player": #Mata o monstro
-            if self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
-                self.life = 0
-                
-        if other.TAG == "Projectile":
-            if self.rect.left < other.rect.right and self.rect.right > other.rect.right: 
-                if not other.who == "Monster":             
-                    self.life -= other.damage
-            if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
-                if not other.who == "Monster":   
-                    self.life -= other.damage
-
-
-class Dummy(Monsters):
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
-        self.speed_x = 3
 
     def update(self):
         self.move()
@@ -62,33 +67,47 @@ class Dummy(Monsters):
     
 
 class Mage(Monsters):
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, hero):
+        super().__init__(x, y, width, height, hero)
         self.width = width
         self.speed_x = 3
         self.color = (0,0, 255)
         self.life = 60
         self.projectile_cooldown = 0
-        self.cool_down = 20      
+        self.cool_down = 20   
     
     def update(self):
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
+
+        for projectile in self.projectiles:
+            projectile.update()
+
+        self.attack()
         return super().update()
     
-    def attack(self, projectiles, x_player):
+    def on_collision(self, other: pygame.Rect):
+        return super().on_collision(other)
+    
+    
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+        for projectile in self.projectiles:
+            projectile.draw(screen)
+    
+    def attack(self):
         if self.projectile_cooldown <= 0:
-            if x_player <= self.rect.x:
-                new_projectile = Projectile(self.rect.left, self.rect.y - self.width/2, - 20, 0, self.TAG, damage= 20)
-                projectiles.append(new_projectile)
+            if self.hero.rect.x <= self.rect.x:
+                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, damage= 20)
+                self.projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.right, self.rect.y - self.width/2, 20, 0, self.TAG, damage= 20)
-                projectiles.append(new_projectile)
+                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, damage= 20)
+                self.projectiles.append(new_projectile)
             self.projectile_cooldown = self.cool_down
 
 class Flying(Monsters):
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, hero):
+        super().__init__(x, y, width, height, hero)
         self.speed_x = 3
         self.gravity = 0
 
@@ -118,19 +137,30 @@ class Flying(Monsters):
         else:
             self.rect.x = self.rect.x - self.speed_x
 
+    def on_collision(self, other):
+        super().on_collision(other)
+
     def update(self):
-        self.move()
+        super().update()
         if self.move_cooldown > 0:
             self.move_cooldown -= 1
 
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
 
-        return super().update()
+        for projectile in self.projectiles:
+            projectile.update()
+        self.move()
+        self.attack()
     
-    def attack(self, projectiles):
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+        for projectile in self.projectiles:
+            projectile.draw(screen)
+    
+    def attack(self):
         if self.projectile_cooldown <= 0:
-            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 20, self.TAG, damage= 20)
-            projectiles.append(new_projectile)
+            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 30, self.TAG, damage= 20)
+            self.projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cool_down

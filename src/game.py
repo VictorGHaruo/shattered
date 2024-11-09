@@ -35,14 +35,14 @@ class GameManager:
         self.maping()
         
         self.enemies = [
-            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50),
-            Mage(200,0,40,50),
-            Flying(200, 50, 40, 50)
+            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50, self.hero),
+            Mage(200,0,40,50,self.hero),
+            Flying(200, 50, 40, 50,self.hero)
         ]
 
         self.bosses = [
-            Balrog(200, 0, 80, 100),
-            Ganon(300, 0, 80, 100)
+            # Balrog(200, 0, 80, 100),
+            # Ganon(300, 0, 80, 100)
         ]
 
         self.texts = [
@@ -96,11 +96,6 @@ class GameManager:
 
         for monster in self.enemies:
             monster.update()
-            if monster.TAG == "Mage":
-                monster.attack(self.projectiles, self.hero.rect.x)
-            if monster.TAG == "Flying":
-                monster.attack(self.projectiles)
-
 
         for projectile in self.projectiles:
             projectile.update()
@@ -125,40 +120,16 @@ class GameManager:
                 ground.on_collision(self.hero) 
                 
             for enemie in self.enemies:
-                is_collision_monster = enemie.rect.colliderect(ground)
                 self.hero.on_collision(enemie)
-
-                if is_collision_monster:
-                    enemie.on_collision(ground)
-                    ground.on_collision(enemie) 
-
-            for projectile in self.projectiles:
-                is_collision_projectile = projectile.rect.colliderect(ground)
-                self.hero.on_collision(projectile)
-                if is_collision_projectile:
-                    self.projectiles.remove(projectile)
+                enemie.on_collision(self.hero)
+                enemie.on_collision(ground)
+                ground.on_collision(enemie)
 
             for boss in self.bosses:
                 is_collision_boss = boss.rect.colliderect(ground)
                 if is_collision_boss:
                     ground.on_collision(ground)
                     boss.on_collision(ground)
-
-   
-
-        for enemie in self.enemies:
-            is_collision_hero = self.hero.rect.colliderect(enemie)
-            if is_collision_hero:
-                self.hero.on_collision(enemie)
-                enemie.on_collision(self.hero)
-            
-            for projectile in self.projectiles:
-                is_collision_p_m = projectile.rect.colliderect(enemie)
-                
-                if is_collision_p_m:
-                    enemie.on_collision(projectile)        
-                    self.projectiles.remove(projectile)
-                    
 
     def maping(self):
         
