@@ -13,17 +13,12 @@ pygame.init()
            
 class GameManager:
 
-    def __init__(self):
-        self.WIDTH = 1400
-        self.HEIGHT = 800
-        screen_size = (self.WIDTH, self.HEIGHT)
-        self.screen = pygame.display.set_mode(screen_size)
-        self.screen.fill([0, 0, 0])
-        
+    def __init__(self, main):
+        main.screen.fill([0, 0, 0])
         self.heros = [
-            Knight(self.WIDTH // 2, self.HEIGHT // 2, 40, 50),
-            Yokai(self.WIDTH // 2, self.HEIGHT // 2, 40, 50),
-            Ninja(self.WIDTH // 2, self.HEIGHT // 2, 40, 50)
+            Knight(main.WIDTH // 2, main.HEIGHT // 2, 40, 50),
+            Yokai(main.WIDTH // 2, main.HEIGHT // 2, 40, 50),
+            Ninja(main.WIDTH // 2, main.HEIGHT // 2, 40, 50)
         ]
         self.atual_hero = 0
         self.hero = self.heros[self.atual_hero]
@@ -46,51 +41,24 @@ class GameManager:
         ]
 
         self.texts = [
-        Text('Hero', type(self.hero).__name__, self.screen, 0, 0, pygame.font.SysFont("Times New Roman", 22)),
-        Text('Life', self.hero.life, self.screen, 0, 20, pygame.font.SysFont("Times New Roman", 22))
+        Text('Hero', type(self.hero).__name__, main.screen, 0, 0, pygame.font.SysFont("Times New Roman", 22)),
+        Text('Life', self.hero.life, main.screen, 0, 20, pygame.font.SysFont("Times New Roman", 22))
         ]
 
         self.Values = [type(self.hero).__name__, self.hero.life]
-
-        
-    def run(self):
-
-        clock = pygame.time.Clock()
-        is_running = True
-        game_over = False
-
-        is_running = True
-        while is_running:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    is_running = False
-                self.trade(event)
-                self.hero.on_event(event)
             
-            if not game_over:
-                key_map = pygame.key.get_pressed()
-                self.hero.on_key_pressed(key_map)
-                self.hero.actions(key_map)
-                
-                self.update()
-                self.collision_decetion()
-                self.elimination()
-                self.draw()
-
-                if self.hero.life <= 0 or self.hero.rect.y > 1400:  
-                    game_over = True
-                    self.gameover() 
-            else:
-                self.gameover()  
-                
-            clock.tick(30)
+    def on_event(self, event):
+        self.trade(event)
+        self.hero.on_event(event)
         
-        pygame.quit()
+    def on_key_pressed(self):
+        key_map = pygame.key.get_pressed()
+        self.hero.on_key_pressed(key_map)
+        self.hero.actions(key_map)
             
-    def update(self):
+    def update(self, WIDTH):
         self.hero.update()
-        self.camera.update_coods(self.hero, self.WIDTH)
+        self.camera.update_coods(self.hero, WIDTH)
         for ground in self.grounds:
             ground.update()
 
@@ -178,27 +146,28 @@ class GameManager:
         
         for projectile in self.projectiles:
                 if not self.screen.get_rect().colliderect(projectile.rect):
-                    self.projectiles.remove(projectile)
+                    self.projectiles.remove(projectile) 
+        
                 
-    def draw(self):
-        self.screen.fill([0,0,0])
-        self.hero.draw(self.screen, self.camera)
+    def draw(self, screen):
+        screen.fill([0,0,0])
+        self.hero.draw(screen, self.camera)
 
         for text in self.texts:  
             text.draw()  
 
             
         for ground in self.grounds:
-            ground.draw(self.screen, self.camera)
+            ground.draw(screen, self.camera)
         
         for monster in self.enemies:
-            monster.draw(self.screen, self.camera)
+            monster.draw(screen, self.camera)
             
         for projectile in self.projectiles:
-                projectile.draw(self.screen)
+                projectile.draw(screen)
 
         for boss in self.bosses:
-            boss.draw(self.screen, self.camera)
+            boss.draw(screen, self.camera)
 
                 
         pygame.display.flip()
