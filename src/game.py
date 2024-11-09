@@ -143,7 +143,7 @@ class GameManager:
         for boss in self.bosses:
             if boss.life <= 0:
                 self.bosses.remove(boss)
-        
+
         for projectile in self.projectiles:
                 if not self.screen.get_rect().colliderect(projectile.rect):
                     self.projectiles.remove(projectile) 
@@ -192,6 +192,7 @@ class GameManager:
     def change(self):
         x_atual = self.hero.rect.x
         y_atual = self.hero.rect.y
+        hero_life = self.hero.life
         speed_y_actual = self.hero.speed_y    
         speed_x_actual = self.hero.speed_x
         jump_count_actual = self.hero.jump_count
@@ -206,6 +207,7 @@ class GameManager:
         
         self.hero.rect.x = x_atual 
         self.hero.rect.y = y_atual
+        self.hero.life = hero_life
         self.hero.speed_y = speed_y_actual 
         self.hero.speed_x = speed_x_actual
         self.hero.jump_count = jump_count_actual
@@ -250,8 +252,9 @@ class GameManager:
 
     def reset(self):
 
-        self.hero = self.heros[self.atual_hero]  
-        self.hero.life = 200  
+        self.hero = self.heros[0]  
+        self.camera = Camera(0, 50)
+        self.hero.life = self.hero.max_life 
         self.hero.rect.x = self.WIDTH // 2  
         self.hero.rect.y = self.HEIGHT // 2  
         self.hero.speed_x = 0  
@@ -259,9 +262,9 @@ class GameManager:
         self.hero.jump_count = 0  
         self.hero.is_running = False  
         self.hero.on_ground = True  
-        
-        self.projectiles = []
-        self.camera = Camera(0, 50)
+
+        self.grounds = []
+        self.maping()
         
         self.enemies = [
             Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50, self.hero),
@@ -270,8 +273,8 @@ class GameManager:
         ]
 
         self.bosses = [
-            Balrog(200, 0, 80, 100),
-            Ganon(300, 0, 80, 100)
+            Balrog(200, 0, 80, 100, self.hero),
+            Ganon(300, 0, 80, 100, self.hero)
         ]
 
 if __name__ == "__main__":

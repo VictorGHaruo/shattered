@@ -5,7 +5,7 @@ import math
 
 class Bosses:
     def __init__(self, x, y, width, height, hero):
-        self.TAG = "Boss"
+        self.TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
         self.color = (255, 0, 0)
         self.gravity = 2
@@ -110,7 +110,7 @@ class Balrog(Bosses):
 class Ganon(Bosses):
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
-        self.TAG = "Ganon"
+        self.sub_TAG = "Ganon"
         self.width = width
         self.speed_x = 3
 
