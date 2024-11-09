@@ -14,7 +14,6 @@ pygame.init()
 class GameManager:
 
     def __init__(self, main):
-        main.screen.fill([0, 0, 0])
         self.heros = [
             Knight(main.WIDTH // 2, main.HEIGHT // 2, 40, 50),
             Yokai(main.WIDTH // 2, main.HEIGHT // 2, 40, 50),
@@ -47,7 +46,7 @@ class GameManager:
 
         self.Values = [type(self.hero).__name__, self.hero.life]
             
-    def on_event(self, event):
+    def on_event(self, event, main):
         self.trade(event)
         self.hero.on_event(event)
         
@@ -135,7 +134,7 @@ class GameManager:
                     self.grounds.append(Ground(j*150, i*50, 150, 50, image_path))
                 
 
-    def elimination(self):
+    def elimination(self, chage_state):
         for monster in self.enemies:
             if monster.life <= 0:
                 self.enemies.remove(monster)
@@ -148,6 +147,8 @@ class GameManager:
                 if not self.screen.get_rect().colliderect(projectile.rect):
                     self.projectiles.remove(projectile) 
         
+        if self.hero.life <= 0 or self.hero.rect.y > 1400:
+            chage_state("over")
                 
     def draw(self, screen):
         screen.fill([0,0,0])
@@ -168,10 +169,7 @@ class GameManager:
 
         for boss in self.bosses:
             boss.draw(screen, self.camera)
-
-                
-        pygame.display.flip()
-        
+            
     def trade(self, event):
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
             change = False
@@ -217,65 +215,6 @@ class GameManager:
         self.hero.to_right = to_right_actual
         self.hero.trade_cooldown = trade_cooldonw_actual
         self.hero.from_the_front = from_the_front_actual
-
-    
-    def gameover(self):
-        
-        self.screen.fill([100, 100, 100])
-        font_gameover = pygame.font.Font(None, 74)
-        font_control = pygame.font.Font(None, 36)
-        
-        text_gameover = font_gameover.render("GAME OVER", True, (255, 255, 255))
-        text_rect = text_gameover.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 3))
-        self.screen.blit(text_gameover, text_rect)
-
-        text_control = font_control.render("Press 'R' to restart or 'Q' to exit.", True, (50, 50, 50))
-        control_rect = text_control.get_rect(center=(self.WIDTH// 2, self.HEIGHT // 2))
-        self.screen.blit(text_control, control_rect)
-
-        pygame.display.flip()
-
-        waiting = True
-        while waiting:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:  
-                        self.reset()
-                        waiting = False
-                        self.run()
-                    elif event.key == pygame.K_q:  
-                        pygame.quit()
-                        sys.exit()
-
-    def reset(self):
-
-        self.hero = self.heros[0]  
-        self.camera = Camera(0, 50)
-        self.hero.life = self.hero.max_life 
-        self.hero.rect.x = self.WIDTH // 2  
-        self.hero.rect.y = self.HEIGHT // 2  
-        self.hero.speed_x = 0  
-        self.hero.speed_y = 0  
-        self.hero.jump_count = 0  
-        self.hero.is_running = False  
-        self.hero.on_ground = True  
-
-        self.grounds = []
-        self.maping()
-        
-        self.enemies = [
-            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50, self.hero),
-            Mage(200,0,40,50, self.hero),
-            Flying(200, 50, 40, 50, self.hero)
-        ]
-
-        self.bosses = [
-            Balrog(200, 0, 80, 100, self.hero),
-            Ganon(300, 0, 80, 100, self.hero)
-        ]
 
 if __name__ == "__main__":
     Game = GameManager()

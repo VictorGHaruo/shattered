@@ -1,5 +1,5 @@
 import pygame
-from menu import Menu
+from interfaces import Menu, Game_Over
 from game import GameManager
 
 class Main():
@@ -9,28 +9,29 @@ class Main():
         self.HEIGHT = 800
         screen_size = (self.WIDTH, self.HEIGHT)
         self.screen = pygame.display.set_mode(screen_size)
+        self.is_running = True
         self.states = {
             "menu": Menu(self),
-            "game": GameManager(self)
+            "game": GameManager(self),
+            "over": Game_Over(self)
         }
         self.current_state = self.states["menu"]
         
     def run(self):
         clock = pygame.time.Clock()
         
-        is_running = True
-        while is_running:
+        while self.is_running:
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
-                    is_running = False
-                self.current_state.on_event(event)
+                    self.is_running = False
+                self.current_state.on_event(event, self)
                 
             if self.current_state == self.states["game"]:
                 self.current_state.on_key_pressed()
                 self.current_state.update(self.WIDTH)
                 self.current_state.collision_decetion()
-                self.current_state.elimination()
+                self.current_state.elimination(self.change_state)
             self.current_state.draw(self.screen)
             pygame.display.flip()
             
