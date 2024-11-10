@@ -21,6 +21,9 @@ class Monsters:
     def update(self):
         self.speed_y += self.gravity
         self.rect.y += min(self.speed_y, self.speed_y_max)
+    
+    def new_hero(self, hero):
+        self.hero = hero
         
     def draw (self, screen, camera):
         if camera.TAG == "Camera":

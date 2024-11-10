@@ -29,7 +29,7 @@ class GameManager:
         self.maping()
         
         self.enemies = [
-            Dummy(self.WIDTH  // 2 + 200, self.HEIGHT // 2, 40, 50, self.hero),
+            Dummy(main.WIDTH  // 2 + 200, main.HEIGHT // 2, 40, 50, self.hero),
             Mage(200,0,40,50,self.hero),
             Flying(200, 50, 40, 50,self.hero)
         ]
