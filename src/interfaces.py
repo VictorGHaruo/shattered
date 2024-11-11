@@ -14,23 +14,35 @@ class Button():
         text_box_rect = text_box.get_rect(center = self.rect.center)
         screen.blit(text_box, text_box_rect)
         
-    def on_event(self, event, change_state):
+    def on_event(self, event, change_state, state):
         if event.type == pygame.MOUSEBUTTONDOWN:
             has_collision = self.rect.collidepoint(event.pos)
             if event.button == 1 and has_collision:
-                change_state("game")
+                change_state(state)
 
 class Menu():
     
     def __init__(self, main):
-        self.button = Button(600, 360, 200, 40, "Start")
+        self.button = Button(575, 350, 250, 45, "Start")
     
     def draw(self, screen: pygame.Surface):
         screen.fill((0,0,0))
         self.button.draw(screen)
         
     def on_event(self, event, main):
-        self.button.on_event(event, main.change_state)
+        self.button.on_event(event, main.change_state, "game")
+        
+class Pause():
+    
+    def __init__(self, main):
+        self.button = Button(575, 350, 250, 45, "Continue")
+        
+    def draw(self, screen):
+        screen.fill((0,0,0))
+        self.button.draw(screen)
+        
+    def on_event(self, event, main):
+        self.button.on_event(event, main.change_state, "game")
 
 class Game_Over():
     

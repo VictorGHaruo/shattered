@@ -1,5 +1,5 @@
 import pygame
-from interfaces import Menu, Game_Over
+from interfaces import Menu, Game_Over, Pause
 from game import GameManager
 
 class Main():
@@ -13,6 +13,7 @@ class Main():
         self.states = {
             "menu": Menu(self),
             "game": GameManager(self),
+            "pause": Pause(self),
             "over": Game_Over(self)
         }
         self.current_state = self.states["menu"]
@@ -25,6 +26,9 @@ class Main():
             for event in events:
                 if event.type == pygame.QUIT:
                     self.is_running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.change_state("pause")
                 self.current_state.on_event(event, self)
                 
             if self.current_state == self.states["game"]:

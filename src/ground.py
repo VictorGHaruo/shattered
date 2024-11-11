@@ -4,7 +4,7 @@ class Ground:
     
     def __init__(self, x, y, width, height, image_path):
         self.TAG = "Ground"
-        self.image = pygame.image.load(image_path)
+        self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
