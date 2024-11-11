@@ -48,6 +48,13 @@ class GameManager:
         ]
 
         self.Values = [type(self.hero).__name__, self.hero.life]
+
+        self.bg_images = []
+        for i in range(1, 3):
+            bg_image = pygame.image.load(f"../assets/Background/background_layer_{i}.png").convert_alpha()
+            bg_image = pygame.transform.scale(bg_image, (self.WIDTH , self.HEIGHT))
+            self.bg_images.append(bg_image)
+        self.bg_width = self.bg_images[0].get_width()
             
     def on_event(self, event, main):
         self.trade(event)
@@ -181,15 +188,20 @@ class GameManager:
                 
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])
+        scroll = self.camera.position_x
         
-        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        assets_path = os.path.join(path_game, os.pardir, "assets")
-        assets_path = os.path.abspath(assets_path)
+        # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        # assets_path = os.path.join(path_game, os.pardir, "assets")
+        # assets_path = os.path.abspath(assets_path)
         
-        background_path = os.path.join(assets_path, "Background", "Background_01.png")
-        background = pygame.image.load(background_path).convert_alpha()
-        background = pygame.transform.scale(background, (self.WIDTH, self.HEIGHT))
-        screen.blit(background, (0,0))
+        # background_path = os.path.join(assets_path, "Background", "Background_01.png")
+        # background = pygame.image.load(background_path).convert_alpha()
+        # background = pygame.transform.scale(background, (self.WIDTH, self.HEIGHT))
+        for x in range(2):
+            speed = 1
+            for i in self.bg_images:
+                screen.blit(i, ((x * self.bg_width) - scroll * speed, 0))
+                speed += 0.6
         
         # background_2_path = os.path.join(assets_path, "Background", "Background_02.png")
         # background_2 = pygame.image.load(background_2_path).convert_alpha()
