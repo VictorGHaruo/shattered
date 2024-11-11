@@ -44,6 +44,7 @@ class Player:
     def draw(self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
+            print(self.rect.x, camera.position_x)
             pygame.draw.rect(screen, self.rect_color, self.rect)
 
         for projectile in self.projectiles:

@@ -33,7 +33,7 @@ class Main():
                 
             if self.current_state == self.states["game"]:
                 self.current_state.on_key_pressed()
-                self.current_state.update(self.WIDTH)
+                self.current_state.update()
                 self.current_state.collision_decetion()
                 self.current_state.elimination(self.change_state)
             self.current_state.draw(self.screen)

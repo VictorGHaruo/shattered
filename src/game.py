@@ -23,7 +23,7 @@ class GameManager:
         self.hero = self.heros[self.atual_hero]
         
         self.projectiles = []
-        self.camera = Camera(0, 50)
+        self.camera = Camera(0, main.WIDTH)
     
         self.grounds = []
         self.maping()
@@ -50,11 +50,13 @@ class GameManager:
         self.Values = [type(self.hero).__name__, self.hero.life]
 
         self.bg_images = []
-        for i in range(1, 3):
+        for i in range(1, 4):
+            print(i)
             bg_image = pygame.image.load(f"../assets/Background/background_layer_{i}.png").convert_alpha()
             bg_image = pygame.transform.scale(bg_image, (self.WIDTH , self.HEIGHT))
             self.bg_images.append(bg_image)
-        self.bg_width = self.bg_images[0].get_width()
+        self.pos_x = -self.WIDTH
+        self.pos_x_p = -self.WIDTH
             
     def on_event(self, event, main):
         self.trade(event)
@@ -65,9 +67,9 @@ class GameManager:
         self.hero.on_key_pressed(key_map)
         self.hero.actions(key_map)
             
-    def update(self, WIDTH):
+    def update(self):
         self.hero.update()
-        self.camera.update_coods(self.hero, WIDTH)
+        self.camera.update_coods(self.hero)
         for ground in self.grounds:
             ground.update()
 
@@ -188,7 +190,6 @@ class GameManager:
                 
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])
-        scroll = self.camera.position_x
         
         # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         # assets_path = os.path.join(path_game, os.pardir, "assets")
@@ -197,11 +198,14 @@ class GameManager:
         # background_path = os.path.join(assets_path, "Background", "Background_01.png")
         # background = pygame.image.load(background_path).convert_alpha()
         # background = pygame.transform.scale(background, (self.WIDTH, self.HEIGHT))
-        for x in range(2):
-            speed = 1
-            for i in self.bg_images:
-                screen.blit(i, ((x * self.bg_width) - scroll * speed, 0))
-                speed += 0.6
+        speed = min(self.hero.speed_x, self.hero.speed_x_max) if self.hero.speed_x > 0 else max(self.hero.speed_x, self.hero.speed_x_min)
+        self.pos_x -= speed // 3
+        self.pos_x_p -= speed // 5
+        x = 0
+        for i in self.bg_images:
+            for j in range(7):
+                screen.blit(i, (self.pos_x +  x * self.pos_x_p + j*self.WIDTH, 0))
+            x+=1
         
         # background_2_path = os.path.join(assets_path, "Background", "Background_02.png")
         # background_2 = pygame.image.load(background_2_path).convert_alpha()
