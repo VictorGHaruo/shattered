@@ -39,7 +39,7 @@ class GameManager:
         self.bosses = [
             Balrog(200, 0, 80, 100, self.hero),
             Ganon(300, 0, 80, 100, self.hero),
-            Demagorgon(400, 0, 80, 100, self.hero)
+            Demagorgon(0, 0, 100, 300, self.hero)
         ]
 
         self.texts = [

@@ -1,6 +1,6 @@
 import pygame
-from weapon import Projectile
-from weapon import Attack
+from weapon import Projectile, Attack
+from assets import Assets
 import random
 import math
 
@@ -34,7 +34,7 @@ class Bosses:
     def draw (self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            pygame.draw.rect(screen, self.color, self.rect)
+            # pygame.draw.rect(screen, self.color, self.rect)
 
     def on_collision(self, other : pygame.Rect):  
 
@@ -159,7 +159,7 @@ class Balrog(Bosses):
 
         return super().update()
 
-class Ganon(Bosses):
+class Ganon(Bosses, pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
         self.sub_TAG = "Ganon"
@@ -221,65 +221,90 @@ class Ganon(Bosses):
             elif self.hero.rect.centerx - self.rect.centerx > 0:
                 self.rect.x = 0.9 * self.screen_width
                 self.rect.y = 0 #retirar dps
-        
-class Demagorgon(Bosses):
+
+class Demagorgon(Bosses, pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
+        pygame.sprite.Sprite.__init__(self)
+
+        #hitbox
         self.color = (255, 255, 0)
+
+        #movement speed
         self.speed_x = 3
+
+        #attack
         self.attacks = None
         self.atk_cooldown = 100
         self.atk_timer = self.atk_cooldown
-        self.weapon_width = 400
-        self.weapon_height = 20
+        self.atk_long = 50
+
+        #weapon
+        self.weapon_width = 130
+        self.weapon_height = height
         self.weapon_damage = 100
         self.damage_timer = 0
 
-        self.atk_long = 50
-
+        #sprites
+        self.assets = Assets()
+        self.assets.init_Demogorgon(width, height)
 
     def attack(self):
         if self.atk_timer <= 0:
             if self.rect.x - self.hero.rect.x <= 0:
-                self.attacks = Attack(self.rect.right, self.rect.centery, self.weapon_width, self.weapon_height, self.weapon_damage)
-                self.atk_timer = self.atk_cooldown
+                self.attacks = Attack(self.rect.right, self.rect.top, self.weapon_width, self.weapon_height, self.weapon_damage)
+                self.atk_timer = self.atk_cooldown + self.atk_long
+
             if self.rect.x - self.hero.rect.x > 0:
-                self.attacks = Attack(self.rect.left - self.weapon_width, self.rect.centery, self.weapon_width, self.weapon_height, self.weapon_damage)
-                self.atk_timer = self.atk_cooldown
-        if self.atk_timer < self.atk_cooldown - self.atk_long and self.attacks != None:
+                self.attacks = Attack(self.rect.left - self.weapon_width, self.rect.top, self.weapon_width, self.weapon_height, self.weapon_damage)
+                self.atk_timer = self.atk_cooldown + self.atk_long
+
+        if self.atk_timer < self.atk_cooldown and self.attacks != None:
             self.attacks = None
 
-    def on_collision(self, other: pygame.Rect):
-        if other.TAG == "Player":
-            if self.attacks != None:
-                if self.attacks.rect.colliderect(other) and self.damage_timer == 0:
-                        print(self.attacks.damage)
-                        other.life -= self.attacks.damage
-                        self.damage_timer = self.atk_timer
-        return super().on_collision(other)
-
-    def draw(self, screen, camera):
-        if self.attacks != None:
-            self.attacks.draw(screen)
-        return super().draw(screen, camera)
-    
     def move(self):
-        if self.atk_timer > self.atk_cooldown - self.atk_long:
+        super().move()
+        if self.atk_timer < self.atk_cooldown:
             if self.rect.x - self.hero.rect.x <= 0:
+                self.assets.assets_Demogorgon("WalkLeft", self.rect)
+                
                 if self.rect.colliderect(self.hero) == False:
                     self.rect.x = self.rect.x + self.speed_x
             elif self.rect.x - self.hero.rect.x > 0:
+                self.assets.assets_Demogorgon("WalkRight", self.rect)
                 if self.rect.colliderect(self.hero) == False:
                     self.rect.x = self.rect.x - self.speed_x
-        return super().move()
+    
+    def on_collision(self, other: pygame.Rect):
+        super().on_collision(other)
+
+        if other.TAG == "Player":
+            if self.attacks != None:
+                if self.attacks.rect.colliderect(other) and self.damage_timer == 0:
+                        other.life -= self.attacks.damage
+                        self.damage_timer = self.atk_timer
+
+    def draw(self, screen, camera):
+        super().draw(screen, camera)
+
+        self.image = self.assets.image
+        screen.blit(self.image, self.assets.image_rect)
+
+        # if self.attacks != None:
+        #     self.attacks.draw(screen)
     
     def update(self):
-        self.move()
-        self.attack()
         if self.atk_timer > 0:
             self.atk_timer -= 1
         
         if self.damage_timer > 0:
             self.damage_timer -=1
 
+        if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x <= 0:
+            self.assets.assets_Demogorgon("AtkLeft", self.rect)
+        if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x > 0:
+            self.assets.assets_Demogorgon("AtkRight", self.rect)
+        self.move()
+        self.attack()
+        
         return super().update()
