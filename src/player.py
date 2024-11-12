@@ -181,13 +181,13 @@ class Knight(Player):
             if self.on_ground:
                 self.speed_x_max = 0
                 self.speed_x_min = 0
-                self.speed_y_max = 0
+                self.speed_jump = 0
                     
         else:
             self.shield = None
             self.speed_x_max = 10
             self.speed_x_min = -10
-            self.speed_y_max = 40
+            self.speed_jump = -30
             
 
     def on_collision(self, other):

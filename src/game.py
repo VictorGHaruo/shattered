@@ -15,9 +15,9 @@ class GameManager:
 
     def __init__(self, main):
         self.heros = [
-            Knight(main.WIDTH // 2, main.HEIGHT // 2, 40, 50),
-            Yokai(main.WIDTH // 2, main.HEIGHT // 2, 40, 50),
-            Ninja(main.WIDTH // 2, main.HEIGHT // 2, 40, 50)
+            Knight(0 , 0, 40, 50),
+            Yokai(0 , 0, 40, 50),
+            Ninja(0 , 0, 40, 50)
         ]
         self.atual_hero = 0
         self.hero = self.heros[self.atual_hero]
@@ -187,6 +187,8 @@ class GameManager:
         to_right_actual = self.hero.to_right
         trade_cooldonw_actual  = self.hero.trade_cooldown
         from_the_front_actual = self.hero.from_the_front
+        invincibility_cooldown_actual = self.hero.invincibility_time
+        projectiles_actual = self.hero.projectiles 
             
         self.hero = self.heros[self.atual_hero]
         
@@ -202,6 +204,8 @@ class GameManager:
         self.hero.to_right = to_right_actual
         self.hero.trade_cooldown = trade_cooldonw_actual
         self.hero.from_the_front = from_the_front_actual
+        self.hero.invincibility_cooldown = invincibility_cooldown_actual
+        self.hero.projectiles = projectiles_actual
 
 if __name__ == "__main__":
     Game = GameManager()

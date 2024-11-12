@@ -55,22 +55,22 @@ class Block(Ground):
 def maping(grounds):
     
     grid = [
-        "X                                                                                                     XXXXXXXXXXXXXXXXXXXXXXXX",
-        "X                                                                                                     XXXXXXXXXXXXXXXXXXXXXXXX",
-        "X                                                                                                     X                      X",
-        "X                                                                                                     X                      X",
-        "X                                                                                                     X                      X",
-        "X                                                                                                     X                      X",
-        "X                                                                                                     X                      X",
-        "X                                                                                                     X                      X",
-        "X                                                                                                     X                      X",
-        "X                    EXXXXXXXXD                                                                                              X",
-        "X                    LGGGGGGGGR                                                                                              X",
-        "X             TMP    LGGGGGGGGR   TP                                   TP                                                    X",
-        "X                    LGGGGGGGGR                                                                                              X",
-        "XXXXXXXXXD           LGGGGGGGGR        EXXXXXXXXXXXXXD         EXXXD              EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "XGGGGGGGGR           LGGGGGGGGR        LGGGGGGGGGGGGGR         LGGGR              LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-        "XGGGGGGGGR           LGGGGGGGGR        LGGGGGGGGGGGGGR   TMP   LGGGR        TMP   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "X                                                                                                               XXXXXXXXXXXXXXXXXXXXXXXX",
+        "X                                                                                                               XXXXXXXXXXXXXXXXXXXXXXXX",
+        "X                                                                                                               X                      X",
+        "X                                                                                                               X                      X",
+        "X                                                                                                               X                      X",
+        "X                                                                                                               X                      X",
+        "X                                                                                                               X                      X",
+        "X                                                                                                               X                      X",
+        "X                                                                                                               X                      X",
+        "X                              EXXXXXXXXD                                                                                              X",
+        "X                              LGGGGGGGGR                                                                                              X",
+        "X                    TMMMMP    LGGGGGGGGR   TP                                   TP                                                    X",
+        "X                              LGGGGGGGGR                                                                                              X",
+        "XXXXXXXXXXXXXXXXD              LGGGGGGGGR        EXXXXXXXXXXXXXD         EXXXD              EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "XGGGGGGGGGGGGGGGR              LGGGGGGGGR        LGGGGGGGGGGGGGR         LGGGR              LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "XGGGGGGGGGGGGGGGR              LGGGGGGGGR        LGGGGGGGGGGGGGR   TMP   LGGGR        TMP   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
     ]
     
     path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
