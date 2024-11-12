@@ -118,7 +118,7 @@ class GameManager:
                 self.enemies.remove(monster)
 
         for boss in self.bosses:
-            if boss.life <= 0:
+            if boss.is_dead == True:
                 self.bosses.remove(boss)
 
         for projectile in self.projectiles:
