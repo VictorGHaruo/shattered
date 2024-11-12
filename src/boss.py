@@ -17,6 +17,7 @@ class Bosses:
         self.hero = hero
         self.projectiles = []
         self.screen_width = pygame.display.Info().current_w
+        self.is_dead = False
 
     def new_hero(self, hero):
         self.hero = hero
@@ -266,15 +267,19 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
         super().move()
         if self.atk_timer < self.atk_cooldown:
             if self.rect.x - self.hero.rect.x <= 0:
-                self.assets.assets_Demogorgon("WalkLeft", self.rect)
                 
                 if self.rect.colliderect(self.hero) == False:
+                    self.assets.assets_Demogorgon("WalkLeft", self.rect)
                     self.rect.x = self.rect.x + self.speed_x
+                else:
+                    self.assets.assets_Demogorgon("IdleLeft", self.rect)
             elif self.rect.x - self.hero.rect.x > 0:
-                self.assets.assets_Demogorgon("WalkRight", self.rect)
                 if self.rect.colliderect(self.hero) == False:
+                    self.assets.assets_Demogorgon("WalkRight", self.rect)
                     self.rect.x = self.rect.x - self.speed_x
-    
+                else:
+                    self.assets.assets_Demogorgon("IdleLeft", self.rect)
+
     def on_collision(self, other: pygame.Rect):
         super().on_collision(other)
 
@@ -300,11 +305,23 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
         if self.damage_timer > 0:
             self.damage_timer -=1
 
-        if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x <= 0:
-            self.assets.assets_Demogorgon("AtkLeft", self.rect)
-        if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x > 0:
-            self.assets.assets_Demogorgon("AtkRight", self.rect)
-        self.move()
-        self.attack()
+        if self.life <= 0 and self.rect.x - self.hero.rect.x <= 0 and self.assets.actual_Death <=16:
+            self.assets.assets_Demogorgon("DeathLeft", self.rect)
+            if self.assets.actual_Death >= len(self.assets.deathL_images):
+                self.is_dead = True
+        elif self.life <= 0 and self.rect.x - self.hero.rect.x > 0 and self.assets.actual_Death <=16:
+            self.assets.assets_Demogorgon("DeathRight", self.rect)
+            if self.assets.actual_Death >= len(self.assets.deathR_images):
+                self.is_dead = True
+
+        if self.life > 0:
+            if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x <= 0:
+                self.assets.assets_Demogorgon("AtkLeft", self.rect)
+
+            if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x > 0:
+                self.assets.assets_Demogorgon("AtkRight", self.rect)
+
+            self.move()
+            self.attack()
         
         return super().update()
