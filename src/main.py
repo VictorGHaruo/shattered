@@ -24,11 +24,15 @@ class Main():
         while self.is_running:
             events = pygame.event.get()
             for event in events:
+                
                 if event.type == pygame.QUIT:
                     self.is_running = False
+                    
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                    if event.key == pygame.K_ESCAPE and self.current_state == self.states["game"]:
                         self.change_state("pause")
+                        break
+                            
                 self.current_state.on_event(event, self)
                 
             if self.current_state == self.states["game"]:

@@ -17,6 +17,7 @@ class Player:
         self.gravity_y = 2 
         self.speed_y = 0
         self.speed_y_max = 40
+        self.speed_jump = -30
         self.jump_count = 0
         self.jump_count_max = 2
         
@@ -44,7 +45,6 @@ class Player:
     def draw(self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            print(self.rect.x, camera.position_x)
             pygame.draw.rect(screen, self.rect_color, self.rect)
 
         for projectile in self.projectiles:
@@ -94,7 +94,8 @@ class Player:
     def jump(self):
         if self.jump_count >= self.jump_count_max:
             return
-        self.speed_y -= 30
+        self.speed_y += self.speed_jump
+        self.speed_y = max(self.speed_y, self.speed_jump)
         self.jump_count += 1
         
     def on_key_pressed(self, key_map):

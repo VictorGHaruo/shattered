@@ -10,7 +10,7 @@ class Camera:
     
     def update_coods(self, hero):
         if hero.TAG == "Player":
-            if hero.rect.right > self.fix_X:
+            if hero.rect.right >= self.fix_X:
                 self.position_x = hero.rect.right - self.WIDGHT // 2
                 self.fix_X -= self.position_x
             else:

@@ -2,7 +2,7 @@ import pygame
 import sys
 from player import Knight, Yokai, Ninja
 from camera import Camera
-from ground import Ground, Block
+from ground import Ground, Block, maping
 from enemy import Dummy, Mage, Flying
 from boss import Balrog, Ganon, Demagorgon
 from text import Text
@@ -26,7 +26,7 @@ class GameManager:
         self.camera = Camera(0, main.WIDTH)
     
         self.grounds = []
-        self.maping()
+        maping(self.grounds)
         self.WIDTH = main.WIDTH
         self.HEIGHT = main.HEIGHT
         
@@ -50,9 +50,12 @@ class GameManager:
         self.Values = [type(self.hero).__name__, self.hero.life]
 
         self.bg_images = []
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        Background_path = os.path.join(path_game, os.pardir, "assets", "Background")
+        Background_path = os.path.abspath(Background_path)
         for i in range(1, 4):
-            print(i)
-            bg_image = pygame.image.load(f"../assets/Background/background_layer_{i}.png").convert_alpha()
+            image_path = os.path.join(Background_path, f"background_{i}.png")
+            bg_image = pygame.image.load(image_path).convert_alpha()
             bg_image = pygame.transform.scale(bg_image, (self.WIDTH , self.HEIGHT))
             self.bg_images.append(bg_image)
         self.pos_x = -self.WIDTH
@@ -109,69 +112,6 @@ class GameManager:
                 ground.on_collision(ground)
                 boss.on_collision(ground)
 
-    def maping(self):
-        
-        grid = [
-            "                                                                                                     XXXXXXXXXXXXXXXXXXXXXXXX",
-            "                                                                                                     XXXXXXXXXXXXXXXXXXXXXXXX",
-            "                                                                                                     X                      X",
-            "                                                                                                     X                      X",
-            "                                                                                                     X                      X",
-            "                                                                                                     X                      X",
-            "                                                                                                     X                      X",
-            "                                                                                                     X                      X",
-            "                                                                                                     X                      X",
-            "                    EXXXXXXXXD                                                                                              X",
-            "                    LGGGGGGGGR                                                                                              X",
-            "             TMP    LGGGGGGGGR   TP                                   TP                                                    X",
-            "                    LGGGGGGGGR                                                                                              X",
-            "XXXXXXXXD           LGGGGGGGGR        EXXXXXXXXXXXXXD         EXXXD              EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-            "GGGGGGGGR           LGGGGGGGGR        LGGGGGGGGGGGGGR         LGGGR              LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-            "GGGGGGGGR           LGGGGGGGGR        LGGGGGGGGGGGGGR   TMP   LGGGR        TMP   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-        ]
-        
-        self.grounds_apend(grid)
-        
-    def grounds_apend(self, grid):
-        
-        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        assets_path = os.path.join(path_game, os.pardir, "assets")
-        assets_path = os.path.abspath(assets_path)
-        image_ground_X = os.path.join(assets_path, "Ground", "Ground_01.png")
-        image_ground_E = os.path.join(assets_path, "Ground", "Ground_02.png")
-        image_ground_G = os.path.join(assets_path, "Ground", "Ground_04.png")
-        image_ground_D = os.path.join(assets_path, "Ground", "Ground_06.png")
-        image_ground_L = os.path.join(assets_path, "Ground", "Ground_07.png")
-        image_ground_T = os.path.join(assets_path, "Ground", "Ground_08.png")        
-        image_ground_M = os.path.join(assets_path, "Ground", "Ground_09.png")
-        image_ground_P = os.path.join(assets_path, "Ground", "Ground_10.png")
-        image_ground_R = os.path.join(assets_path, "Ground", "Ground_11.png")
-        
-        
-        i_range = len(grid)
-        j_range = len(grid[0])
-        for i in range(i_range):
-            for j in range(j_range):
-                if grid[i][j] == "X":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_X))
-                if grid[i][j] == "E":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_E))
-                if grid[i][j] == "G":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_G))
-                if grid[i][j] == "D":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_D))
-                if grid[i][j] == "L":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_L))
-                if grid[i][j] == "R":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_R))
-                if grid[i][j] == "T":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_T))
-                if grid[i][j] == "M":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_M))
-                if grid[i][j] == "P":
-                    self.grounds.append(Ground(j*50, i*50, 50, 50, image_ground_P))
-                
-
     def elimination(self, chage_state):
         for monster in self.enemies:
             if monster.life <= 0:
@@ -191,13 +131,6 @@ class GameManager:
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])
         
-        # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        # assets_path = os.path.join(path_game, os.pardir, "assets")
-        # assets_path = os.path.abspath(assets_path)
-        
-        # background_path = os.path.join(assets_path, "Background", "Background_01.png")
-        # background = pygame.image.load(background_path).convert_alpha()
-        # background = pygame.transform.scale(background, (self.WIDTH, self.HEIGHT))
         speed = min(self.hero.speed_x, self.hero.speed_x_max) if self.hero.speed_x > 0 else max(self.hero.speed_x, self.hero.speed_x_min)
         self.pos_x -= speed // 3
         self.pos_x_p -= speed // 5
@@ -206,11 +139,6 @@ class GameManager:
             for j in range(7):
                 screen.blit(i, (self.pos_x +  x * self.pos_x_p + j*self.WIDTH, 0))
             x+=1
-        
-        # background_2_path = os.path.join(assets_path, "Background", "Background_02.png")
-        # background_2 = pygame.image.load(background_2_path).convert_alpha()
-        # background_2 = pygame.transform.scale(background_2, (self.WIDTH, self.HEIGHT))
-        # screen.blit(background_2, (0,0))
         
         self.hero.draw(screen, self.camera)
 
