@@ -7,6 +7,7 @@ import math
 class Bosses:
     def __init__(self, x, y, width, height, hero):
         self.TAG = "Monster"
+        self.sub_TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
         self.color = (255, 0, 0)
         self.gravity = 2
@@ -18,6 +19,7 @@ class Bosses:
         self.projectiles = []
         self.screen_width = pygame.display.Info().current_w
         self.is_dead = False
+        self.immune = False
 
     def new_hero(self, hero):
         self.hero = hero
@@ -35,7 +37,7 @@ class Bosses:
     def draw (self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            # pygame.draw.rect(screen, self.color, self.rect)
+            pygame.draw.rect(screen, self.color, self.rect)
 
     def on_collision(self, other : pygame.Rect):  
 
@@ -163,6 +165,8 @@ class Balrog(Bosses):
 class Ganon(Bosses, pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
+        pygame.sprite.Sprite.__init__(self)
+
         self.sub_TAG = "Ganon"
         self.width = width
         self.speed_x = 3
@@ -176,6 +180,13 @@ class Ganon(Bosses, pygame.sprite.Sprite):
         self.projectile_cooldown = 0
         self.cool_down = 20
 
+        self.teleport = 60
+        self.teleport_cooldown = self.teleport
+
+        #sprites
+        self.assets = Assets()
+        self.assets.init_Ganon(width, height)
+
     def update(self):
 
         if self.projectile_cooldown > 0:
@@ -183,16 +194,39 @@ class Ganon(Bosses, pygame.sprite.Sprite):
 
         for projectile in self.projectiles:
             projectile.update()
+
+        # print(self.life)
         
+        if self.life > 0:
+            if self.projectile_cooldown > self.cool_down and self.rect.x - self.hero.rect.x <= 0:
+                self.assets.assets_Ganon("AtkLeft", self.rect)
+
+        if self.life <= 0 and self.rect.x - self.hero.rect.x <= 0 and self.assets.Gactual_Death <=14:
+            self.assets.assets_Ganon("DeathLeft", self.rect)
+            if self.assets.Gactual_Death >= 13.5:
+                print("OIE")
+
+                self.is_dead = True
+        elif self.life <= 0 and self.rect.x - self.hero.rect.x > 0 and self.assets.Gactual_Death <=14:
+            if self.assets.Gactual_Death >= 13.5:
+                print("OIE")
+                self.is_dead = True
+            self.assets.assets_Ganon("DeathRight", self.rect)
+
         self.attack()
         self.move()
         return super().update()
     
     def draw(self, screen, camera):
-        for projectile in self.projectiles:
-            projectile.draw(screen)
+        super().draw(screen, camera)
 
-        return super().draw(screen, camera)
+        for projectile in self.projectiles: 
+            projectile.draw(screen)
+        
+        self.image = self.assets.image
+        screen.blit(self.image, self.assets.image_rect)
+
+
 
     def on_collision(self, other: pygame.Rect):
         return super().on_collision(other)
@@ -215,13 +249,35 @@ class Ganon(Bosses, pygame.sprite.Sprite):
         return distance
 
     def move(self):
-        if self.distance(self.hero) <= 110:
-            if self.hero.rect.centerx - self.rect.centerx < 0:
-                self.rect.x = 0.1 * self.screen_width
-                self.rect.y = 0 #retirar dps
-            elif self.hero.rect.centerx - self.rect.centerx > 0:
-                self.rect.x = 0.9 * self.screen_width
-                self.rect.y = 0 #retirar dps
+        if self.life > 0:
+
+            if self.distance(self.hero) > 200:
+                self.immune = False
+                self.teleport_cooldown = self.teleport
+                self.assets.Gactual_Immune = 0
+                if self.hero.rect.centerx - self.rect.centerx < 0:
+                    self.assets.assets_Ganon("IdleLeft", self.rect)
+                elif self.hero.rect.centerx - self.rect.centerx > 0:
+                    self.assets.assets_Ganon("IdleRight", self.rect)
+
+            if self.distance(self.hero) <= 200:
+                self.immune = True
+                if self.teleport_cooldown > 0:
+                    self.teleport_cooldown -= 1
+                    if self.hero.rect.centerx - self.rect.centerx < 0:
+
+                        self.assets.assets_Ganon("ImmuneLeft", self.rect)
+                    elif self.hero.rect.centerx - self.rect.centerx > 0:
+
+                        self.assets.assets_Ganon("ImmuneRight", self.rect)
+                        
+
+                if self.hero.rect.centerx - self.rect.centerx < 0 and self.teleport_cooldown <= 0:
+                    self.rect.x = 0.1 * self.screen_width
+                    self.rect.y = 0 #retirar dps
+                elif self.hero.rect.centerx - self.rect.centerx > 0 and self.teleport_cooldown <= 0:
+                    self.rect.x = 0.9 * self.screen_width
+                    self.rect.y = 0 #retirar dps
 
 class Demagorgon(Bosses, pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, hero):
@@ -278,7 +334,7 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
                     self.assets.assets_Demogorgon("WalkRight", self.rect)
                     self.rect.x = self.rect.x - self.speed_x
                 else:
-                    self.assets.assets_Demogorgon("IdleLeft", self.rect)
+                    self.assets.assets_Demogorgon("IdleRight", self.rect)
 
     def on_collision(self, other: pygame.Rect):
         super().on_collision(other)

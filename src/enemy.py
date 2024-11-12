@@ -5,6 +5,7 @@ import random
 class Monsters:
     def __init__(self, x, y, width, height, hero):
         self.TAG = "Monster"
+        self.sub_TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
         self.color = (255, 0, 0)
         self.gravity = 2
@@ -13,6 +14,7 @@ class Monsters:
         self.speed_x = 0
         self.life = 50
         self.hero = hero
+        self.immune = False
         self.projectiles = []   
 
     def move(self):

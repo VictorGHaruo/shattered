@@ -154,7 +154,8 @@ class Player:
 
         for projectile in self.projectiles:
                 if other.TAG == "Monster" and projectile.rect.colliderect(other):
-                    other.life -= self.damage
+                    if not other.sub_TAG == "Ganon":
+                        other.life -= self.damage
                     self.projectiles.remove(projectile)
 
                     
@@ -225,6 +226,7 @@ class Yokai(Player):
     
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
+        self.subTAG = "Yokai"
         self.jump_count_max = 2
         self.rect_color = (255, 255, 0)
         self.damage = 20
@@ -272,7 +274,7 @@ class Ninja(Player):
 
         if self.attack is not None:
 
-            if other.TAG == "Monster" and self.attack.rect.colliderect(other):
+            if other.TAG == "Monster" and self.attack.rect.colliderect(other) and other.immune == False:
                 other.life -= self.damage
 
 
