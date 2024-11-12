@@ -51,6 +51,7 @@ class Player:
             projectile.draw(screen)
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
+                del projectile
         
     def update(self):
         ##Updating Y:
@@ -121,7 +122,7 @@ class Player:
             
             
     def on_collision(self, other):
-        if other.TAG == "Ground":
+        if other.TAG == "Ground" and self.rect.colliderect(other):
             if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top and self.speed_y > 0:
                 self.rect.bottom = other.rect.top
                 self.speed_y = 0
@@ -157,10 +158,12 @@ class Player:
                     if not other.sub_TAG == "Ganon":
                         other.life -= self.damage
                     self.projectiles.remove(projectile)
+                    del projectile
 
                     
-                if other.TAG == "Block" and projectile.rect.colliderect(other):
+                if other.TAG == "Ground" and projectile.rect.colliderect(other):
                     self.projectiles.remove(projectile)
+                    del projectile
 
             
 class Knight(Player):

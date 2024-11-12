@@ -45,10 +45,12 @@ class Monsters:
             if other.TAG == "Ground":
                 if projectile.rect.colliderect(other):
                     self.projectiles.remove(projectile)
+                    del projectile
             if other.TAG == "Player":
                 if projectile.rect.colliderect(other):
                     other.life -= projectile.damage
                     self.projectiles.remove(projectile)
+                    del projectile
 
 class Dummy(Monsters):
     def __init__(self, x, y, width, height, hero):

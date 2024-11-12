@@ -53,6 +53,9 @@ class Block(Ground):
                 self.is_pushing_l = True
             if self.rect.right > other.rect.left and self.rect.top < other.rect.bottom:
                 self.is_pushing_r = True
+        if other.TAG == "Projectile":
+            other.who.projectiles.remove(other)
+            del other
                 
 class Spike(Ground):
     

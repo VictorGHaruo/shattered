@@ -95,10 +95,9 @@ class GameManager:
         
     def collision_decetion(self):
         for ground in self.grounds:
-            is_collision_hero = self.hero.rect.colliderect(ground)
-            if is_collision_hero:
-                self.hero.on_collision(ground)
-                ground.on_collision(self.hero) 
+            
+            self.hero.on_collision(ground)
+            ground.on_collision(self.hero)
                 
             for enemie in self.enemies:
                 self.hero.on_collision(enemie)
@@ -109,21 +108,24 @@ class GameManager:
             for boss in self.bosses:
                 boss.on_collision(self.hero)
                 self.hero.on_collision(boss)
-                ground.on_collision(ground)
+                ground.on_collision(boss)
                 boss.on_collision(ground)
 
     def elimination(self, chage_state):
         for monster in self.enemies:
             if monster.life <= 0:
                 self.enemies.remove(monster)
+                del monster
 
         for boss in self.bosses:
             if boss.is_dead == True:
                 self.bosses.remove(boss)
+                del boss
 
         for projectile in self.projectiles:
                 if not self.screen.get_rect().colliderect(projectile.rect):
-                    self.projectiles.remove(projectile) 
+                    self.projectiles.remove(projectile)
+                    del projectile
         
         if self.hero.life <= 0 or self.hero.rect.y > 1000:
             chage_state("over")
