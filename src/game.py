@@ -125,20 +125,26 @@ class GameManager:
                 if not self.screen.get_rect().colliderect(projectile.rect):
                     self.projectiles.remove(projectile) 
         
-        if self.hero.life <= 0 or self.hero.rect.y > 1400:
+        if self.hero.life <= 0 or self.hero.rect.y > 1000:
             chage_state("over")
                 
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])
+            
+        if self.hero.speed_x > 0: 
+            speed = min(self.hero.speed_x, self.hero.speed_x_max) 
+        else :
+            speed = max(self.hero.speed_x, self.hero.speed_x_min)
+        if self.camera.fix_X >= 690:
+            speed = 0
         
-        speed = min(self.hero.speed_x, self.hero.speed_x_max) if self.hero.speed_x > 0 else max(self.hero.speed_x, self.hero.speed_x_min)
         self.pos_x -= speed // 3
         self.pos_x_p -= speed // 5
         x = 0
         for i in self.bg_images:
-            for j in range(7):
+            for j in range(8):
                 screen.blit(i, (self.pos_x +  x * self.pos_x_p + j*self.WIDTH, 0))
-            x+=1
+            x += 1
         
         self.hero.draw(screen, self.camera)
 

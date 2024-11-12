@@ -8,9 +8,10 @@ class Button():
         self.text = text
         self.font = pygame.font.Font(None, fontsize)
         
-    def draw(self, screen: pygame.Surface):
-        pygame.draw.rect(screen, "grey", self.rect)
-        text_box = self.font.render(self.text, True, "black")
+    def draw(self, screen: pygame.Surface, bool):
+        if bool:
+            pygame.draw.rect(screen, "grey", self.rect)
+        text_box = self.font.render(self.text, True, "white")
         text_box_rect = text_box.get_rect(center = self.rect.center)
         screen.blit(text_box, text_box_rect)
         
@@ -37,11 +38,15 @@ class Menu():
     def __init__(self, main):
         self.b_start = Button(575, 345, 250, 50, "Start")
         self.b_exit = Button(575, 405, 250, 50, "Exit game")
+        self.title = pygame.font.Font(None, 74)
+        self.title = self.title.render("Shattered", True, "White")
+        self.text_rect = self.title.get_rect(center=(main.WIDTH // 2, 300))
     
     def draw(self, screen: pygame.Surface):
         screen.fill((0,0,0))
-        self.b_start.draw(screen)
-        self.b_exit.draw(screen)
+        screen.blit(self.title, self.text_rect)
+        self.b_start.draw(screen, True)
+        self.b_exit.draw(screen, True)
         
     def on_event(self, event, main):
         self.b_start.change_state(event, main, "game")
@@ -60,9 +65,9 @@ class Pause():
         
     def draw(self, screen):
         screen.fill((0,0,0))
-        self.b_continue.draw(screen)
-        self.b_restart.draw(screen)
-        self.b_quit.draw(screen)
+        self.b_continue.draw(screen, True)
+        self.b_restart.draw(screen, True)
+        self.b_quit.draw(screen, True)
         
     def on_event(self, event, main):
         self.b_continue.change_state(event, main, "game")

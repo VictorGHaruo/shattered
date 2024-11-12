@@ -136,6 +136,9 @@ class Player:
             elif self.rect.top < other.rect.bottom and self.rect.bottom > other.rect.bottom:
                 self.rect.top = other.rect.bottom
                 self.speed_y = 0
+            
+            if other.sub_TAG == "Spike":
+                self.life -= 1000
 
         if other.TAG == "Monster":
 

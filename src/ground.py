@@ -6,6 +6,7 @@ class Ground:
     
     def __init__(self, x, y, width, height, image_path):
         self.TAG = "Ground"
+        self.sub_TAG = "Ground"
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
@@ -30,8 +31,9 @@ class Ground:
                
 class Block(Ground):
     
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, image_path):
+        super().__init__(x, y, width, height, image_path)
+        self.sub_TAG = "Block"
         
     def update(self):
         super().update()
@@ -51,26 +53,40 @@ class Block(Ground):
                 self.is_pushing_l = True
             if self.rect.right > other.rect.left and self.rect.top < other.rect.bottom:
                 self.is_pushing_r = True
+                
+class Spike(Ground):
+    
+    def __init__(self, x, y, width, height, image_path):
+        super().__init__(x, y, width, height, image_path)
+        self.sub_TAG = "Spike"
+    
+class Invsible(Ground):
+    def __init__(self, x, y, width, height, image_path):
+        super().__init__(x, y, width, height, image_path)
+        
+    def draw(self, screen, camera):
+        if camera.TAG == "Camera":
+            self.rect.x -= camera.position_x
          
 def maping(grounds):
     
     grid = [
-        "X                                                                                                               XXXXXXXXXXXXXXXXXXXXXXXX",
-        "X                                                                                                               XXXXXXXXXXXXXXXXXXXXXXXX",
-        "X                                                                                                               X                      X",
-        "X                                                                                                               X                      X",
-        "X                                                                                                               X                      X",
-        "X                                                                                                               X                      X",
-        "X                                                                                                               X                      X",
-        "X                                                                                                               X                      X",
-        "X                                                                                                               X                      X",
-        "X                              EXXXXXXXXD                                                                                              X",
-        "X                              LGGGGGGGGR                                                                                              X",
-        "X                    TMMMMP    LGGGGGGGGR   TP                                   TP                                                    X",
-        "X                              LGGGGGGGGR                                                                                              X",
-        "XXXXXXXXXXXXXXXXD              LGGGGGGGGR        EXXXXXXXXXXXXXD         EXXXD              EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "XGGGGGGGGGGGGGGGR              LGGGGGGGGR        LGGGGGGGGGGGGGR         LGGGR              LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-        "XGGGGGGGGGGGGGGGR              LGGGGGGGGR        LGGGGGGGGGGGGGR   TMP   LGGGR        TMP   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "I                                                                                                     I                              XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "I                                                                                                     I                              XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "I                                                                                                     N                              X                          X",
+        "I                                                                      TMMP         TMMMP         TMMMP                              X                          X",
+        "I                                                                                                                                    X                          X",
+        "I                                                         TMMMP                                                                      X                          X",
+        "I                                                                                                                                    X                          X",
+        "I                                                                                                                                    X                          X",
+        "I                                                                                                                                    X                          X",
+        "I                              EXXXXXXXXXXXXXXXXXD                                                                                   X                          X",
+        "I                              LGGGGGGGGGGGGGGGGGR                                                                                   X                          X",
+        "I                    TMMMMP    LGGGGGGGGGGGGGGGGGR   TP                                                                              X                          X",
+        "I                              LGGGGGGGGGGGGGGGGGR                                                                                   X                          X",
+        "IXXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD                                                                  X",
+        "IGGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    ED  EXXXD     ED   EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "IGGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLRSSLGGGRSSSSSLRSSSLGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
     ]
     
     path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -85,6 +101,8 @@ def maping(grounds):
     image_ground_M = os.path.join(assets_path, "Ground", "Ground_09.png")
     image_ground_P = os.path.join(assets_path, "Ground", "Ground_10.png")
     image_ground_R = os.path.join(assets_path, "Ground", "Ground_11.png")
+    image_ground_S = os.path.join(assets_path, "Ground", "Spikes.png")
+    image_ground_N = os.path.join(assets_path, "Ground", "Stone.png")
     
     
     i_range = len(grid)
@@ -109,4 +127,10 @@ def maping(grounds):
                 grounds.append(Ground(j*50 - 50, i*50, 50, 50, image_ground_M))
             if grid[i][j] == "P":  
                 grounds.append(Ground(j*50 - 50, i*50, 50, 50, image_ground_P))
+            if grid[i][j] == "S":  
+                grounds.append(Spike(j*50 - 50, i*50, 50, 50, image_ground_S))
+            if grid[i][j] == "N":  
+                grounds.append(Ground(j*50 - 50, i*50, 50, 50, image_ground_N))
+            if grid[i][j] == "I":  
+                grounds.append(Invsible(j*50 - 50, i*50, 50, 50, image_ground_N))
     
