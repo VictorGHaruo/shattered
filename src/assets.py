@@ -23,6 +23,7 @@ class Assets():
 
         #Ganon
         self.Ganon_spritesheet = pygame.image.load(f"{self.main_directory}/assets/Ganon/Character_sheet.png").convert_alpha()
+        self.Ganon_projectile = pygame.image.load(f"{self.main_directory}/assets/Ganon/arm_projectile_glowing.png").convert_alpha()
         self.GidleL_images = []
         self.GidleR_images = []
         self.GattackL_images = []
@@ -31,6 +32,8 @@ class Assets():
         self.GimmuneR_images = []
         self.GdeathL_images = []
         self.GdeathR_images = []
+        # self.GprojectileL_images = []
+        self.GprojectileR_images = []
 
         self.Gactual_Idle = 0
         self.Gactual_Attack = 0
@@ -44,8 +47,8 @@ class Assets():
         image = pygame.transform.flip(image, invert, False)
         return image
     
-    def load_spritesheet(self, size_x, size_y, line,idle_left, width, height, invert):
-        image = self.Ganon_spritesheet.subsurface((idle_left * size_x, line), (size_x, size_y)) #arrumar
+    def load_spritesheet(self, size_x, size_y, line,idle_left, width, height, invert, spritesheet):
+        image = spritesheet.subsurface((idle_left * size_x, line), (size_x, size_y)) #arrumar
         image = pygame.transform.scale(image, (width, height))
         image = pygame.transform.flip(image, invert, False)
         return image
@@ -134,49 +137,52 @@ class Assets():
 
     def init_Ganon(self, width, height):
         for idle_left in range(4):
-            image = self.load_spritesheet(100, 100, 0, idle_left, width + self.Gadjust, height + self.Gadjust, True)
+            image = self.load_spritesheet(100, 100, 0, idle_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
             self.GidleL_images.append(image)
         
         for idle_right in range(4):
-            image = self.load_spritesheet(100, 100, 0, idle_right, width + self.Gadjust, height + self.Gadjust, False)
+            image = self.load_spritesheet(100, 100, 0, idle_right, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
             self.GidleR_images.append(image)
             
-        for attack_left in range(9):
-            image = self.load_spritesheet(100, 100, 100, attack_left, width + self.Gadjust, height + self.Gadjust, True)
+        for attack_left in range(6):
+            image = self.load_spritesheet(100, 100, 100, attack_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
             self.GattackL_images.append(image)
 
-        for attack_right in range(9):
-            image = self.load_spritesheet(100, 100, 100, attack_right, width + self.Gadjust, height + self.Gadjust, False)
+        for attack_right in range(6):
+            image = self.load_spritesheet(100, 100, 100, attack_right, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
             self.GattackR_images.append(image)
 
         for immune_left in range(8):
-            image = self.load_spritesheet(100, 100, 300, immune_left, width + self.Gadjust, height + self.Gadjust, True)
+            image = self.load_spritesheet(100, 100, 300, immune_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
             self.GimmuneL_images.append(image)
 
         for immune_right in range(8):
-            image = self.load_spritesheet(100, 100, 300, immune_right, width + self.Gadjust, height + self.Gadjust, False)
+            image = self.load_spritesheet(100, 100, 300, immune_right, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
             self.GimmuneR_images.append(image)
         
         for death_left in range(10):
-            image = self.load_spritesheet(100, 100, 700, death_left, width + self.Gadjust, height + self.Gadjust, False)
+            image = self.load_spritesheet(100, 100, 700, death_left, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
             self.GdeathL_images.append(image)
         
         for death_left in range(4):
-            image = self.load_spritesheet(100, 100, 800, death_left, width + self.Gadjust, height + self.Gadjust, False)
+            image = self.load_spritesheet(100, 100, 800, death_left, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
             self.GdeathL_images.append(image)
 
         for death_right in range(10):
-            image = self.load_spritesheet(100, 100, 700, death_right, width + self.Gadjust, height + self.Gadjust, True)
+            image = self.load_spritesheet(100, 100, 700, death_right, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
             self.GdeathR_images.append(image)
         
         for death_right in range(4):
-            image = self.load_spritesheet(100, 100, 800, death_right, width + self.Gadjust, height + self.Gadjust, True)
+            image = self.load_spritesheet(100, 100, 800, death_right, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
             self.GdeathR_images.append(image)
-        
+
+        self.projectile = self.load_spritesheet(100, 150, 100, 0, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_projectile)
+        image = self.load_spritesheet(100, 150, 100, 0, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_projectile)
+        self.GprojectileR_images.append(image)
 
     def assets_Ganon(self, action, rect):
         if action == "IdleLeft" or action == "IdleRight":
-            self.Gactual_Idle = self.Gactual_Idle + 0.4
+            self.Gactual_Idle = self.Gactual_Idle + 0.2
             if self.Gactual_Idle >= len(self.GidleL_images):
                 self.Gactual_Idle = 0
             
@@ -187,9 +193,9 @@ class Assets():
                 self.image = self.GidleR_images[int(self.Gactual_Idle)]
         
         if action == "AttackLeft" or action == "AttackRight":
-            self.Gactual_Attack = self.Gactual_Attack + 0.4
+            self.Gactual_Attack = self.Gactual_Attack + 0.1
             if self.Gactual_Attack >= len(self.GattackL_images):
-                self.Gactual_Attack = 0
+                self.Gactual_Attack = 5
             
             if action == "AttackLeft":
                 self.image = self.GattackL_images[int(self.Gactual_Attack)]
@@ -210,16 +216,18 @@ class Assets():
             self.Gactual_Immune = self.Gactual_Immune + 0.3
         
         if action == "DeathLeft" or action == "DeathRight":
-            # if self.Gactual_Death >= len(self.GdeathL_images):
-            #     self.Gactual_Death = 0
-            print(self.Gactual_Death)
-            print(len(self.GdeathL_images))
             if action == "DeathLeft":
                 self.image = self.GdeathL_images[int(self.Gactual_Death)]
             
             if action == "DeathRight":
                 self.image = self.GdeathR_images[int(self.Gactual_Death)]
             self.Gactual_Death = self.Gactual_Death + 0.2
+        
+        if action == "ProjectileLeft" or action == "ProjectileRight":
+            # if action == "ProjectileLeft":
+                # self.image = self.projectileL
+            if action == "ProjectileRight":
+                self.image == self.GprojectileR_images[0]
 
         self.image_rect = self.image.get_rect()
         self.image_rect.bottom = rect.bottom + 40

@@ -105,10 +105,10 @@ class Mage(Monsters):
     def attack(self):
         if self.projectile_cooldown <= 0:
             if self.hero.rect.x <= self.rect.x:
-                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, damage= 20)
+                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 15, 15)
                 self.projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, damage= 20)
+                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 15, 15)
                 self.projectiles.append(new_projectile)
             self.projectile_cooldown = self.cool_down
 
@@ -167,7 +167,7 @@ class Flying(Monsters):
     
     def attack(self):
         if self.projectile_cooldown <= 0:
-            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 30, self.TAG, damage= 20)
+            new_projectile = Projectile(self.rect.left, self.rect.bottom, self.speed_x, 30, self.TAG, 20, 15, 15)
             self.projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cool_down

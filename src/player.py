@@ -7,6 +7,7 @@ class Player:
     
     def __init__(self, x, y, width, height):
         self.TAG = "Player"
+        self.sub_TAG = "Player"
         self.max_life = 2000
         self.life = self.max_life
         
@@ -155,7 +156,7 @@ class Player:
 
         for projectile in self.projectiles:
                 if other.TAG == "Monster" and projectile.rect.colliderect(other):
-                    if not other.sub_TAG == "Ganon":
+                    if not projectile.who == "Yokai":
                         other.life -= self.damage
                     self.projectiles.remove(projectile)
                     del projectile
@@ -229,7 +230,7 @@ class Yokai(Player):
     
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
-        self.subTAG = "Yokai"
+        self.sub_TAG = "Yokai"
         self.jump_count_max = 2
         self.rect_color = (255, 255, 0)
         self.damage = 20
@@ -238,13 +239,13 @@ class Yokai(Player):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0:
             if key_map[pygame.K_UP]:  
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.TAG, self.damage)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.sub_TAG, self.damage, 15, 15)
                 self.projectiles.append(new_projectile)
             elif self.from_the_front: 
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.TAG, self.damage)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.sub_TAG, self.damage, 15, 15)
                 self.projectiles.append(new_projectile)
             else:
-                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.TAG, self.damage)
+                new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.sub_TAG, self.damage, 15, 15)
                 self.projectiles.append(new_projectile)
 
             self.projectile_cooldown = self.cooldown_time

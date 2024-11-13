@@ -1,9 +1,9 @@
 import pygame
 
 class Projectile:
-    def __init__(self, x, y, speed_x, speed_y, who, damage):
+    def __init__(self, x, y, speed_x, speed_y, who, damage, width, height):
         self.TAG = "Projectile"
-        self.rect = pygame.Rect(x, y, 15, 15) 
+        self.rect = pygame.Rect(x, y, width, height) 
         self.color = (0, 0, 255)  
         self.speed_x = speed_x  
         self.speed_y = speed_y
