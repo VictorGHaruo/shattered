@@ -22,7 +22,6 @@ class GameManager:
         self.atual_hero = 0
         self.hero = self.heros[self.atual_hero]
         
-        self.projectiles = []
         self.camera = Camera(0, main.WIDTH)
     
         self.grounds = []
@@ -46,14 +45,16 @@ class GameManager:
         Text('Hero', type(self.hero).__name__, main.screen, 0, 0, pygame.font.SysFont("Times New Roman", 22)),
         Text('Life', self.hero.life, main.screen, 0, 20, pygame.font.SysFont("Times New Roman", 22))
         ]
-
         self.Values = [type(self.hero).__name__, self.hero.life]
+        
+        # Trade keys
         self.keys_trade = [
                     "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
                     "on_ground", "to_left", "to_right", "from_the_front",
-                    "invincibility_time", "projectiles", "is_touching_obelisk"
+                    "invincibility_time", "projectiles", "touched_obelisk", "can_push_block"
                 ]
 
+        ##BackGround
         self.bg_images = []
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         Background_path = os.path.join(path_game, os.pardir, "assets", "Background")
@@ -85,8 +86,8 @@ class GameManager:
             monster.update()
             monster.new_hero(self.hero)
 
-        for projectile in self.projectiles:
-            projectile.update()
+        # for projectile in self.projectiles:
+        #     projectile.update()
 
         for boss in self.bosses:
             boss.update()
@@ -126,11 +127,6 @@ class GameManager:
             if boss.is_dead == True:
                 self.bosses.remove(boss)
                 del boss
-
-        for projectile in self.projectiles:
-                if not self.screen.get_rect().colliderect(projectile.rect):
-                    self.projectiles.remove(projectile)
-                    del projectile
         
         if self.hero.life <= 0 or self.hero.rect.y > 1000:
             chage_state("over")
@@ -159,9 +155,6 @@ class GameManager:
         
         for monster in self.enemies:
             monster.draw(screen, self.camera)
-            
-        for projectile in self.projectiles:
-                projectile.draw(screen)
 
         for boss in self.bosses:
             boss.draw(screen, self.camera)

@@ -14,8 +14,9 @@ class Projectile:
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+    def draw(self, screen, camera):
+        self.rect.x -= camera.position_x
+        pygame.draw.rect(screen, self.color, self.rect) 
 
 class Shield:
     def __init__(self, x, y, width, height, damage):

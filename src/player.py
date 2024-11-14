@@ -1,5 +1,6 @@
 import pygame
 from weapon import Projectile, Shield, Attack
+import copy
 
 class Player:
     
@@ -28,7 +29,9 @@ class Player:
         self.to_right = False
         self.on_ground = False
         self.from_the_front = True
-        self.is_touching_obelisk = False
+        self.has_collision_obelisk = False
+        self.touched_obelisk = False
+        self.can_push_block = False
         
         
         self.trade_cooldown_time = 60
@@ -48,7 +51,7 @@ class Player:
             pygame.draw.rect(screen, self.rect_color, self.rect)
 
         for projectile in self.projectiles:
-            projectile.draw(screen)
+            projectile.draw(screen, camera)
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
                 del projectile
@@ -91,6 +94,9 @@ class Player:
             if event.key == pygame.K_SPACE:
                 self.jump()
                 self.on_ground = False
+            if event.key == pygame.K_f and self.has_collision_obelisk:
+                self.touched_obelisk = True
+                self.can_push_block = True
 
     def jump(self):
         if self.jump_count >= self.jump_count_max:
@@ -120,8 +126,9 @@ class Player:
                 self.is_running = False
                 self.speed_x = 0
                 
-            if key_map[pygame.K_f] and self.is_touching_obelisk:
-                main.save_state = main.current_state
+            # if key_map[pygame.K_f] and self.is_touching_obelisk:
+            #     f_save(main)
+                
             
             
     def on_collision(self, other):
@@ -169,9 +176,14 @@ class Player:
                     del projectile
                     
         if other.TAG == "Obelisk" and self.rect.colliderect(other.rect):
-            self.is_touching_obelisk = True
-        elif other.TAG == "Obelisk":
-            self.is_touching_obelisk = False
+            self.has_collision_obelisk = True
+            
+        if other.TAG == "Obelisk" and self.touched_obelisk and self.rect.colliderect(other.rect):
+            other.touched = True
+            self.has_collision_obelisk = False
+            self.touched_obelisk = False
+            
+            
 
             
 class Knight(Player):
@@ -303,3 +315,13 @@ class Ninja(Player):
 
         if self.attack_cooldown > 0:
             self.attack_cooldown -= 1    
+
+
+# def f_save(main):
+#     keys_save = ["heros"]
+#     main.save_state_game = main.current_state.__getstate__()
+#     for key in keys_save:
+#         print(main.save_state_game[key])
+#         main.save_state_game = copy.deepcopy(main.save_state_game[key])
+#         print(main.save_state_game)
+#     print("Saved")

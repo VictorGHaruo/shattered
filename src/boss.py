@@ -231,7 +231,7 @@ class Ganon(Bosses, pygame.sprite.Sprite):
         super().draw(screen, camera)
 
         for projectile in self.projectiles: 
-            projectile.draw(screen)
+            projectile.draw(screen, camera)
         
         self.image = self.assets.image
         screen.blit(self.image, self.assets.image_rect)

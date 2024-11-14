@@ -45,7 +45,7 @@ class Block(Ground):
     def on_collision(self, other):
         super().on_collision(other)
         
-        if other.TAG == "Player" and other.rect.colliderect(self.rect):
+        if other.TAG == "Player" and other.rect.colliderect(self.rect) and other.can_push_block:
             if other.speed_x > 0 and self.rect.top < other.rect.top:
                 self.is_pushing_l = True
             if other.speed_x < 0 and self.rect.top < other.rect.top:
@@ -73,17 +73,28 @@ class Obelisk():
     
     def __init__(self, x, y, width, height, image_path):
         self.TAG = "Obelisk"
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.image.get_rect()
+        self.sheet_im = pygame.image.load(image_path).convert_alpha()
+        self.images = []
+        for i in range(14):
+            image = self.sheet_im.subsurface((i*190, 0), (190, 380))
+            image = pygame.transform.scale(image, (width, height))
+            self.images.append(image)
+        self.num_image = 0
+        self.rect = self.images[0].get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.is_touching = False
+        self.touched = False
     
     def draw(self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            screen.blit(self.image, self.rect)
+            if self.touched and self.num_image < 14:
+                screen.blit(self.images[int(self.num_image)], self.rect)
+                self.num_image += 0.25
+            else: 
+                screen.blit(self.images[0], self.rect)
+                self.num_image = 0
+                self.touched = False
             
     def on_collision(self, other):
         pass
@@ -97,7 +108,7 @@ def maping(grounds):
     grid = [
         "I                                                                                                     I                              XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
         "I                                                                                                     I                              XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "I                                                                                                     N                              X                          X",
+        "I                                                                                                   O N                              X                          X",
         "I                                                                      TMMP         TMMMP         TMMMP                              X                          X",
         "I                                                                                                                                    X                          X",
         "I                                                         TMMMP                                                                      X                          X",
@@ -107,7 +118,7 @@ def maping(grounds):
         "I                              EXXXXXXXXXXXXXXXXXD                                                                                   X                          X",
         "I                              LGGGGGGGGGGGGGGGGGR                                                                                   X                          X",
         "I                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                   X                          X",
-        "I       O                      LGGGGGGGGGGGGGGGGGR   TMP                                                                             X                          X",
+        "I  O   B                       LGGGGGGGGGGGGGGGGGR   TMP                                                                             X                          X",
         "IXXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD                                                                  X",
         "IGGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
         "IGGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
@@ -127,12 +138,12 @@ def maping(grounds):
     image_ground_R = os.path.join(Ground_path, "Ground_11.png")
     image_ground_N = os.path.join(Ground_path, "Stone.png")
     image_spike_S = os.path.join(Ground_path, "Spikes.png")
-    image_obelisk_O = os.path.join(Ground_path, "obelisk.png")
+    image_obelisk_O = os.path.join(Ground_path, "Obelisk.png")
     
     keys_ground = [
         ["X", image_ground_X], ["E", image_ground_E], ["G", image_ground_G], ["D", image_ground_D],
         ["L", image_ground_L], ["T", image_ground_T], ["M", image_ground_M], ["P", image_ground_P],
-        ["R", image_ground_R], ["N", image_ground_N], ["I", image_ground_X]
+        ["R", image_ground_R], ["N", image_ground_N]
     ] 
     
     i_range = len(grid)
@@ -140,11 +151,13 @@ def maping(grounds):
     for i in range(i_range):
         for j in range(j_range):
             if grid[i][j] == "O":
-                grounds.append(Obelisk(j*50 - 50, i*50 - 60, 50, 125, image_obelisk_O))
+                grounds.append(Obelisk(j*50 - 50, i*50 - 185, 150, 250, image_obelisk_O))
             if grid[i][j] == "I":
                 grounds.append(Invsible(j*50 - 50, i*50, 50, 50, image_ground_X))
             if grid[i][j] == "S":
-                grounds.append(Spike(j*50 - 50, i*50, 50, 50, image_spike_S))                
+                grounds.append(Spike(j*50 - 50, i*50, 50, 50, image_spike_S))    
+            if grid[i][j] == "B":
+                grounds.append(Block(j*50 - 50, i*50, 50, 50, image_ground_N))                
             for key in keys_ground:
                 if grid[i][j] == key[0]:
                     grounds.append(Ground(j*50 - 50, i*50, 50, 50, key[1]))

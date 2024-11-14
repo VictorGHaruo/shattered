@@ -25,11 +25,15 @@ class Button():
         if event.type == pygame.MOUSEBUTTONDOWN:
             has_colission = self.rect.collidepoint(event.pos)
             if event.button == 1 and has_colission:
-                if main.save_state != 0:
-                    main.states["game"] = main.save_state
-                    main.change_state("game")
-                else:
-                    f_reset_game(main)
+                # print(main.save_state)
+                # if main.save_state_game != 0:
+                #     f_reset_game(main)
+                #     print(main.states["game"].__dict__["heros"][0].life)
+                #     main.states["game"].__dict__["heros"]= main.save_state_game
+                #     print(main.states["game"].__dict__["heros"][0].life)
+                #     main.change_state("game")
+                # else:
+                f_reset_game(main)
                 
     def exit(self, event, main):
         if event.type == pygame.MOUSEBUTTONDOWN:

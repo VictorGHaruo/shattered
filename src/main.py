@@ -17,7 +17,7 @@ class Main():
             "over": Game_Over(self)
         }
         self.current_state = self.states["menu"]
-        self.save_state = 0
+        # self.save_state_game = 0
         
     def run(self):
         clock = pygame.time.Clock()
