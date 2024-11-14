@@ -139,7 +139,7 @@ class Balrog(Bosses, pygame.sprite.Sprite):
         if len(self.attacks) != 0:
             for atks in self.attacks:
                 # self.assets.assets_Balrog("Lightning", atks.rect)
-                print(atks.rect.x)
+                # print(atks.rect.x)
 
                 atks.draw(screen)
         

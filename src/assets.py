@@ -273,7 +273,7 @@ class Assets():
                 self.Bactual_Fly = 0
             if action == "FlyLeft":
                 self.image = self.BflyL_images[int(self.Bactual_Fly)]
-                print(self.Bactual_Fly)
+                # print(self.Bactual_Fly)
             if action == "FlyRight":
                 self.image = self.BflyR_images[int(self.Bactual_Fly)]
 
