@@ -116,6 +116,10 @@ class GameManager:
                 self.hero.on_collision(boss)
                 ground.on_collision(boss)
                 boss.on_collision(ground)
+                
+            if ground.sub_TAG == "Block":
+                for gro in self.grounds:
+                    ground.on_collision(gro)
 
     def elimination(self, chage_state):
         for monster in self.enemies:

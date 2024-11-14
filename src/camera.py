@@ -11,7 +11,7 @@ class Camera:
     
     def update_coods(self, hero):
         if hero.TAG == "Player":
-            if self.fix_X <= -5700:
+            if self.fix_X <= (132 * (-50)) + 700:
                 self.boss_fase = True
             if hero.rect.centerx >= self.fix_X and not self.boss_fase:
                 self.position_x = hero.rect.centerx - self.WIDGHT // 2

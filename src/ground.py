@@ -29,21 +29,32 @@ class Block(Ground):
     def __init__(self, x, y, width, height, image_path):
         super().__init__(x, y, width, height, image_path)
         self.sub_TAG = "Block"
-        self.speed_x = 0
+        self.gravity_y = 2
+        self.speed_y = 0
+        self.speed_y_max = 40
         self.is_pushing_r = False
         self.is_pushing_l = False
         
     def update(self):
         super().update()
+        
+        self.speed_y += self.gravity_y
+        self.rect.y += min(self.speed_y, self.speed_y_max)
+        
         if self.is_pushing_r:
-            self.rect.x -= 1
+            self.rect.x -= 1.5
             self.is_pushing_r = False
         if self.is_pushing_l:
-            self.rect.x += 1
+            self.rect.x += 1.5
             self.is_pushing_l = False
             
     def on_collision(self, other):
         super().on_collision(other)
+        
+        if other.TAG == "Ground" and self.rect.colliderect(other.rect):
+            if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
+                self.rect.bottom = other.rect.top
+                self.speed_y = 0
         
         if other.TAG == "Player" and other.rect.colliderect(self.rect) and other.can_push_block:
             if other.speed_x > 0 and self.rect.top < other.rect.top:
@@ -73,6 +84,7 @@ class Obelisk():
     
     def __init__(self, x, y, width, height, image_path):
         self.TAG = "Obelisk"
+        self.sub_TAG = "Obelisk"
         self.sheet_im = pygame.image.load(image_path).convert_alpha()
         self.images = []
         for i in range(14):
@@ -106,22 +118,22 @@ class Obelisk():
 def maping(grounds):
     
     grid = [
-        "I                                                                                                     I                              XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "I                                                                                                     I                              XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "I                                                                                                   O N                              X                          X",
-        "I                                                                      TMMP         TMMMP         TMMMP                              X                          X",
-        "I                                                                                                                                    X                          X",
-        "I                                                         TMMMP                                                                      X                          X",
-        "I                                                                                                                                    X                          X",
-        "I                                                                                                                                    X                          X",
-        "I                                                                                                                                    X                          X",
-        "I                              EXXXXXXXXXXXXXXXXXD                                                                                   X                          X",
-        "I                              LGGGGGGGGGGGGGGGGGR                                                                                   X                          X",
-        "I                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                   X                          X",
-        "I  O   B                       LGGGGGGGGGGGGGGGGGR   TMP                                                                             X                          X",
-        "IXXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD                                                                  X",
-        "IGGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "IGGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "                                                                                                     I                             CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "                                                                                                     I                             CC                          CC",
+        "                                                                                                   O I                             CC                          CC",
+        "                                                                      TMMP         TMMMP         TMMMP                             CC                          CC",
+        "                                                                                                                                   CC                          CC",
+        "                                                         TMMMP                                                                     CC                          CC",
+        "                                                                                                                                   CC                          CC",
+        "                                                                                                                                   CC                          CC",
+        "                                                                                                                                   CC                          CC",
+        "                              EXXXXXXXXXXXXXXXXXD                                                                                  CC                          CC",
+        "                              LGGGGGGGGGGGGGGGGGR                                                                                  CC                          CC",
+        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                  CC                          CC",
+        "  O   B                       LGGGGGGGGGGGGGGGGGR   TMP                                                                             B                          CC",
+        "XXXXXXX XXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD                       EXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
     ]
     
     path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -136,14 +148,15 @@ def maping(grounds):
     image_ground_M = os.path.join(Ground_path, "Ground_09.png")
     image_ground_P = os.path.join(Ground_path, "Ground_10.png")
     image_ground_R = os.path.join(Ground_path, "Ground_11.png")
-    image_ground_N = os.path.join(Ground_path, "Stone.png")
+    image_ground_B = os.path.join(Ground_path, "Wooden_Box.png")
     image_spike_S = os.path.join(Ground_path, "Spikes.png")
     image_obelisk_O = os.path.join(Ground_path, "Obelisk.png")
+    image_ground_C = os.path.join(Ground_path, "Brick_02_p.png")
     
     keys_ground = [
         ["X", image_ground_X], ["E", image_ground_E], ["G", image_ground_G], ["D", image_ground_D],
         ["L", image_ground_L], ["T", image_ground_T], ["M", image_ground_M], ["P", image_ground_P],
-        ["R", image_ground_R], ["N", image_ground_N]
+        ["R", image_ground_R], ["C", image_ground_C]
     ] 
     
     i_range = len(grid)
@@ -151,13 +164,13 @@ def maping(grounds):
     for i in range(i_range):
         for j in range(j_range):
             if grid[i][j] == "O":
-                grounds.append(Obelisk(j*50 - 50, i*50 - 185, 150, 250, image_obelisk_O))
+                grounds.append(Obelisk(j*50, i*50 - 185, 150, 250, image_obelisk_O))
             if grid[i][j] == "I":
-                grounds.append(Invsible(j*50 - 50, i*50, 50, 50, image_ground_X))
+                grounds.append(Invsible(j*50, i*50, 50, 50, image_ground_X))
             if grid[i][j] == "S":
-                grounds.append(Spike(j*50 - 50, i*50, 50, 50, image_spike_S))    
+                grounds.append(Spike(j*50, i*50, 50, 50, image_spike_S))    
             if grid[i][j] == "B":
-                grounds.append(Block(j*50 - 50, i*50, 50, 50, image_ground_N))                
+                grounds.append(Block(j*50, i*50, 40, 52, image_ground_B))                
             for key in keys_ground:
                 if grid[i][j] == key[0]:
-                    grounds.append(Ground(j*50 - 50, i*50, 50, 50, key[1]))
+                    grounds.append(Ground(j*50, i*50, 50, 50, key[1]))

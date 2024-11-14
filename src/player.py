@@ -72,6 +72,9 @@ class Player:
             if self.to_right:
                 self.speed_x = 0
             self.rect.x += max(self.speed_x, self.speed_x_min)
+        print(self.rect.x)
+        if self.rect.x <= 0:
+            self.rect.x = 0
         
         # Se tiver no ar is_running é True, para manter constante a velocidade
         if not self.is_running:
