@@ -62,7 +62,7 @@ class Bosses:
                     self.projectiles.remove(projectile)
                     del projectile
 
-class Balrog(Bosses):
+class Balrog(Bosses, pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
         self.speed_x = 3
@@ -90,11 +90,14 @@ class Balrog(Bosses):
         self.warning_sign = 20
 
 
-        self.number_bars = 5
+        self.number_bars = 3
         self.weapon_damage = 100
 
         self.attacks = []
         self.all_atks = []
+
+        self.assets = Assets()
+        self.assets.init_Balrog(width, height)
         
         for atks in range(self.number_bars):
             self.all_atks.append(Attack(self.screen_width/self.number_bars * atks, 10 + atks, self.screen_width / self.number_bars, 200, self.weapon_damage))
@@ -126,17 +129,25 @@ class Balrog(Bosses):
         
         if self.randomic >= self.probability:
             self.rect.x = self.rect.x + self.speed_x
+            self.assets.assets_Balrog("FlyRight", self.rect)
 
         else:
             self.rect.x = self.rect.x - self.speed_x
+            self.assets.assets_Balrog("FlyLeft", self.rect)
 
     def draw(self, screen, camera):
         if len(self.attacks) != 0:
             for atks in self.attacks:
+                # self.assets.assets_Balrog("Lightning", atks.rect)
+                # print(atks.rect.x)
+
                 atks.draw(screen)
+        
+        self.image = self.assets.image
+        screen.blit(self.image, self.assets.image_rect)
+        super().draw(screen, camera)
 
 
-        return super().draw(screen, camera)
 
     def on_collision(self, other: pygame.Rect):
         for atks in self.attacks:
@@ -149,6 +160,8 @@ class Balrog(Bosses):
     def update(self):
         self.move()
         self.attack()
+
+        # print(self.life)
 
         if self.damage_timer > 0:
             self.damage_timer -=1
@@ -178,11 +191,11 @@ class Ganon(Bosses, pygame.sprite.Sprite):
         self.color_aux = ()
         self.color_change = False
 
-        self.life = 60
+        self.life = 1
 
-        self.atk_timer = 200
+        self.atk_timer = 100
         self.atk_cooldown = self.atk_timer
-        self.atk_long = 100
+        self.atk_long = 30
 
         self.teleport = 60
         self.teleport_cooldown = self.teleport
@@ -192,6 +205,7 @@ class Ganon(Bosses, pygame.sprite.Sprite):
         #sprites
         self.assets = Assets()
         self.assets.init_Ganon(width, height)
+        self.assets.init_Projectile(width, height - 200)
 
     def update(self):
 
@@ -199,20 +213,9 @@ class Ganon(Bosses, pygame.sprite.Sprite):
             self.atk_timer -= 1
 
         for projectile in self.projectiles:
-            self.assets.assets_Ganon("ProjectileRight", projectile.rect)
+            # self.assets.assets_Ganon("ProjectileRight", projectile.rect)
             projectile.update()
         
-
-        #ARRUMAR
-        # if self.life > 0:
-        #     if self.atk_cooldown > self.atk_timer and self.rect.x - self.hero.rect.x <= 0:
-        #         self.assets.assets_Ganon("AttackRight", self.rect)
-
-        #     if self.atk_cooldown > self.atk_timer and self.rect.x - self.hero.rect.x > 0:
-        #         self.assets.assets_Ganon("AttackLeft", self.rect)
-
-
-        # print(self.life)
 
         if self.life <= 0 and self.rect.x - self.hero.rect.x <= 0 and self.assets.Gactual_Death <=14:
             self.assets.assets_Ganon("DeathLeft", self.rect)
@@ -223,6 +226,11 @@ class Ganon(Bosses, pygame.sprite.Sprite):
                 self.is_dead = True
             self.assets.assets_Ganon("DeathRight", self.rect)
 
+        for projectile in self.projectiles:
+            projectile.update()
+            
+            # projectile.draw(screen)
+
         self.attack()
         self.move()
         return super().update()
@@ -230,9 +238,13 @@ class Ganon(Bosses, pygame.sprite.Sprite):
     def draw(self, screen, camera):
         super().draw(screen, camera)
 
-        for projectile in self.projectiles: 
+        for projectile in self.projectiles:
+            projectile.update()
+            self.image = self.assets.projectile
+            # screen.blit(self.image, self.rect)
+
             projectile.draw(screen, camera)
-        
+
         self.image = self.assets.image
         screen.blit(self.image, self.assets.image_rect)
 
@@ -246,22 +258,13 @@ class Ganon(Bosses, pygame.sprite.Sprite):
                 if self.atk_timer <= 0:
                     if self.assets.Gactual_Attack >= 5:
                         self.assets.Gactual_Attack = 0
-                    new_projectile_1 = Projectile(self.rect.left, self.rect.centery + 40, - 20, 0, self.TAG, 20, 40, 40)
-                    new_projectile_2 = Projectile(self.rect.left, self.rect.centery + 80, - 20, 0, self.TAG, 20, 40, 40)
-                    new_projectile_3 = Projectile(self.rect.left, self.rect.centery + 120, - 20, 0, self.TAG, 20, 40, 40)
-                    new_projectile_4 = Projectile(self.rect.left, self.rect.centery - 40, - 20, 0, self.TAG, 20, 40, 40)
-                    new_projectile_5 = Projectile(self.rect.left, self.rect.centery - 80, - 20, 0, self.TAG, 20, 40, 40)
-                    new_projectile_6 = Projectile(self.rect.left, self.rect.centery - 120, - 20, 0, self.TAG, 20, 40, 40)
-                    new_projectile_7 = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 40, 40)
 
 
-                    self.projectiles.append(new_projectile_1)
-                    self.projectiles.append(new_projectile_2)
-                    self.projectiles.append(new_projectile_3)
-                    self.projectiles.append(new_projectile_4)
-                    self.projectiles.append(new_projectile_5)
-                    self.projectiles.append(new_projectile_6)
-                    self.projectiles.append(new_projectile_7)
+                        new_projectile_7 = Projectile(self.rect.left, self.rect.centery, -5, 0, self.TAG, 20, 40, 40, self.assets.assets_Projectile("ProjectileLeft"))
+                        self.projectiles.append(new_projectile_7)
+
+
+
                     self.atk_timer = self.atk_cooldown + self.atk_long 
 
             if self.hero.rect.x - self.rect.x  > 0:
@@ -303,7 +306,6 @@ class Ganon(Bosses, pygame.sprite.Sprite):
 
                         self.assets.assets_Ganon("ImmuneRight", self.rect)
                         
-
                 if self.hero.rect.centerx - self.rect.centerx < 0 and self.teleport_cooldown <= 0:
                     self.rect.x = 0.1 * self.screen_width
                     self.rect.y = 0 #retirar dps
@@ -392,6 +394,8 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
         
         if self.damage_timer > 0:
             self.damage_timer -=1
+
+        # print(self.life)
 
         if self.life <= 0 and self.rect.x - self.hero.rect.x <= 0 and self.assets.actual_Death <=16:
             self.assets.assets_Demogorgon("DeathLeft", self.rect)
