@@ -39,7 +39,17 @@ class Assets():
         self.Gactual_Attack = 0
         self.Gactual_Immune = 0
         self.Gactual_Death = 0
-        self.Gadjust = 180
+        self.Gadjust = 100
+
+        #Balrog
+        self.BflyL_images = []
+        self.BflyR_images = []
+        self.Blightning_images = []
+
+        self.Bactual_Fly = 0
+        self.Bactual_Lightning = 0
+
+        self.Badjust = 100
 
     def load_image(self, image_path, width, height, invert):
         image = pygame.image.load(image_path).convert_alpha()
@@ -53,7 +63,6 @@ class Assets():
         image = pygame.transform.flip(image, invert, False)
         return image
     
-
     def init_Demogorgon(self, width, height):
         for walk_left in range(10):
             image = self.load_image(f"{self.main_directory}/assets/Demagorgon/walk/walk_{walk_left+1}.png", width + self.Dadjust, height + self.Dadjust, True)
@@ -135,6 +144,23 @@ class Assets():
         self.image_rect.bottom = rect.bottom + 90 
         self.image_rect.centerx = rect.centerx
 
+    def init_Projectile (self,width, height):
+        image = self.load_spritesheet(100, 150, 100, 0, width + 200, height + 200, False, self.Ganon_projectile)
+        self.GprojectileR_images.append(image)
+
+        image = self.load_spritesheet(100, 150, 100, 0, width + 1200, height + 1200, True, self.Ganon_projectile)
+        self.GprojectileR_images.append(image)
+    
+    def assets_Projectile(self, action):
+
+
+        if action == "ProjectileLeft":
+            self.projectile = self.GprojectileR_images[0]
+            return self.projectile
+        elif action == "ProjectileRight":
+            self.projectile = self.GprojectileR_images[1]
+            return self.projectile
+
     def init_Ganon(self, width, height):
         for idle_left in range(4):
             image = self.load_spritesheet(100, 100, 0, idle_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
@@ -176,9 +202,6 @@ class Assets():
             image = self.load_spritesheet(100, 100, 800, death_right, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
             self.GdeathR_images.append(image)
 
-        self.projectile = self.load_spritesheet(100, 150, 100, 0, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_projectile)
-        image = self.load_spritesheet(100, 150, 100, 0, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_projectile)
-        self.GprojectileR_images.append(image)
 
     def assets_Ganon(self, action, rect):
         if action == "IdleLeft" or action == "IdleRight":
@@ -223,12 +246,42 @@ class Assets():
                 self.image = self.GdeathR_images[int(self.Gactual_Death)]
             self.Gactual_Death = self.Gactual_Death + 0.2
         
-        if action == "ProjectileLeft" or action == "ProjectileRight":
-            # if action == "ProjectileLeft":
-                # self.image = self.projectileL
-            if action == "ProjectileRight":
-                self.image == self.GprojectileR_images[0]
+
 
         self.image_rect = self.image.get_rect()
-        self.image_rect.bottom = rect.bottom + 40
+        self.image_rect.bottom = rect.bottom + 30
         self.image_rect.centerx = rect.centerx 
+
+    def init_Balrog(self, width, height):
+        for fly_left in range(6):
+            image = self.load_image(f"{self.main_directory}/assets/Balrog/fly/fly_{fly_left+1}.png", width + self.Badjust, height + self.Badjust, True)
+            self.BflyL_images.append(image)
+        
+        for fly_right in range(6):
+            image = self.load_image(f"{self.main_directory}/assets/Balrog/fly/fly_{fly_right+1}.png", width + self.Badjust, height + self.Badjust, False)
+            self.BflyR_images.append(image)
+
+        for lightning in range(11):
+            image = self.load_image(f"{self.main_directory}/assets/Balrog/lightning/Lightning{lightning+1}.png", width + self.Badjust + 200, height + self.Badjust + 200, False)
+            self.Blightning_images.append(image)
+
+    def assets_Balrog(self, action, rect):
+        # print(len(self.BflyL_images))
+        if action == "FlyLeft" or action == "FlyRight":
+            self.Bactual_Fly = self.Bactual_Fly + 0.4
+            if self.Bactual_Fly >= len(self.BflyL_images):
+                self.Bactual_Fly = 0
+            if action == "FlyLeft":
+                self.image = self.BflyL_images[int(self.Bactual_Fly)]
+                print(self.Bactual_Fly)
+            if action == "FlyRight":
+                self.image = self.BflyR_images[int(self.Bactual_Fly)]
+
+            # if self.Bactual_Lightning >= len(self.Blightning_images):
+            #     self.Bactual_Lightning = self.Bactual_Lightning + 0.4
+            #     self.Bactual_Lightning = 0
+            # self.image = self.Blightning_images[int(self.Bactual_Lightning)]
+
+        self.image_rect = self.image.get_rect()
+        self.image_rect.bottom = rect.bottom + 90 
+        self.image_rect.centerx = rect.centerx

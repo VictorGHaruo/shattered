@@ -1,7 +1,7 @@
 import pygame
 
 class Projectile:
-    def __init__(self, x, y, speed_x, speed_y, who, damage, width, height):
+    def __init__(self, x, y, speed_x, speed_y, who, damage, width, height, image = None):
         self.TAG = "Projectile"
         self.rect = pygame.Rect(x, y, width, height) 
         self.color = (0, 0, 255)  
@@ -9,13 +9,20 @@ class Projectile:
         self.speed_y = speed_y
         self.who = who
         self.damage = damage
+        self.image = image
 
     def update(self):
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
+
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+        if self.image:
+            print("oi")
+            screen.blit(self.image, self.rect)
+            pygame.draw.rect(screen, self.color, self.rect)
+        else:
+            pygame.draw.rect(screen, self.color, self.rect)
 
 class Shield:
     def __init__(self, x, y, width, height, damage):

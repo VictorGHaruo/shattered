@@ -158,8 +158,8 @@ class Player:
 
         for projectile in self.projectiles:
                 if other.TAG == "Monster" and projectile.rect.colliderect(other):
-                    if not projectile.who == "Yokai":
-                        other.life -= self.damage
+                    if not projectile.who == "Yokai" or not other.sub_TAG == "Ganon":
+                            other.life -= self.damage
                     self.projectiles.remove(projectile)
                     del projectile
 
