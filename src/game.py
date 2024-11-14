@@ -48,6 +48,11 @@ class GameManager:
         ]
 
         self.Values = [type(self.hero).__name__, self.hero.life]
+        self.keys_trade = [
+                    "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
+                    "on_ground", "to_left", "to_right", "from_the_front",
+                    "invincibility_time", "projectiles", "is_touching_obelisk"
+                ]
 
         self.bg_images = []
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -65,9 +70,9 @@ class GameManager:
         self.trade(event)
         self.hero.on_event(event)
         
-    def on_key_pressed(self):
+    def on_key_pressed(self, main):
         key_map = pygame.key.get_pressed()
-        self.hero.on_key_pressed(key_map)
+        self.hero.on_key_pressed(key_map, main)
         self.hero.actions(key_map)
             
     def update(self):
@@ -96,8 +101,8 @@ class GameManager:
     def collision_decetion(self):
         for ground in self.grounds:
             
-            self.hero.on_collision(ground)
             ground.on_collision(self.hero)
+            self.hero.on_collision(ground)
                 
             for enemie in self.enemies:
                 self.hero.on_collision(enemie)
@@ -148,10 +153,6 @@ class GameManager:
                 screen.blit(i, (self.pos_x +  x * self.pos_x_p + j*self.WIDTH, 0))
             x += 1
         
-        self.hero.draw(screen, self.camera)
-
-        for text in self.texts:  
-            text.draw()  
             
         for ground in self.grounds:
             ground.draw(screen, self.camera)
@@ -164,6 +165,11 @@ class GameManager:
 
         for boss in self.bosses:
             boss.draw(screen, self.camera)
+            
+        self.hero.draw(screen, self.camera)
+
+        for text in self.texts:  
+            text.draw()  
             
     def trade(self, event):
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
@@ -178,42 +184,15 @@ class GameManager:
                 self.atual_hero = 2
                 change = True
             
-            if change:    
-                self.change()
+            if change:
+                state_dict = self.hero.__getstate__()
+                
+                self.hero = self.heros[self.atual_hero]
+                
+                for key in self.keys_trade:
+                    self.hero.__dict__[key] = state_dict[key]
+                    
                 self.hero.trade_cooldown = self.hero.trade_cooldown_time
-        
-    def change(self):
-        x_atual = self.hero.rect.x
-        y_atual = self.hero.rect.y
-        hero_life = self.hero.life
-        speed_y_actual = self.hero.speed_y    
-        speed_x_actual = self.hero.speed_x
-        jump_count_actual = self.hero.jump_count
-        is_running_actual = self.hero.is_running
-        on_ground_actual = self.hero.on_ground
-        to_left_actual = self.hero.to_left
-        to_right_actual = self.hero.to_right
-        trade_cooldonw_actual  = self.hero.trade_cooldown
-        from_the_front_actual = self.hero.from_the_front
-        invincibility_cooldown_actual = self.hero.invincibility_time
-        projectiles_actual = self.hero.projectiles 
-            
-        self.hero = self.heros[self.atual_hero]
-        
-        self.hero.rect.x = x_atual 
-        self.hero.rect.y = y_atual
-        self.hero.life = hero_life
-        self.hero.speed_y = speed_y_actual 
-        self.hero.speed_x = speed_x_actual
-        self.hero.jump_count = jump_count_actual
-        self.hero.is_running = is_running_actual
-        self.hero.on_ground = on_ground_actual
-        self.hero.to_left = to_left_actual
-        self.hero.to_right = to_right_actual
-        self.hero.trade_cooldown = trade_cooldonw_actual
-        self.hero.from_the_front = from_the_front_actual
-        self.hero.invincibility_cooldown = invincibility_cooldown_actual
-        self.hero.projectiles = projectiles_actual
 
 if __name__ == "__main__":
     Game = GameManager()

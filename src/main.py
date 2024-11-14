@@ -17,6 +17,7 @@ class Main():
             "over": Game_Over(self)
         }
         self.current_state = self.states["menu"]
+        self.save_state = 0
         
     def run(self):
         clock = pygame.time.Clock()
@@ -36,7 +37,7 @@ class Main():
                 self.current_state.on_event(event, self)
                 
             if self.current_state == self.states["game"]:
-                self.current_state.on_key_pressed()
+                self.current_state.on_key_pressed(self)
                 self.current_state.update()
                 self.current_state.collision_decetion()
                 self.current_state.elimination(self.change_state)

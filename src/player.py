@@ -1,7 +1,5 @@
 import pygame
-from weapon import Projectile
-from weapon import Shield
-from weapon import Attack
+from weapon import Projectile, Shield, Attack
 
 class Player:
     
@@ -30,6 +28,7 @@ class Player:
         self.to_right = False
         self.on_ground = False
         self.from_the_front = True
+        self.is_touching_obelisk = False
         
         
         self.trade_cooldown_time = 60
@@ -100,7 +99,7 @@ class Player:
         self.speed_y = max(self.speed_y, self.speed_jump)
         self.jump_count += 1
         
-    def on_key_pressed(self, key_map):
+    def on_key_pressed(self, key_map, main):
         if self.on_ground:
             if key_map[pygame.K_RIGHT] or key_map[pygame.K_d]:
                 self.speed_x += 5
@@ -120,6 +119,9 @@ class Player:
             else:
                 self.is_running = False
                 self.speed_x = 0
+                
+            if key_map[pygame.K_f] and self.is_touching_obelisk:
+                main.save_state = main.current_state
             
             
     def on_collision(self, other):
@@ -165,6 +167,11 @@ class Player:
                 if other.TAG == "Ground" and projectile.rect.colliderect(other):
                     self.projectiles.remove(projectile)
                     del projectile
+                    
+        if other.TAG == "Obelisk" and self.rect.colliderect(other.rect):
+            self.is_touching_obelisk = True
+        elif other.TAG == "Obelisk":
+            self.is_touching_obelisk = False
 
             
 class Knight(Player):

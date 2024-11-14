@@ -212,7 +212,7 @@ class Ganon(Bosses, pygame.sprite.Sprite):
         #         self.assets.assets_Ganon("AttackLeft", self.rect)
 
 
-        print(self.life)
+        # print(self.life)
 
         if self.life <= 0 and self.rect.x - self.hero.rect.x <= 0 and self.assets.Gactual_Death <=14:
             self.assets.assets_Ganon("DeathLeft", self.rect)
