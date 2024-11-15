@@ -7,6 +7,8 @@ def change_image(dict, action, side):
     
     if dict.sub_TAG == "Dummy" and dict.action_idx in (4, 5):
         dict.fps /= 4
+    if dict.sub_TAG == "Mage" and dict.action_idx in (0,1):
+        dict.fps /= 3
         
     dict.img_idx += dict.fps
     if dict.action_idx in (2, 3) and dict.img_idx >= 8: 
@@ -196,9 +198,12 @@ class Mage(Monsters):
         ATTACK_path = os.path.join(Mage_path, "ATTACK.png")
         IDLE_path = os.path.join(Mage_path, "IDLE.png")
         DEATH_path = os.path.join(Mage_path, "DEATH.png")
+        projectile_path = os.path.join(Mage_path, "projectile.png")
         self.sheet_im_atk = pygame.image.load(ATTACK_path).convert_alpha()
         self.sheet_im_idle = pygame.image.load(IDLE_path).convert_alpha()
         self.sheet_im_death = pygame.image.load(DEATH_path).convert_alpha()
+        self.image_projectile_r = pygame.image.load(projectile_path).convert_alpha()
+        self.image_projectile_l = pygame.transform.flip(self.image_projectile_r, True, False)
         self.action_idx = 0
         self.img_idx = 0
         self.is_atking = False
@@ -224,8 +229,6 @@ class Mage(Monsters):
                 imgs_death_l.append(image)
                 image = pygame.transform.flip(image, True, False)
                 imgs_death_r.append(image)
-        self.image_projectile_r = self.sheet_im_idle.subsurface((1*80, 3*80), (80, 80))
-        self.image_projectile_l = pygame.transform.flip(self.image_projectile_r, True, False)
         self.image_actual = self.imgs_list[self.action_idx][self.img_idx]
     
     def update(self):
@@ -255,11 +258,11 @@ class Mage(Monsters):
     def attack(self):
         if self.projectile_cooldown <= 0:
             if self.hero.rect.x <= self.rect.x:
-                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 15, 15, self.image_projectile_r)
+                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 50, 30, self.image_projectile_r)
                 self.projectiles.append(new_projectile)
                 change_image(self, "atk", "l")
             else:
-                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 15, 15, self.image_projectile_l)
+                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 50, 30, self.image_projectile_l)
                 self.projectiles.append(new_projectile)
                 change_image(self, "atk", "r")
             self.projectile_cooldown = self.cool_down
