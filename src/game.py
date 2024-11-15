@@ -32,7 +32,7 @@ class GameManager:
         self.enemies = [
             # Dummy(main.WIDTH  // 2 + 200, main.HEIGHT // 2, 40, 50, self.hero),
             # Mage(200,0,40,50,self.hero),
-            # Flying(200, 50, 40, 50,self.hero)
+            Flying(200, 50, 70, 70, self.hero)
         ]
 
         self.bosses = [
@@ -123,7 +123,7 @@ class GameManager:
 
     def elimination(self, chage_state):
         for monster in self.enemies:
-            if monster.life <= 0:
+            if monster.is_dead:
                 self.enemies.remove(monster)
                 del monster
 

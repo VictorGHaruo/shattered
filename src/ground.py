@@ -118,19 +118,19 @@ class Obelisk():
 def maping(grounds):
     
     grid = [
-        "                                                                                                     I                             CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-        "                                                                                                     I                             CC                          CC",
-        "                                                                                                   O I                             CC                          CC",
-        "                                                                      TMMP         TMMMP         TMMMP                             CC                          CC",
-        "                                                                                                                                   CC                          CC",
-        "                                                         TMMMP                                                                     CC                          CC",
-        "                                                                                                                                   CC                          CC",
-        "                                                                                                                                   CC                          CC",
-        "                                                                                                                                   CC                          CC",
-        "                              EXXXXXXXXXXXXXXXXXD                                                                                  CC                          CC",
-        "                              LGGGGGGGGGGGGGGGGGR                                                                                  CC                          CC",
-        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                  CC                          CC",
-        "  O   B                       LGGGGGGGGGGGGGGGGGR   TMP                                                                             B                          CC",
+        "                                                                                                     I                              CCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "                                                                                                     I                              C                          CC",
+        "                                                                                                   O I                              C                          CC",
+        "                                                                      TMMP         TMMMP         TMMMP                              C                          CC",
+        "                                                                                                                                    C                          CC",
+        "                                                         TMMMP                                                                      C                          CC",
+        "                                                                                                                                    C                          CC",
+        "                                                                                                                                    C                          CC",
+        "                                                                                                                                    C                          CC",
+        "           CCCCC              EXXXXXXXXXXXXXXXXXD                                                                                   C                          CC",
+        "               C              LGGGGGGGGGGGGGGGGGR                                                                                   C                          CC",
+        "               C    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                   C                          CC",
+        "  O   B        C              LGGGGGGGGGGGGGGGGGR   TMP                                                                             B                          CC",
         "XXXXXXX XXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD                       EXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXXXXXXX",
         "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
         "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
@@ -148,10 +148,10 @@ def maping(grounds):
     image_ground_M = os.path.join(Ground_path, "Ground_09.png")
     image_ground_P = os.path.join(Ground_path, "Ground_10.png")
     image_ground_R = os.path.join(Ground_path, "Ground_11.png")
-    image_ground_B = os.path.join(Ground_path, "Wooden_Box.png")
+    image_ground_B = os.path.join(Ground_path, "Box.png")
     image_spike_S = os.path.join(Ground_path, "Spikes.png")
     image_obelisk_O = os.path.join(Ground_path, "Obelisk.png")
-    image_ground_C = os.path.join(Ground_path, "Brick_02_p.png")
+    image_ground_C = os.path.join(Ground_path, "Brick.png")
     
     keys_ground = [
         ["X", image_ground_X], ["E", image_ground_E], ["G", image_ground_G], ["D", image_ground_D],

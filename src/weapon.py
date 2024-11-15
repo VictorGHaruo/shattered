@@ -18,10 +18,8 @@ class Projectile:
 
     def draw(self, screen, camera):
         self.rect.x -= camera.position_x
-        if self.image:
-            print("oi")
+        if self.image != None:
             screen.blit(self.image, self.rect)
-            pygame.draw.rect(screen, self.color, self.rect)
         else:
             pygame.draw.rect(screen, self.color, self.rect) 
 
