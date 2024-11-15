@@ -2,7 +2,8 @@ import pygame
 import sys
 from player import Knight, Yokai, Ninja
 from camera import Camera
-from ground import Ground, Block, maping
+from ground import Ground, Block
+from maker import maping
 from enemy import Dummy, Mage, Flying
 from boss import Balrog, Ganon, Demagorgon
 from text import Text
@@ -25,15 +26,11 @@ class GameManager:
         self.camera = Camera(0, main.WIDTH)
     
         self.grounds = []
-        maping(self.grounds)
+        self.enemies = []
+        maping(self.grounds, self.enemies, self.hero)
         self.WIDTH = main.WIDTH
         self.HEIGHT = main.HEIGHT
         
-        self.enemies = [
-            Dummy(250, 500, 90, 140, self.hero),
-            Mage(200, 0, 100, 150,self.hero),
-            Flying(200, 50, 70, 70, self.hero)
-        ]
 
         self.bosses = [
             # Balrog(200, 0, 80, 100, self.hero),
@@ -142,7 +139,7 @@ class GameManager:
             speed = min(self.hero.speed_x, self.hero.speed_x_max) 
         else :
             speed = max(self.hero.speed_x, self.hero.speed_x_min)
-        if self.camera.fix_X >= 690:
+        if self.camera.fix_x >= 690:
             speed = 0
         
         self.pos_x -= speed // 3

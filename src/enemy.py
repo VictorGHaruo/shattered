@@ -73,8 +73,12 @@ class Monsters:
     def draw (self, screen: pygame.Surface, camera, image_actual):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            # pygame.draw.rect(screen, self.color, self.rect)
             screen.blit(image_actual, self.rect)
+        for projectile in self.projectiles:
+            projectile.draw(screen, camera)
+            if not screen.get_rect().colliderect(projectile.rect):
+                self.projectiles.remove(projectile)
+                del projectile
                         
     def on_collision(self, other):  
 
@@ -103,7 +107,7 @@ class Dummy(Monsters):
         self.init_x = x
         self.to_left = True
         self.to_right = False
-        self.range = 300
+        self.range = 100
         
         imgs_run_r = []
         imgs_run_l = []
@@ -148,10 +152,6 @@ class Dummy(Monsters):
     def on_collision(self, other):
         super().on_collision(other)
         
-        if self.rect.x < 0 and self.to_right:
-            self.speed_x *= -1
-            self.to_left = True
-            self.to_right = False
         if self.rect.x > self.init_x + self.range and self.to_left:
             self.speed_x *= -1
             self.to_left = False
@@ -172,7 +172,13 @@ class Dummy(Monsters):
         else:
             change_image(self, "run", "r")
         
-    def draw(self, screen, camera):
+    def draw(self, screen: pygame.Surface, camera):
+        if camera.TAG == "Camera":
+            self.init_x -= camera.position_x
+            if self.rect.x < camera.fix_x - (screen.get_size()[0] // 2) and self.to_right:
+                self.speed_x *= -1
+                self.to_left = True
+                self.to_right = False
         return super().draw(screen, camera, self.image_actual)
 
 class Mage(Monsters):
@@ -252,8 +258,6 @@ class Mage(Monsters):
     
     def draw(self, screen, camera):
         super().draw(screen, camera, self.image_actual)
-        for projectile in self.projectiles:
-            projectile.draw(screen, camera)
     
     def attack(self):
         if self.projectile_cooldown <= 0:
@@ -358,8 +362,6 @@ class Flying(Monsters):
     
     def draw(self, screen, camera):
         super().draw(screen, camera, self.image_actual)
-        for projectile in self.projectiles:
-            projectile.draw(screen, camera)
     
     def attack(self):
         if self.projectile_cooldown <= 0:
