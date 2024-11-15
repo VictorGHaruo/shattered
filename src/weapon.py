@@ -9,7 +9,10 @@ class Projectile:
         self.speed_y = speed_y
         self.who = who
         self.damage = damage
-        self.image = image
+        if image != None:
+            self.image = pygame.transform.scale(image, (width, height))
+        else:
+            self.image = None
 
     def update(self):
         self.rect.x += self.speed_x

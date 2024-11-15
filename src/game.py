@@ -30,13 +30,13 @@ class GameManager:
         self.HEIGHT = main.HEIGHT
         
         self.enemies = [
-            # Dummy(main.WIDTH  // 2 + 200, main.HEIGHT // 2, 40, 50, self.hero),
-            # Mage(200,0,40,50,self.hero),
+            Dummy(250, 500, 90, 140, self.hero),
+            Mage(200, 0, 100, 150,self.hero),
             Flying(200, 50, 70, 70, self.hero)
         ]
 
         self.bosses = [
-            Balrog(200, 0, 80, 100, self.hero),
+            # Balrog(200, 0, 80, 100, self.hero),
             # Ganon(300, 0, 150, 220, self.hero),
             # Demagorgon(0, 0, 100, 300, self.hero)
         ]
