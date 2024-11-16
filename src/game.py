@@ -54,6 +54,11 @@ class GameManager:
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         Background_path = os.path.join(path_game, os.pardir, "assets", "Background")
         Background_path = os.path.abspath(Background_path)
+        
+        image_path = os.path.join(Background_path, "boss_fase.png")
+        self.bg_boss = pygame.image.load(image_path).convert_alpha()
+        self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH , self.HEIGHT))
+        
         for i in range(1, 4):
             image_path = os.path.join(Background_path, f"background_{i}.png")
             bg_image = pygame.image.load(image_path).convert_alpha()
@@ -128,7 +133,8 @@ class GameManager:
                 
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])
-            
+
+        ## Paralax
         if self.hero.speed_x > 0: 
             speed = min(self.hero.speed_x, self.hero.speed_x_max) 
         else :
@@ -143,7 +149,8 @@ class GameManager:
             for j in range(8):
                 screen.blit(i, (self.pos_x +  x * self.pos_x_p + j*self.WIDTH, 0))
             x += 1
-        
+        ## Boss fase (132 * 50) + self.camera.position_x
+        screen.blit(self.bg_boss, ( ((132 * 50) - 700) + self.camera.fix_x, 0))        
             
         for ground in self.grounds:
             ground.draw(screen, self.camera)

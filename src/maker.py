@@ -16,11 +16,13 @@ def maping(grounds : list, enemies : list, hero):
         "                                      U        A                                                                                    C                          CC",
         "                              EXXXXXXXXXXXXXXXXXD                                                                                   C                          CC",
         "                      U       LGGGGGGGGGGGGGGGGGR                                                                                   C                          CC",
-        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                   C                          CC",
-        "                              LGGGGGGGGGGGGGGGGGR   TMP       U         U               A                                           B                          CC",
-        "XXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD        U        A     EXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   LGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                                              CC",
+        "                              LGGGGGGGGGGGGGGGGGR   TMP       U         U               A                                                                      CC",
+        "XXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD        U        A                     B                          CC",
+        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   EXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "                                                                                                                                                                 ",
+        "                                                                                                                                     G                           ",
     ]
     
     path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -58,7 +60,7 @@ def maping(grounds : list, enemies : list, hero):
             if grid[i][j] == "S":
                 grounds.append(Spike(j*50, i*50, 50, 50, image_spike_S))    
             if grid[i][j] == "B":
-                grounds.append(Block(j*50, i*50, 40, 52, image_ground_B))                
+                grounds.append(Block(j*50, i*50 - 100, 40, 152, image_ground_B))                
             for key in keys_ground:
                 if grid[i][j] == key[0]:
                     grounds.append(Ground(j*50, i*50, 50, 50, key[1]))
