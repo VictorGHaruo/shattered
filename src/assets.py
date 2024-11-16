@@ -1,4 +1,5 @@
 import pygame
+import sys
 import os
 
 class Assets():
@@ -285,3 +286,105 @@ class Assets():
         self.image_rect = self.image.get_rect()
         self.image_rect.bottom = rect.bottom + 90 
         self.image_rect.centerx = rect.centerx
+
+class Herolife:
+        
+    def __init__(self, hero, heart, x, y):
+        self.max_life = hero.max_life
+        self.actual_life = 0
+        self.images = []
+        self.heart = heart
+        self.hearts = self.max_life//self.heart
+        self.x = x
+        self.y = y
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        Heart_path = os.path.join(path_game, os.pardir, "assets", "Heart")
+        Heart_path = os.path.abspath(Heart_path)
+        for i in range(1, 6):
+            image_path = os.path.join(Heart_path, f"heart_{i}.png")
+            self.image = pygame.image.load(image_path).convert_alpha()
+            self.images.append(self.image)
+
+
+    def update(self, hero):
+        self.actual_life = hero.life
+
+    def draw(self,screen):
+        actual_life = self.actual_life
+        for i in range(1, self.hearts + 1):
+            if actual_life <= 0:
+                screen.blit(self.images[4], (i*self.x , self.y))
+
+            elif actual_life >= self.heart:
+                screen.blit(self.images[0], (i*self.x , self.y))
+                
+            elif actual_life >= self.heart*(3/4):
+                
+                screen.blit(self.images[1], (i*self.x , self.y))
+            elif actual_life >= self.heart*(1/2):
+                
+                screen.blit(self.images[2], (i*self.x , self.y))
+            else:
+                screen.blit(self.images[3], (i*self.x , self.y))
+            actual_life -= self.heart
+
+class Bar:
+    def __init__(self, Value, x, y, width, height, color1, color2):
+        self.max = Value  
+        self.actual = 0     
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color1 = color1
+        self.color2 = color2
+        self.images = []
+        self.rect = pygame.Rect(self.x, self.y, width, height)
+        self.rect_2 = pygame.Rect(self.x, self.y, width, height)
+
+        # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        # Bars_path = os.path.join(path_game, os.pardir, "assets", "Bars")
+        # Bars_path = os.path.abspath(Bars_path)
+
+        # for i in range(1, 3):
+        #     image_path = os.path.join(Bars_path, f"Bar{i}.png")
+        #     bar_image = pygame.image.load(image_path).convert_alpha()
+        #     bar_image = pygame.transform.scale(bar_image, (self.width, self.height))
+        #     self.images.append(bar_image)
+
+    def update(self, Value):
+
+        self.actual = Value
+        if self.actual > 0 :
+            self.actual = self.max - self.actual
+            self.rect.width = self.width * (self.actual/self.max)
+
+
+    def draw(self, screen):
+
+        #screen.blit(self.images[1], (self.x, self.y), self.rect)
+        pygame.draw.rect(screen, self.color1, self.rect_2)
+        pygame.draw.rect(screen, self.color2, self.rect)
+        pygame.draw.rect(screen, (0,0,0), self.rect_2, 4)
+        #screen.blit(self.images[0], (self.x, self.y))
+
+class Bosslife(Bar):
+    def __init__(self, Value, x, y, width, height, color1, color2):
+        super().__init__(Value, x, y, width, height, color1, color2)
+        self.health_ratio = self.max / self.width
+        self.health_change_speed = 1
+        self.transition = pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def update(self, Value):
+
+        self.rect.width = self.width * (Value / self.max)
+
+        if self.transition.width > self.rect.width:
+            self.transition.width -= self.health_change_speed 
+
+    def draw(self, screen):
+        
+        pygame.draw.rect(screen, self.color2, self.transition)
+        pygame.draw.rect(screen, self.color1, self.rect)
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(self.x, self.y, self.width, self.height), 4)
+

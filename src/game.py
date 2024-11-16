@@ -6,7 +6,9 @@ from ground import Ground, Block
 from maker import maping
 from enemy import Dummy, Mage, Flying
 from boss import Balrog, Ganon, Demagorgon
-from text import Text
+from assets import Herolife
+from assets import Bar
+from assets import Bosslife
 import os
 import sys
 
@@ -18,9 +20,9 @@ class GameManager:
         self.heros = [
             Knight(0 , 0, 40, 50),
             Yokai(0 , 0, 40, 50),
-            Ninja(0 , 0, 40, 50)
+            Ninja(0 , 0, 120, 150)
         ]
-        self.atual_hero = 0
+        self.atual_hero = 2
         self.hero = self.heros[self.atual_hero]
         
         self.camera = Camera(0, main.WIDTH)
@@ -38,12 +40,8 @@ class GameManager:
             # Demagorgon(0, 0, 100, 300, self.hero)
         ]
 
-        self.texts = [
-        Text('Hero', type(self.hero).__name__, main.screen, 0, 0, pygame.font.SysFont("Times New Roman", 22)),
-        Text('Life', self.hero.life, main.screen, 0, 20, pygame.font.SysFont("Times New Roman", 22))
-        ]
-        self.Values = [type(self.hero).__name__, self.hero.life]
-        
+        self.life_bar = Herolife(self.hero, 400, 20, 5)
+        self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 20, 100, 20, (255,255,255), (0,0,0))
         # Trade keys
         self.keys_trade = [
                     "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
@@ -75,6 +73,8 @@ class GameManager:
             
     def update(self):
         self.hero.update()
+        self.life_bar.update(self.hero)
+        self.hero_timer.update(self.hero.trade_cooldown)
         self.camera.update_coods(self.hero)
         for ground in self.grounds:
             ground.update()
@@ -90,12 +90,6 @@ class GameManager:
             boss.update()
             boss.new_hero(self.hero)
 
-        self.Values[0] = type(self.hero).__name__  
-        self.Values[1] = self.hero.life 
-
-        for i, text in enumerate(self.texts):
-            text.update(value=self.Values[i])
-        
     def collision_decetion(self):
         for ground in self.grounds:
             
@@ -161,9 +155,8 @@ class GameManager:
             boss.draw(screen, self.camera)
             
         self.hero.draw(screen, self.camera)
-
-        for text in self.texts:  
-            text.draw()  
+        self.life_bar.draw(screen)
+        self.hero_timer.draw(screen)  
             
     def trade(self, event):
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
