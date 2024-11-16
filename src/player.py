@@ -1,6 +1,52 @@
 import pygame
 from weapon import Projectile, Shield, Attack
 import copy
+import os, sys
+
+def change_image(dict):
+    if dict.sub_TAG == "Ninja":
+        if dict.action is not None:
+
+            if dict.action == "Jump":
+                dict.img_idx += dict.fps
+                dict.action_idx = 4 if dict.from_the_front else 5
+
+                if dict.img_idx >= 7:
+                    dict.img_idx = 7
+
+                if dict.on_ground:
+                    dict.action = None
+
+            if dict.action == "Atk":
+                dict.img_idx += dict.fps*2
+                dict.action_idx = 8 if dict.from_the_front else 9
+
+                if dict.img_idx >= 5:
+                    dict.action = None
+
+                dict.img_idx %= len(dict.image_list[dict.action_idx])
+
+            if dict.action == "Hurt":
+                dict.img_idx += dict.fps/5
+                dict.action_idx = 6 if dict.from_the_front else 7
+                if dict.img_idx >= 1:
+                    dict.img_idx = 0
+                    dict.action = None
+
+        else:
+                dict.img_idx += dict.fps
+                if dict.to_right and dict.on_ground :
+                    dict.action_idx = 2
+                elif dict.to_left and dict.on_ground :
+                    dict.action_idx = 3
+                else: 
+                    dict.action_idx = 0 if dict.from_the_front else 1
+
+                dict.img_idx %= len(dict.image_list[dict.action_idx])
+    #dict.img_idx %= len(dict.image_list[dict.action_idx])
+    dict.image_actual = dict.image_list[dict.action_idx][int(dict.img_idx)]
+ 
+
 
 class Player:
     
@@ -25,6 +71,7 @@ class Player:
         self.speed_x_max = 10
         self.speed_x_min = -10
         self.is_running = False
+        self.action = None
         self.to_left = False
         self.to_right = False
         self.on_ground = False
@@ -45,10 +92,11 @@ class Player:
         self.cooldown_time = 20
         self.rect_color = (255, 0, 0)
         
-    def draw(self, screen, camera):
+    def draw(self, screen, camera, image_actual):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            pygame.draw.rect(screen, self.rect_color, self.rect)
+            #pygame.draw.rect(screen, self.rect_color, self.rect)
+            screen.blit(image_actual, self.rect)
 
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
@@ -90,6 +138,8 @@ class Player:
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
 
+        change_image(self)
+
                 
     def on_event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -106,6 +156,8 @@ class Player:
         self.speed_y += self.speed_jump
         self.speed_y = max(self.speed_y, self.speed_jump)
         self.jump_count += 1
+        self.action = "Jump"
+        self.img_idx = 0
         
     def on_key_pressed(self, key_map, main):
         if self.on_ground:
@@ -158,6 +210,8 @@ class Player:
             if self.rect.colliderect(other) and self.invincibility_cooldown <= 0:
                 self.life -= self.collision_damage
                 self.invincibility_cooldown = self.invincibility_time
+                self.speed_x = -20 if self.from_the_front else 20
+                self.action = "Hurt"
 
             for projectile in other.projectiles:
 
@@ -185,13 +239,11 @@ class Player:
             self.has_collision_obelisk = False
             self.touched_obelisk = False
             
-            
-
-            
 class Knight(Player):
     
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
+        self.sub_TAG = "Knight"
         self.jump_count_max = 1
         self.rect_color = (255, 0, 0)
         self.shield_width = 15
@@ -199,7 +251,70 @@ class Knight(Player):
         self.shield_x = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 50
         self.shield_y = self.rect.y
         self.shield_damage = 0.7
-        self.shield = None  
+        self.shield = None 
+
+        # imgs_idle_r = []
+        # imgs_idle_l = []
+        # imgs_walk_r = []
+        # imgs_walk_l = []
+        # imgs_jump_r = []
+        # imgs_jump_l = []
+        # imgs_hurt_r = []
+        # imgs_hurt_l = []
+        # imgs_def_r = []
+        # imgs_def_l = []
+
+        # self.image_list = [imgs_idle_r, imgs_idle_l,imgs_walk_r, imgs_walk_l, imgs_jump_r, imgs_jump_l, imgs_hurt_r, imgs_hurt_l, imgs_def_r, imgs_def_l]
+        # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        # Knight_path = os.path.join(path_game, os.pardir, "assets", "Knight")
+        # Knight_path = os.path.abspath(Knight_path)
+        # Idle_path = os.path.join(Knight_path, "Idle.png")
+        # Walk_path = os.path.join(Knight_path, "Walk.png")
+        # Jump_path = os.path.join(Knight_path, "Jump.png")
+        # Hurt_path = os.path.join(Knight_path, "Hurt.png")
+        # Defend_path = os.path.join(Knight_path, "Defend.png")
+
+        # self.sheet_im_idle = pygame.image.load(Idle_path).convert_alpha()
+        # self.sheet_im_walk = pygame.image.load(Walk_path).convert_alpha()
+        # self.sheet_im_jump = pygame.image.load(Jump_path).convert_alpha()
+        # self.sheet_im_hurt = pygame.image.load(Hurt_path).convert_alpha()
+        # self.sheet_im_defend = pygame.image.load(Defend_path).convert_alpha()
+
+        # for i in range(4):
+        #     image = self.sheet_im_idle.subsurface((i*72.5, 0), (72.5, 86))
+        #     image = pygame.transform.scale(image, (width, height))
+        #     imgs_idle_r.append(image)
+        #     image = pygame.transform.flip(image, True, False)
+        #     imgs_idle_l.append(image)
+        # for i in range(8):
+        #     image = self.sheet_im_walk.subsurface((i*72.5, 0), (72.5, 86))
+        #     image = pygame.transform.scale(image, (width, height))
+        #     imgs_walk_r.append(image)
+        #     image = pygame.transform.flip(image, True, False)
+        #     imgs_walk_l.append(image)
+        # for i in range(6):
+        #     image = self.sheet_im_jump.subsurface((i*80, 0), (80, 86))
+        #     image = pygame.transform.scale(image, (width, height))
+        #     imgs_jump_r.append(image)
+        #     image = pygame.transform.flip(image, True, False)
+        #     imgs_jump_l.append(image)
+        # for i in range(2):
+        #     image = self.sheet_im_hurt.subsurface((i*70, 0), (70, 86))
+        #     image = pygame.transform.scale(image, (width, height))
+        #     imgs_hurt_r.append(image)
+        #     image = pygame.transform.flip(image, True, False)
+        #     imgs_hurt_l.append(image)
+        # for i in range(5):
+        #     image = self.sheet_im_defend.subsurface((i*72.5, 0), (80, 86))
+        #     image = pygame.transform.scale(image, (width, height))
+        #     imgs_def_r.append(image)
+        #     image = pygame.transform.flip(image, True, False)
+        #     imgs_def_l.append(image)
+        # self.action_idx = 6
+        # self.img_idx = 0
+        # self.fps = 0.2
+        # self.image_actual = self.image_list[self.action_idx][self.img_idx]
+        
 
     def actions(self, key_map):
 
@@ -230,7 +345,7 @@ class Knight(Player):
                     self.shield.reflect(self.TAG, projectile, self.projectiles, other.projectiles)
 
     def draw(self, screen, camera):
-        super().draw(screen, camera)
+        super().draw(screen, camera, self.image_actual)
 
         if self.shield is not None:
             self.shield.draw(screen)
@@ -276,6 +391,7 @@ class Ninja(Player):
     
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
+        self.sub_TAG = "Ninja"
         self.jump_count_max = 3
         self.rect_color = (255, 255, 255)
         self.range = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 60
@@ -284,12 +400,75 @@ class Ninja(Player):
         self.damage = 100
         self.attack = None
 
+        imgs_idle_r = []
+        imgs_idle_l = []
+        imgs_walk_r = []
+        imgs_walk_l = []
+        imgs_jump_r = []
+        imgs_jump_l = []
+        imgs_hurt_r = []
+        imgs_hurt_l = []
+        imgs_atk_r = []
+        imgs_atk_l = []
+
+        self.image_list = [imgs_idle_r, imgs_idle_l,imgs_walk_r, imgs_walk_l, imgs_jump_r, imgs_jump_l, imgs_hurt_r, imgs_hurt_l, imgs_atk_r, imgs_atk_l]
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        Knight_path = os.path.join(path_game, os.pardir, "assets", "Ninja")
+        Knight_path = os.path.abspath(Knight_path)
+        Idle_path = os.path.join(Knight_path, "Idle.png")
+        Walk_path = os.path.join(Knight_path, "Walk.png")
+        Jump_path = os.path.join(Knight_path, "Jump.png")
+        Hurt_path = os.path.join(Knight_path, "Hurt.png")
+        Atk_path = os.path.join(Knight_path, "Attack_1.png")
+
+        self.sheet_im_idle = pygame.image.load(Idle_path).convert_alpha()
+        self.sheet_im_walk = pygame.image.load(Walk_path).convert_alpha()
+        self.sheet_im_jump = pygame.image.load(Jump_path).convert_alpha()
+        self.sheet_im_hurt = pygame.image.load(Hurt_path).convert_alpha()
+        self.sheet_im_atk = pygame.image.load(Atk_path).convert_alpha()
+
+        for i in range(6):
+            image = self.sheet_im_idle.subsurface((i*96, 0), (96, 96))
+            image = pygame.transform.scale(image, (width, height))
+            imgs_idle_r.append(image)
+            image = pygame.transform.flip(image, True, False)
+            imgs_idle_l.append(image)
+        for i in range(8):
+            image = self.sheet_im_walk.subsurface((i*96, 0), (96, 96))
+            image = pygame.transform.scale(image, (width, height))
+            imgs_walk_r.append(image)
+            image = pygame.transform.flip(image, True, False)
+            imgs_walk_l.append(image)
+        for i in range(8):
+            image = self.sheet_im_jump.subsurface((i*96, 0), (96, 96))
+            image = pygame.transform.scale(image, (width, height))
+            imgs_jump_r.append(image)
+            image = pygame.transform.flip(image, True, False)
+            imgs_jump_l.append(image)
+        for i in range(2):
+            image = self.sheet_im_hurt.subsurface((i*96, 0), (96, 96))
+            image = pygame.transform.scale(image, (width, height))
+            imgs_hurt_r.append(image)
+            image = pygame.transform.flip(image, True, False)
+            imgs_hurt_l.append(image)
+        for i in range(6):
+            image = self.sheet_im_atk.subsurface((i*96, 0), (96, 96))
+            image = pygame.transform.scale(image, (width, height))
+            imgs_atk_r.append(image)
+            image = pygame.transform.flip(image, True, False)
+            imgs_atk_l.append(image)
+        self.action_idx = 0
+        self.img_idx = 0
+        self.fps = 0.5
+        self.image_actual = self.image_list[self.action_idx][self.img_idx]
+
     def actions(self, key_map):
 
         if key_map[pygame.K_v] and self.attack_cooldown <= 0:
 
-            self.attack = Attack(self.range, self.rect.y, 25, 15, self.damage)
-            self.attack_cooldown = self.cooldown_time
+            self.attack = Attack(self.range, self.rect.y, 25, 100, self.damage)
+            self.attack_cooldown = self.cooldown_time 
+            self.action = "Atk"
 
         else:
             self.attack = None
@@ -304,7 +483,7 @@ class Ninja(Player):
 
 
     def draw(self, screen, camera):
-        super().draw(screen, camera)
+        super().draw(screen, camera,self.image_actual)
 
         if self.attack is not None:
             self.attack.draw(screen)
@@ -316,8 +495,7 @@ class Ninja(Player):
         self.range = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 60
 
         if self.attack_cooldown > 0:
-            self.attack_cooldown -= 1    
-
+            self.attack_cooldown -= 1 
 
 # def f_save(main):
 #     keys_save = ["heros"]
