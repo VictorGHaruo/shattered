@@ -21,7 +21,7 @@ class GameManager:
         self.heros = [
             Knight(0 , 0, 40, 50),
             Yokai(0 , 0, 40, 50),
-            Ninja(0 , 0, 120, 150)
+            Ninja(0 , 0, 40, 50)
         ]
         self.atual_hero = 2
         self.hero = self.heros[self.atual_hero]
@@ -36,9 +36,9 @@ class GameManager:
         
 
         self.bosses = [
-            Balrog(200, 0, 80, 100, self.hero),
+            # Balrog(200, 0, 80, 100, self.hero),
             Ganon(300, 0, 150, 220, self.hero),
-            Demagorgon(0, 0, 100, 300, self.hero)
+            # Demagorgon(0, 0, 100, 300, self.hero)
         ]
 
         self.life_bar = Herolife(self.hero, 400, 20, 5)
