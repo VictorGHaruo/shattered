@@ -21,10 +21,7 @@ class Projectile:
 
     def draw(self, screen, camera):
         self.rect.x -= camera.position_x
-        if self.image != None:
-            screen.blit(self.image, self.rect)
-        else:
-            pygame.draw.rect(screen, self.color, self.rect) 
+        pygame.draw.rect(screen, self.color, self.rect) 
 
 class Shield:
     def __init__(self, x, y, width, height, damage):
@@ -39,7 +36,7 @@ class Shield:
 
         if other.TAG == "Projectile" and self.rect.colliderect(other.rect):
             other.speed_x = -other.speed_x
-            other.image = pygame.transform.flip(other.image, True, False)
+            # other.image = pygame.transform.flip(other.image, True, False)
             other.who = user
             other.damage = other.damage * self.damage
             list1.append(other)

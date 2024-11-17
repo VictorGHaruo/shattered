@@ -12,6 +12,7 @@ from assets import Bosslife
 import os
 import sys
 
+
 pygame.init()
            
 class GameManager:
@@ -35,7 +36,7 @@ class GameManager:
         
 
         self.bosses = [
-            # Balrog(200, 0, 80, 100, self.hero),
+            Balrog(200, 0, 80, 100, self.hero),
             # Ganon(300, 0, 150, 220, self.hero),
             # Demagorgon(0, 0, 100, 300, self.hero)
         ]
@@ -179,11 +180,11 @@ class GameManager:
                 change = True
             
             if change:
-                state_dict = self.hero.__getstate__()
+                state_dict = self.hero.__dict__
                 
                 self.hero = self.heros[self.atual_hero]
                 
-                for key in self.keys_trade:
+                for key in self.keys_trade:     
                     self.hero.__dict__[key] = state_dict[key]
                     
                 self.hero.trade_cooldown = self.hero.trade_cooldown_time
