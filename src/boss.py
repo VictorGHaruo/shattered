@@ -99,9 +99,6 @@ class Balrog(Bosses, pygame.sprite.Sprite):
 
         self.attacks = []
         self.all_atks = []
-
-        self.assets = Assets()
-        self.assets.init_Balrog(width, height)
         
         for atks in range(self.number_bars):
             self.all_atks.append(Attack(self.screen_width/self.number_bars * atks, 10 + atks, self.screen_width / self.number_bars, 650, self.weapon_damage))
