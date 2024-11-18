@@ -41,7 +41,6 @@ class Shield:
 
         if other.TAG == "Projectile" and self.rect.colliderect(other.rect):
             other.speed_x = -other.speed_x
-            print(other.image)
             other.image = pygame.transform.flip(other.image, True, False)
             other.who = user
             other.damage = other.damage * self.damage

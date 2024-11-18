@@ -24,6 +24,27 @@ class Bosses:
         self.death_position = None
 
     def new_hero(self, hero):
+        """
+        Update object hero.
+
+        Parameters
+        ----------
+        hero : int
+            O primeiro número.
+       
+
+        Returns
+        -------
+        None: This function doesn't return
+            
+
+        Examples
+        --------
+        >>> add_numbers(2, 3)
+        5
+        >>> add_numbers(-1, 1)
+        0
+        """
         self.hero = hero
 
     def move(self):
@@ -39,7 +60,7 @@ class Bosses:
     def draw (self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            pygame.draw.rect(screen, self.color, self.rect)
+            # pygame.draw.rect(screen, self.color, self.rect)
         for projectile in self.projectiles:
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
@@ -71,6 +92,8 @@ class Bosses:
 class Balrog(Bosses, pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
+        self.sub_TAG = "Balrog"
+
         self.speed_x = 3
         self.gravity = 0
         self.life = 1
@@ -244,16 +267,13 @@ class Ganon(Bosses):
         self.atk_cooldown = self.atk_timer
         self.atk_long = 30
 
-        self.teleport = 20
+        self.teleport = 40
         self.teleport_cooldown = self.teleport
 
 
         self.adjH = 100
         self.adjW = 120 
         self.adj = 25
-        self.adjH_atk = 0
-        self.adjW_atk = 1000
-        self.adj_atk = 0
 
         #SPRITES V2
         self.sprites = Sprites()
@@ -309,12 +329,8 @@ class Ganon(Bosses):
         self.sprites.load_spritesheets(self.sizes_directory, "GAttack", False, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "GImmune", True, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "GImmune", False, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, self.adjW, self.adjH)
-        # self.sprites.load_spritesheets(self.sizes_directory, "GProjectile", True, self.images_directory, self.images, "arm_projectile_glowing", 70, 60, 130, width, height, self.adjW_atk, self.adjH_atk, 200)
-        # self.sprites.load_spritesheets(self.sizes_directory, "GProjectile", False, self.images_directory, self.images, "arm_projectile_glowing", 70, 60, 0, width, height, self.adjW_atk, self.adjH_atk,100)
-
         self.sprites.load_spritesheets(self.sizes_directory, "GDeath", False, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, self.adjW, self.adjH, 10)
         self.sprites.load_spritesheets(self.sizes_directory, "GDeath", True, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, self.adjW, self.adjH, 10)
-
         self.sprites.load_images(True, 70, 28, "GProjectile", self.images, self.sizes_directory, self.images_directory, 0, 0)
         self.sprites.load_images(False, 70, 28, "GProjectile", self.images, self.sizes_directory, self.images_directory, 0, 0) 
 
@@ -323,8 +339,6 @@ class Ganon(Bosses):
 
         if self.atk_timer > 0:
             self.atk_timer -= 1        
-
-        # print(self.life)
 
         if self.life <= 0 and self.death_position == None:
             self.death_position = self.hero.rect.x
@@ -364,6 +378,7 @@ class Ganon(Bosses):
             if self.hero.rect.x - self.rect.x <= 0:
                 self.sprites.assets(self.rect, "Attack", self.actual_ganon, "L", self.fps["Attack"], self.images, self.adj, "G")
                 if self.atk_timer <= 0:
+                    self.actual_ganon["Attack"] = 0
                     self.new_projectiles = [
                                 Projectile(self.rect.left -50, self.rect.centery + 47, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
                                 Projectile(self.rect.left -31, self.rect.centery + 8, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
@@ -382,6 +397,7 @@ class Ganon(Bosses):
                 self.sprites.assets(self.rect, "Attack", self.actual_ganon, "R", self.fps["Attack"], self.images, self.adj, "G")
 
                 if self.atk_timer <= 0:
+                    self.actual_ganon["Attack"] = 0
                     self.new_projectiles = [
                         Projectile(self.rect.right +50, self.rect.centery + 47, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
                         Projectile(self.rect.right +31, self.rect.centery + 8, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
@@ -404,36 +420,70 @@ class Ganon(Bosses):
 
     def move(self):
 
-        if self.distance(self.hero) > 200:
+        if self.distance(self.hero) > 200 and self.atk_timer > self.atk_long:
             self.immune = False
             self.teleport_cooldown = self.teleport
             if self.hero.rect.centerx - self.rect.centerx < 0:
+                self.actual_ganon["Immune"] = 0 
                 self.sprites.assets(self.rect, "Idle", self.actual_ganon, "L", self.fps["Idle"], self.images, self.adj, "G")
 
             elif self.hero.rect.centerx - self.rect.centerx > 0:
+                self.actual_ganon["Immune"] = 8
                 self.sprites.assets(self.rect, "Idle", self.actual_ganon, "R", self.fps["Idle"], self.images, self.adj, "G")
 
         if self.distance(self.hero) <= 200:
             self.immune = True
             if self.teleport_cooldown > 0:
                 self.teleport_cooldown -= 1
-                if self.hero.rect.centerx - self.rect.centerx < 0:
+                if self.hero.rect.centerx - self.rect.centerx < 0 and self.actual_ganon["Immune"] < 8:
                     self.sprites.assets(self.rect, "Immune", self.actual_ganon, "L", self.fps["Immune"], self.images, self.adj, "G")
 
-                elif self.hero.rect.centerx - self.rect.centerx > 0:
+                if self.hero.rect.centerx - self.rect.centerx > 0 and self.actual_ganon["Immune"] < 16 and self.actual_ganon["Immune"] >= 8:
+
                     self.sprites.assets(self.rect, "Immune", self.actual_ganon, "R", self.fps["Immune"], self.images, self.adj, "G")
                     
+
+
             if self.hero.rect.centerx - self.rect.centerx < 0 and self.teleport_cooldown <= 0:
+                self.actual_ganon["Immune"] = 0
                 self.rect.x = 0.1 * self.screen_width
                 self.rect.y = 0 #retirar dps
             elif self.hero.rect.centerx - self.rect.centerx > 0 and self.teleport_cooldown <= 0:
+                self.actual_ganon["Immune"] = 8
                 self.rect.x = 0.9 * self.screen_width
                 self.rect.y = 0 #retirar dps
 
-class Demagorgon(Bosses, pygame.sprite.Sprite):
+class Demagorgon(Bosses):
+    """
+    A class used to represent the boss named Demagorgon
+
+    ...
+
+    Attributes
+    ----------
+    says_str : str
+        a formatted string to print out what the animal says
+    name : str
+        the name of the animal
+    sound : str
+        the sound that the animal makes
+    num_legs : int
+        the number of legs the animal has (default 4)
+
+    Methods
+    -------
+
+    says(sound=None)
+        Prints the animals name and what sound it makes
+    """
     def __init__(self, x, y, width, height, hero):
+        """
+        Inicializes the class Demagorgon with values of atributes
+        """
+
+
         super().__init__(x, y, width, height, hero)
-        pygame.sprite.Sprite.__init__(self)
+        self.sub_TAG = "Demagorgon"
 
         #hitbox
         self.color = (255, 255, 0)
@@ -558,11 +608,8 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
         if self.damage_timer > 0:
             self.damage_timer -=1
 
-        # print(self.life)
-
         if self.life <= 0 and self.death_position == None:
             self.death_position = self.hero.rect.x
-            print("OI")
 
         if self.life <= 0 and self.rect.x - self.death_position <= 0:
             self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "L", self.fps["Death"], self.images, self.adj, "D")

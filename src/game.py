@@ -37,8 +37,14 @@ class GameManager:
 
         self.bosses = [
             # Balrog(200, 100, 140, 180, self.hero),
-            Ganon(300, 0, 150, 220, self.hero),
+            # Ganon(300, 0, 150, 220, self.hero),
             # Demagorgon(0, 0, 100, 300, self.hero)
+        ]
+
+        self.order = [
+            Balrog(200, 100, 140, 180, self.hero),
+            Ganon(300, 0, 150, 220, self.hero),
+            Demagorgon(0, 0, 100, 300, self.hero)
         ]
 
         self.life_bar = Herolife(self.hero, 400, 20, 5)
@@ -82,6 +88,12 @@ class GameManager:
         self.life_bar.update(self.hero)
         self.hero_timer.update(self.hero.trade_cooldown)
         self.camera.update_coods(self.hero)
+
+        if len(self.bosses) == 0:
+            if len(self.order) != 0:
+                self.bosses.append(self.order[0])
+                del self.order[0]
+
         for ground in self.grounds:
             ground.update()
 

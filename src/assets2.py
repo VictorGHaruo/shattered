@@ -37,7 +37,7 @@ class Sprites():
         for act in self.actions:
             if action == act:
                 if direction == "L":
-                    if actual[action] >= len(images[name+action])/2:
+                    if actual[action] >= len(images[name+action])/2: #>=
                         actual[action] = 0
                     self.image = images[name+action][int(actual[action])]
                 elif direction == "R":
