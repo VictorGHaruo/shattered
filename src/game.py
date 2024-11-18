@@ -1,19 +1,10 @@
 import pygame
-import sys
 from player import Knight, Yokai, Ninja
 from camera import Camera
-from ground import Ground, Block
 from maker import maping
-from enemy import Dummy, Mage, Flying
 from boss import Balrog, Ganon, Demagorgon
-from assets import Herolife
-from assets import Bar
-from assets import Bosslife
-import os
-import sys
-
-
-pygame.init()
+from assets import Herolife, Bar, Bosslife
+import os, sys, random
            
 class GameManager:
 
@@ -33,6 +24,7 @@ class GameManager:
         maping(self.grounds, self.enemies, self.hero)
         self.WIDTH = main.WIDTH
         self.HEIGHT = main.HEIGHT
+        self.main = main
         
 
         self.bosses = [
@@ -40,7 +32,7 @@ class GameManager:
             # Ganon(300, 0, 150, 220, self.hero),
             # Demagorgon(0, 0, 100, 300, self.hero)
         ]
-
+        
         self.order = [
             Balrog(200, 100, 140, 180, self.hero),
             Ganon(300, 0, 150, 220, self.hero),
@@ -74,20 +66,35 @@ class GameManager:
         self.pos_x = -self.WIDTH
         self.pos_x_p = -self.WIDTH
             
+    def music(self, main, volume):
+        if main.is_changed:
+            if self.camera.boss_fase:
+                music_num = random.randint(1, 2)
+                pygame.mixer.music.load(f"../assets/Music/Boss/B{music_num}.mp3")
+            elif self.hero.can_push_block:
+                music_num = random.randint(1, 3)
+                pygame.mixer.music.load(f"../assets/Music/Obelisk/O{music_num}.mp3")
+            else:    
+                music_num = random.randint(1, 3)
+                pygame.mixer.music.load(f"../assets/Music/World/W{music_num}.mp3")
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play()  
+        main.is_changed = False
+            
     def on_event(self, event, main):
         self.trade(event)
-        self.hero.on_event(event)
+        self.hero.on_event(event, self.main)
         
-    def on_key_pressed(self, main):
+    def on_key_pressed(self):
         key_map = pygame.key.get_pressed()
-        self.hero.on_key_pressed(key_map, main)
+        self.hero.on_key_pressed(key_map, self.main)
         self.hero.actions(key_map)
             
     def update(self):
         self.hero.update()
         self.life_bar.update(self.hero)
         self.hero_timer.update(self.hero.trade_cooldown)
-        self.camera.update_coods(self.hero)
+        self.camera.update_coods(self.hero, self.main)
 
         if len(self.bosses) == 0:
             if len(self.order) != 0:
@@ -142,7 +149,7 @@ class GameManager:
                 del boss
         
         if self.hero.life <= 0 or self.hero.rect.y > 1000:
-            chage_state("over")
+            chage_state("over", True)
                 
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])

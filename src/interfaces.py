@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 from game import GameManager
 
 class Button():
@@ -15,24 +15,16 @@ class Button():
         text_box_rect = text_box.get_rect(center = self.rect.center)
         screen.blit(text_box, text_box_rect)
         
-    def change_state(self, event, main, state):
+    def change_state(self, event, main, state, music_bool):
         if event.type == pygame.MOUSEBUTTONDOWN:
             has_collision = self.rect.collidepoint(event.pos)
             if event.button == 1 and has_collision:
-                main.change_state(state)
+                main.change_state(state, music_bool)
                 
     def reset_game(self, event, main):
         if event.type == pygame.MOUSEBUTTONDOWN:
             has_colission = self.rect.collidepoint(event.pos)
             if event.button == 1 and has_colission:
-                # print(main.save_state)
-                # if main.save_state_game != 0:
-                #     f_reset_game(main)
-                #     print(main.states["game"].__dict__["heros"][0].life)
-                #     main.states["game"].__dict__["heros"]= main.save_state_game
-                #     print(main.states["game"].__dict__["heros"][0].life)
-                #     main.change_state("game")
-                # else:
                 f_reset_game(main)
                 
     def exit(self, event, main):
@@ -50,6 +42,14 @@ class Menu():
         self.title = self.title.render("Shattered", True, "White")
         self.text_rect = self.title.get_rect(center=(main.WIDTH // 2, 300))
     
+    def music(self, main, volume):
+        if main.is_changed:
+            music_num = random.randint(1, 2)
+            pygame.mixer.music.load(f"../assets/Music/Menu/M{music_num}.mp3")
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play()  
+        main.is_changed = False
+    
     def draw(self, screen: pygame.Surface):
         screen.fill((0,0,0))
         screen.blit(self.title, self.text_rect)
@@ -57,12 +57,12 @@ class Menu():
         self.b_exit.draw(screen, True)
         
     def on_event(self, event, main):
-        self.b_start.change_state(event, main, "game")
+        self.b_start.change_state(event, main, "game", True)
         self.b_exit.exit(event, main)
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                main.change_state("game")
+                main.change_state("game", True)
         
 class Pause():
     
@@ -71,6 +71,9 @@ class Pause():
         self.b_restart = Button(575, 375, 250, 50, "Restart")
         self.b_quit = Button(575, 430, 250, 50, "Quit")
         
+    def music(self, main, volume):
+        pass
+    
     def draw(self, screen):
         screen.fill((0,0,0))
         self.b_continue.draw(screen, True)
@@ -78,28 +81,36 @@ class Pause():
         self.b_quit.draw(screen, True)
         
     def on_event(self, event, main):
-        self.b_continue.change_state(event, main, "game")
+        self.b_continue.change_state(event, main, "game", False)
         
         self.b_restart.reset_game(event, main)
         
         self.b_quit.reset_game(event, main)
-        self.b_quit.change_state(event, main, "menu")
+        self.b_quit.change_state(event, main, "menu", True)
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                main.change_state("game")
+                main.change_state("game", False)
             if event.key == pygame.K_r:
                 f_reset_game(main)
             if event.key == pygame.K_q:
                 f_reset_game(main)
-                main.change_state("menu")
+                main.change_state("menu", True)
 
 class Game_Over():
     
     def __init__(self, main):
         self.WIDTH = main.WIDTH
         self.HEIGHT = main.HEIGHT
-        
+    
+    def music(self, main, volume):
+        if main.is_changed:
+            music_num = random.randint(1, 2)
+            pygame.mixer.music.load(f"../assets/Music/Over/D{music_num}.mp3")
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play()  
+        main.is_changed = False
+                
     def draw(self, screen):
         screen.fill([100, 100, 100])
         font_gameover = pygame.font.Font(None, 74)
@@ -119,12 +130,12 @@ class Game_Over():
                 f_reset_game(main)
             elif event.key == pygame.K_q:
                 f_reset_game(main)
-                main.change_state("menu")
+                main.change_state("menu", True)
                 
 def f_reset_game(main):
     del main.states["game"]
     main.states["game"] = GameManager(main)
-    main.change_state("game")
+    main.change_state("game", True)
     
     
 

@@ -91,12 +91,14 @@ class Player:
             self.projectile_cooldown -= 1
 
                 
-    def on_event(self, event: pygame.event.Event):
+    def on_event(self, event: pygame.event.Event, main):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 self.jump()
                 self.on_ground = False
             if event.key == pygame.K_f and self.has_collision_obelisk:
+                if not self.can_push_block:
+                    main.is_changed = True
                 self.touched_obelisk = True
                 self.can_push_block = True
 
