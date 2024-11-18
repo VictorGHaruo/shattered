@@ -1,6 +1,5 @@
 import pygame
 from weapon import Projectile, Attack
-from assets import Assets
 import random
 import os
 import math
@@ -110,6 +109,11 @@ class Balrog(Bosses, pygame.sprite.Sprite):
         self.lightning = Sprites()
         main_directory = os.path.dirname(os.path.dirname(__file__))
         assets_directory = os.path.join(main_directory, "assets")
+        self.adjH = 150
+        self.adjW = 150
+        self.adjH_atk = 300
+        self.adjW_atk = 300
+        self.adj = 50
 
         self.images_directory = {"BWalk" : os.path.join(assets_directory, "Balrog", "fly"),
                                  "BAttack" : os.path.join(assets_directory, "Balrog", "lightning"),
@@ -131,12 +135,18 @@ class Balrog(Bosses, pygame.sprite.Sprite):
                               "Death" : 0
         }
 
-        self.sprites.load_images(True, width, height, "BWalk", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(False, width, height, "BWalk", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(True, width, height, "BAttack", self.images, self.sizes_directory, self.images_directory, 300, 300)
-        self.sprites.load_images(False, width, height, "BAttack", self.images, self.sizes_directory, self.images_directory, 300, 300)
-        self.sprites.load_images(True, width, height, "BDeath", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(False, width, height, "BDeath", self.images, self.sizes_directory, self.images_directory, 200, 200)
+        self.fps = {"Walk" : 0.3,
+                    "Attack" : 0.3,
+                    "Death" : 0.3
+
+        }
+
+        self.sprites.load_images(True, width, height, "BWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(False, width, height, "BWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(True, width, height, "BAttack", self.images, self.sizes_directory, self.images_directory, self.adjW_atk, self.adjH_atk)
+        self.sprites.load_images(False, width, height, "BAttack", self.images, self.sizes_directory, self.images_directory, self.adjW_atk, self.adjH_atk)
+        self.sprites.load_images(True, width, height, "BDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(False, width, height, "BDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
 
     def attack(self):
         if self.atk_cooldown == self.warning_sign:
@@ -160,24 +170,21 @@ class Balrog(Bosses, pygame.sprite.Sprite):
         
         if self.randomic >= self.probability:
             self.rect.x = self.rect.x + self.speed_x
-            self.sprites.assets(self.rect, "Walk", self.actual_balrog, "R", 0.4, self.images, 75, "B")
+            self.sprites.assets(self.rect, "Walk", self.actual_balrog, "R", self.fps["Walk"], self.images, self.adj, "B")
 
         else:
             self.rect.x = self.rect.x - self.speed_x
-            self.sprites.assets(self.rect, "Walk", self.actual_balrog, "L", 0.4, self.images, 75, "B")
+            self.sprites.assets(self.rect, "Walk", self.actual_balrog, "L", self.fps["Walk"], self.images, self.adj, "B")
 
     def draw(self, screen, camera):
         super().draw(screen, camera)
         if len(self.attacks) != 0:
             for atks in self.attacks:
                 # atks.draw(screen)
-                self.lightning.assets(atks.rect, "Attack", self.actual_balrog, "L", 0.3, self.images, 0, "B")
-                self.lightning.draw(screen)
-        
+                self.lightning.assets(atks.rect, "Attack", self.actual_balrog, "L", self.fps["Attack"], self.images, 0, "B")
+                self.lightning.draw(screen)       
         self.sprites.draw(screen)
 
-        # self.image = self.assets.image
-        # screen.blit(self.image, self.assets.image_rect)
 
     def on_collision(self, other: pygame.Rect):
         for atks in self.attacks:
@@ -200,13 +207,11 @@ class Balrog(Bosses, pygame.sprite.Sprite):
         if self.life <= 0:
             self.gravity = 2
             if self.rect.x - self.hero.rect.x <= 0:
-                self.sprites.assets(self.rect, "Death", self.actual_balrog, "L", 0.2, self.images, 45, "B")
-                # print("OIE")
+                self.sprites.assets(self.rect, "Death", self.actual_balrog, "L", self.fps["Death"], self.images, self.adj, "B")
                 if self.actual_balrog["Death"] >= len(self.images["BDeath"])/2:
                     self.is_dead = True
             elif self.rect.x - self.hero.rect.x > 0:
-                self.sprites.assets(self.rect, "Death", self.actual_balrog, "R", 0.2, self.images, 45, "B")
-                # print("OI")
+                self.sprites.assets(self.rect, "Death", self.actual_balrog, "R", self.fps["Death"], self.images, self.adj, "B")
                 if self.actual_balrog["Death"] >= len(self.images["BDeath"]):
                     self.is_dead = True
 
@@ -231,6 +236,14 @@ class Ganon(Bosses):
         self.teleport = 60
         self.teleport_cooldown = self.teleport
 
+
+        self.adjH = 100
+        self.adjW = 120 
+        self.adj = 25
+        self.adjH_atk = 120
+        self.adjW_atk = 120
+        self.adj_atk = 220
+
         #SPRITES V2
         self.sprites = Sprites()
         self.shot = Sprites()
@@ -250,8 +263,6 @@ class Ganon(Bosses):
                                 "GImmune" : 8,
                                 "GProjectile" : 1,
                                 "GDeath" : 14
-
-
         }
 
         self.images = {"GIdle" : [],
@@ -270,19 +281,22 @@ class Ganon(Bosses):
 
         }
 
-
-        self.sprites.load_spritesheets(self.sizes_directory, "GIdle", True, self.images_directory, self.images, "Character_sheet", 100, 100, 0, width, height, 150, 150)
-        self.sprites.load_spritesheets(self.sizes_directory, "GIdle", False, self.images_directory, self.images, "Character_sheet", 100, 100, 0, width, height, 200, 200)
-        self.sprites.load_spritesheets(self.sizes_directory, "GAttack", True, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, 120, 100)
-        self.sprites.load_spritesheets(self.sizes_directory, "GAttack", False, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, 120, 100)
-        self.sprites.load_spritesheets(self.sizes_directory, "GImmune", True, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, 120, 100)
-        self.sprites.load_spritesheets(self.sizes_directory, "GImmune", False, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, 120, 100)
-        self.sprites.load_spritesheets(self.sizes_directory, "GProjectile", True, self.images_directory, self.images, "arm_projectile_glowing", 100, 150, 100, width, height, 120, 100)
-        self.sprites.load_spritesheets(self.sizes_directory, "GProjectile", False, self.images_directory, self.images, "arm_projectile_glowing", 100, 150, 100, width, height, 120, 100)
-        self.sprites.load_spritesheets(self.sizes_directory, "GDeath", True, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, 120, 100, 10)
-        self.sprites.load_spritesheets(self.sizes_directory, "GDeath", False, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, 120, 100, 10)
+        self.fps = {"Idle" : 0.2,
+                    "Attack" : 0.2,
+                    "Immune" : 0.4,
+                    "Death" : 0.2}
 
 
+        self.sprites.load_spritesheets(self.sizes_directory, "GIdle", True, self.images_directory, self.images, "Character_sheet", 100, 100, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "GIdle", False, self.images_directory, self.images, "Character_sheet", 100, 100, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "GAttack", True, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "GAttack", False, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "GImmune", True, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "GImmune", False, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "GProjectile", True, self.images_directory, self.images, "arm_projectile_glowing", 100, 150, 100, width, height, self.adjW_atk, self.adjH_atk)
+        self.sprites.load_spritesheets(self.sizes_directory, "GProjectile", False, self.images_directory, self.images, "arm_projectile_glowing", 100, 150, 100, width, height, self.adjW_atk, self.adjH_atk)
+        self.sprites.load_spritesheets(self.sizes_directory, "GDeath", True, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, self.adjW, self.adjH, 10)
+        self.sprites.load_spritesheets(self.sizes_directory, "GDeath", False, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, self.adjW, self.adjH, 10)
 
     def update(self):
 
@@ -290,13 +304,13 @@ class Ganon(Bosses):
             self.atk_timer -= 1        
 
         if self.life <= 0 and self.rect.x - self.hero.rect.x > 0:
-            self.sprites.assets(self.rect, "Death", self.actual_ganon, "L", 0.3, self.images, 75, "G")
+            self.sprites.assets(self.rect, "Death", self.actual_ganon, "L", self.fps["Death"], self.images, self.adj, "G")
 
             if self.actual_ganon["Death"] >= len(self.images["GDeath"])/2:
                 
                 self.is_dead = True
         elif self.life <= 0 and self.rect.x - self.hero.rect.x <= 0:
-            self.sprites.assets(self.rect, "Death", self.actual_ganon, "R", 0.3, self.images, 75, "G")
+            self.sprites.assets(self.rect, "Death", self.actual_ganon, "R", self.fps["Death"], self.images, self.adj, "G")
 
             if self.actual_ganon["Death"] >= len(self.images["GDeath"]):
                 self.is_dead = True
@@ -313,9 +327,9 @@ class Ganon(Bosses):
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
             if projectile.speed_x >= 0:
-                self.shot.assets(projectile.rect, "Projectile", self.actual_ganon, "L", 0, self.images, 220, "G")
+                self.shot.assets(projectile.rect, "Projectile", self.actual_ganon, "L", 0, self.images, self.adj_atk, "G")
             else:
-                self.shot.assets(projectile.rect, "Projectile", self.actual_ganon, "R", 0, self.images, 220, "G")
+                self.shot.assets(projectile.rect, "Projectile", self.actual_ganon, "R", 0, self.images, self.adj_atk, "G")
 
             self.shot.draw(screen)
 
@@ -324,14 +338,14 @@ class Ganon(Bosses):
         if self.atk_timer <= self.atk_long:
 
             if self.hero.rect.x - self.rect.x <= 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_ganon, "L", 0.8, self.images, 75, "G")
+                self.sprites.assets(self.rect, "Attack", self.actual_ganon, "L", self.fps["Attack"], self.images, self.adj, "G")
                 if self.atk_timer <= 0:
                     new_projectile_7 = Projectile(self.rect.left, self.rect.centery, -10, 0, self.TAG, 20, 40, 40, self.images["GProjectile"][0])
                     self.projectiles.append(new_projectile_7)
                     self.atk_timer = self.atk_cooldown + self.atk_long 
 
             if self.hero.rect.x - self.rect.x  > 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_ganon, "R", 0.5, self.images, 75, "G")
+                self.sprites.assets(self.rect, "Attack", self.actual_ganon, "R", self.fps["Attack"], self.images, self.adj, "G")
 
                 if self.atk_timer <= 0:
 
@@ -358,11 +372,11 @@ class Ganon(Bosses):
                 self.teleport_cooldown = self.teleport
                 if self.hero.rect.centerx - self.rect.centerx < 0:
                     pass
-                    self.sprites.assets(self.rect, "Idle", self.actual_ganon, "L", 0.3, self.images, 75, "G")
+                    self.sprites.assets(self.rect, "Idle", self.actual_ganon, "L", self.fps["Idle"], self.images, self.adj, "G")
  
                 elif self.hero.rect.centerx - self.rect.centerx > 0:
                     pass
-                    self.sprites.assets(self.rect, "Idle", self.actual_ganon, "R", 0.3, self.images, 75, "G")
+                    self.sprites.assets(self.rect, "Idle", self.actual_ganon, "R", self.fps["Idle"], self.images, self.adj, "G")
 
 
             if self.distance(self.hero) <= 200:
@@ -370,10 +384,10 @@ class Ganon(Bosses):
                 if self.teleport_cooldown > 0:
                     self.teleport_cooldown -= 1
                     if self.hero.rect.centerx - self.rect.centerx < 0:
-                        self.sprites.assets(self.rect, "Immune", self.actual_ganon, "L", 0.3, self.images, 75, "G")
+                        self.sprites.assets(self.rect, "Immune", self.actual_ganon, "L", self.fps["Immune"], self.images, self.adj, "G")
 
                     elif self.hero.rect.centerx - self.rect.centerx > 0:
-                        self.sprites.assets(self.rect, "Immune", self.actual_ganon, "R", 0.3, self.images, 75, "G")
+                        self.sprites.assets(self.rect, "Immune", self.actual_ganon, "R", self.fps["Immune"], self.images, self.adj, "G")
                         
                 if self.hero.rect.centerx - self.rect.centerx < 0 and self.teleport_cooldown <= 0:
                     self.rect.x = 0.1 * self.screen_width
@@ -410,6 +424,10 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
         main_directory = os.path.dirname(os.path.dirname(__file__))
         assets_directory = os.path.join(main_directory, "assets")
 
+        self.adjH = 200
+        self.adjW = 200
+        self.adj = 75
+
         self.images_directory = {"DWalk" : os.path.join(assets_directory, "Demagorgon", "walk"),
                                 "DIdle" : os.path.join(assets_directory, "Demagorgon", "idle"),
                                 "DAttack" : os.path.join(assets_directory, "Demagorgon", "1_atk"),
@@ -434,14 +452,21 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
                                   "Death" : 0
         }
 
-        self.sprites.load_images(True, width, height, "DWalk", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(False, width, height, "DWalk", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(True, width, height, "DIdle", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(False, width, height, "DIdle", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(True, width, height, "DAttack", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(False, width, height, "DAttack", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(True, width, height, "DDeath", self.images, self.sizes_directory, self.images_directory, 200, 200)
-        self.sprites.load_images(False, width, height, "DDeath", self.images, self.sizes_directory, self.images_directory, 200, 200)
+        self.fps = {"Walk" : 0.4,
+                    "Idle" : 0.4,
+                    "Attack" : 0.3,
+                    "Death" : 0.25
+
+        }
+
+        self.sprites.load_images(True, width, height, "DWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(False, width, height, "DWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(True, width, height, "DIdle", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(False, width, height, "DIdle", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(True, width, height, "DAttack", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(False, width, height, "DAttack", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(True, width, height, "DDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(False, width, height, "DDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
 
     def attack(self):
         if self.atk_timer <= 0:
@@ -462,18 +487,18 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
             if self.rect.x - self.hero.rect.x <= 0:
                 
                 if self.rect.colliderect(self.hero) == False:
-                    self.sprites.assets(self.rect, "Walk", self.actual_demagorgon, "L", 0.4, self.images, 75, "D")
+                    self.sprites.assets(self.rect, "Walk", self.actual_demagorgon, "L", self.fps["Walk"], self.images, self.adj, "D")
                     self.rect.x = self.rect.x + self.speed_x
                 else:
-                    self.sprites.assets(self.rect, "Idle", self.actual_demagorgon, "L", 1, self.images, 75, "D")
+                    self.sprites.assets(self.rect, "Idle", self.actual_demagorgon, "L", self.fps["Idle"], self.images, self.adj, "D")
 
             elif self.rect.x - self.hero.rect.x > 0:
                 if self.rect.colliderect(self.hero) == False:
-                    self.sprites.assets(self.rect, "Walk", self.actual_demagorgon, "R", 0.3, self.images, 75, "D")
+                    self.sprites.assets(self.rect, "Walk", self.actual_demagorgon, "R", self.fps["Walk"], self.images, self.adj, "D")
 
                     self.rect.x = self.rect.x - self.speed_x
                 else:
-                    self.sprites.assets(self.rect, "Idle", self.actual_demagorgon, "R", 1, self.images, 75, "D")
+                    self.sprites.assets(self.rect, "Idle", self.actual_demagorgon, "R", self.fps["Idle"], self.images, self.adj, "D")
 
 
     def on_collision(self, other: pygame.Rect):
@@ -500,23 +525,23 @@ class Demagorgon(Bosses, pygame.sprite.Sprite):
             self.damage_timer -=1
 
         if self.life <= 0 and self.rect.x - self.hero.rect.x <= 0:
-            self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "L", 0.3, self.images, 75, "D")
+            self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "L", self.fps["Death"], self.images, self.adj, "D")
 
             if self.actual_demagorgon["Death"] >= len(self.images["DDeath"])/2:
                 
                 self.is_dead = True
         elif self.life <= 0 and self.rect.x - self.hero.rect.x > 0:
-            self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "R", 0.3, self.images, 75, "D")
+            self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "R", self.fps["Death"], self.images, self.adj, "D")
 
             if self.actual_demagorgon["Death"] >= len(self.images["DDeath"]):
                 self.is_dead = True
 
         if self.life > 0:
             if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x <= 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_demagorgon, "L", 0.3, self.images, 75, "D")
+                self.sprites.assets(self.rect, "Attack", self.actual_demagorgon, "L", self.fps["Attack"], self.images, self.adj, "D")
 
             if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x > 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_demagorgon, "R", 0.3, self.images, 75, "D")
+                self.sprites.assets(self.rect, "Attack", self.actual_demagorgon, "R", self.fps["Attack"], self.images, self.adj, "D")
 
             self.move()
             self.attack()

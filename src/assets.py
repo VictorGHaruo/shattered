@@ -139,8 +139,6 @@ class Assets():
             if action == "IdleRight":
                 self.image = self.idleR_images[int(self.actual_Idle)]         
 
-
-
         self.image_rect = self.image.get_rect()
         self.image_rect.bottom = rect.bottom + 90 
         self.image_rect.centerx = rect.centerx
