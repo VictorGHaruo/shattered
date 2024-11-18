@@ -259,7 +259,7 @@ class Yokai(Player):
     def actions(self, key_map):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0:
-            if key_map[pygame.K_UP]:  
+            if key_map[pygame.K_UP] or key_map[pygame.K_w]:  
                 new_projectile = Projectile(self.rect.centerx, self.rect.top, 0, -20, self.sub_TAG, self.damage, 15, 15)
                 self.projectiles.append(new_projectile)
             elif self.from_the_front: 

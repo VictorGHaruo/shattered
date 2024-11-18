@@ -8,11 +8,11 @@ def maping(grounds : list, enemies : list, hero):
         "                                                                                                     I                              CCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
         "                                                                                                     I                              C                          CC",
         "                       F                                               U           A             A O I                             CC                          CC",
-        "                                                                      TMMP         TMMMP         TMMMP                             CC                          CC",
+        "                                                                     TMMMP         TMMMP         TMMMP                             CC                          CC",
         "                                                                                                                                  CCC                          CC",
         "                                                         TMMMP                                                                    CCC                          CC",
-        "                                                                                                                                 CCCC                          CC",
         "                                                                   F                                  F                          CCCC                          CC",
+        "                                                                                                                                 CCCC                          CC",
         "                                      U        A                                                                                CCCCC                          CC",
         "                              EXXXXXXXXXXXXXXXXXD                                                                             CCCCCCC                          CC",
         "                      U       LGGGGGGGGGGGGGGGGGR                                                                             CCCCCCC                          CC",
@@ -25,7 +25,7 @@ def maping(grounds : list, enemies : list, hero):
         "                                                                                                                                     G                           ",
     ]
     
-    path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+    path_game = os.path.dirname(os.path.abspath(sys.argv[0]))   
     Ground_path = os.path.join(path_game, os.pardir, "assets", "Ground")
     Ground_path = os.path.abspath(Ground_path)
     image_ground_X = os.path.join(Ground_path, "Ground_01.png")
@@ -65,8 +65,8 @@ def maping(grounds : list, enemies : list, hero):
                 if grid[i][j] == key[0]:
                     grounds.append(Ground(j*50, i*50, 50, 50, key[1]))
             if grid[i][j] == "U":
-                enemies.append(Dummy(j*50, i*50, 90, 140, hero))
+                enemies.append(Dummy(j*50, i*50, 50, 80, hero))
             if grid[i][j] == "F":
-                enemies.append(Flying(j*50, i*50, 70, 70, hero))
+                enemies.append(Flying(j*50, i*50, 60, 60, hero))
             if grid[i][j] == "A":
-                enemies.append(Mage(j*50, i*50, 100, 150, hero))
+                enemies.append(Mage(j*50, i*50, 80, 150, hero))

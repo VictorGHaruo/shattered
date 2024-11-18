@@ -64,7 +64,7 @@ class GameManager:
         
         image_path = os.path.join(Background_path, "boss_fase.png")
         self.bg_boss = pygame.image.load(image_path).convert_alpha()
-        self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH , self.HEIGHT))
+        self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH, self.HEIGHT))
         
         for i in range(1, 4):
             image_path = os.path.join(Background_path, f"background_{i}.png")
@@ -200,8 +200,3 @@ class GameManager:
                     self.hero.__dict__[key] = state_dict[key]
                     
                 self.hero.trade_cooldown = self.hero.trade_cooldown_time
-
-if __name__ == "__main__":
-    Game = GameManager()
-    Game.run()
-    pygame.quit()
