@@ -1,19 +1,10 @@
 import pygame
-import sys
 from player import Knight, Yokai, Ninja
 from camera import Camera
-from ground import Ground, Block
 from maker import maping
-from enemy import Dummy, Mage, Flying
 from boss import Balrog, Ganon, Demagorgon
-from assets import Herolife
-from assets import Bar
-from assets import Bosslife
-import os
-import sys
-
-
-pygame.init()
+from assets import Herolife, Bar, Bosslife
+import os, sys, random
            
 class GameManager:
 
@@ -33,16 +24,23 @@ class GameManager:
         maping(self.grounds, self.enemies, self.hero)
         self.WIDTH = main.WIDTH
         self.HEIGHT = main.HEIGHT
+        self.main = main
         
 
         self.bosses = [
             # Balrog(200, 100, 140, 180, self.hero),
-            Ganon(300, 0, 150, 220, self.hero),
+            # Ganon(300, 0, 150, 220, self.hero),
             # Demagorgon(0, 0, 100, 300, self.hero)
         ]
+        
+        self.order = [
+            Balrog(200, 100, 140, 180, self.hero),
+            Ganon(300, 0, 150, 220, self.hero),
+            Demagorgon(0, 0, 100, 300, self.hero)
+        ]
 
-        self.life_bar = Herolife(self.hero, 400, 20, 5)
-        self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 20, 100, 20, (255,255,255), (0,0,0))
+        self.life_bar = Herolife(self.hero, 400, 20, 10)
+        self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 30, 100, 20, (255,255,255), (0,0, 255))
         # Trade keys
         self.keys_trade = [
                     "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
@@ -58,7 +56,7 @@ class GameManager:
         
         image_path = os.path.join(Background_path, "boss_fase.png")
         self.bg_boss = pygame.image.load(image_path).convert_alpha()
-        self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH , self.HEIGHT))
+        self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH, self.HEIGHT))
         
         for i in range(1, 4):
             image_path = os.path.join(Background_path, f"background_{i}.png")
@@ -68,20 +66,41 @@ class GameManager:
         self.pos_x = -self.WIDTH
         self.pos_x_p = -self.WIDTH
             
+    def music(self, main, volume):
+        if main.is_changed:
+            if self.camera.boss_fase:
+                music_num = random.randint(1, 2)
+                pygame.mixer.music.load(f"../assets/Music/Boss/B{music_num}.mp3")
+            elif self.hero.can_push_block:
+                music_num = random.randint(1, 3)
+                pygame.mixer.music.load(f"../assets/Music/Obelisk/O{music_num}.mp3")
+            else:    
+                music_num = random.randint(1, 3)
+                pygame.mixer.music.load(f"../assets/Music/World/W{music_num}.mp3")
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play()  
+        main.is_changed = False
+            
     def on_event(self, event, main):
         self.trade(event)
-        self.hero.on_event(event)
+        self.hero.on_event(event, self.main)
         
-    def on_key_pressed(self, main):
+    def on_key_pressed(self):
         key_map = pygame.key.get_pressed()
-        self.hero.on_key_pressed(key_map, main)
+        self.hero.on_key_pressed(key_map, self.main)
         self.hero.actions(key_map)
             
     def update(self):
         self.hero.update()
         self.life_bar.update(self.hero)
         self.hero_timer.update(self.hero.trade_cooldown)
-        self.camera.update_coods(self.hero)
+        self.camera.update_coods(self.hero, self.main)
+
+        if len(self.bosses) == 0:
+            if len(self.order) != 0:
+                self.bosses.append(self.order[0])
+                del self.order[0]
+
         for ground in self.grounds:
             ground.update()
 
@@ -130,7 +149,7 @@ class GameManager:
                 del boss
         
         if self.hero.life <= 0 or self.hero.rect.y > 1000:
-            chage_state("over")
+            chage_state("over", True)
                 
     def draw(self, screen: pygame.Surface):
         screen.fill([0,0,0])
@@ -188,8 +207,3 @@ class GameManager:
                     self.hero.__dict__[key] = state_dict[key]
                     
                 self.hero.trade_cooldown = self.hero.trade_cooldown_time
-
-if __name__ == "__main__":
-    Game = GameManager()
-    Game.run()
-    pygame.quit()

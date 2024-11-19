@@ -1,7 +1,7 @@
 import pygame
 
 class Projectile:
-    def __init__(self, x, y, speed_x, speed_y, who, damage, width, height, image = None):
+    def __init__(self, x, y, speed_x, speed_y, who, damage, width, height, image = None, adj = 0):
         self.TAG = "Projectile"
         self.rect = pygame.Rect(x, y, width, height) 
         self.color = (0, 0, 255)  
@@ -9,8 +9,9 @@ class Projectile:
         self.speed_y = speed_y
         self.who = who
         self.damage = damage
+
         if image != None:
-            self.image = pygame.transform.scale(image, (width, height))
+            self.image = pygame.transform.scale(image, (width + adj, height + adj))
         else:
             self.image = None
 
@@ -21,7 +22,11 @@ class Projectile:
 
     def draw(self, screen, camera):
         self.rect.x -= camera.position_x
-        pygame.draw.rect(screen, self.color, self.rect) 
+        # pygame.draw.rect(screen, self.color, self.rect) 
+        if self.image != None:
+            screen.blit(self.image, self.rect)
+        else:
+            pygame.draw.rect(screen, self.color, self.rect) 
 
 class Shield:
     def __init__(self, x, y, width, height, damage):
@@ -36,7 +41,6 @@ class Shield:
 
         if other.TAG == "Projectile" and self.rect.colliderect(other.rect):
             other.speed_x = -other.speed_x
-            print(other.image)
             other.image = pygame.transform.flip(other.image, True, False)
             other.who = user
             other.damage = other.damage * self.damage

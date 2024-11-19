@@ -2,47 +2,7 @@ import pygame
 from weapon import Projectile
 import random
 import os, sys
-
-def change_image(dict, action, side):
-    
-    if dict.sub_TAG == "Dummy" and dict.action_idx in (4, 5):
-        dict.fps /= 4
-    if dict.sub_TAG == "Mage" and dict.action_idx in (0,1):
-        dict.fps /= 3
-        
-    dict.img_idx += dict.fps
-    if dict.action_idx in (2, 3) and dict.img_idx >= 8: 
-        dict.is_atking = False
-        dict.img_idx = 0
-    if dict.action_idx in (4, 5) and dict.img_idx >= 7:
-        dict.is_dead = True
-
-    if dict.life <= 0:
-        if dict.action_idx in (0, 1, 2, 3):
-            dict.img_idx = 0
-        if side == "r":
-            dict.action_idx = 4
-        if side == "l":
-            dict.action_idx = 5
-    else:    
-        if action in  ("fly", "idle", "run") and not dict.is_atking:
-            if dict.action_idx in (2, 3):
-                dict.img_idx = 0
-            if side == "r":
-                dict.action_idx = 0
-            if side == "l":
-                dict.action_idx = 1
-                
-        if action == "atk":
-            dict.is_atking = True
-        if side == "r" and dict.is_atking:
-            dict.action_idx = 2
-        if side == "l" and dict.is_atking:
-            dict.action_idx = 3
-            
-    dict.img_idx %= len(dict.imgs_list[dict.action_idx])
-    
-    dict.image_actual = dict.imgs_list[dict.action_idx][int(dict.img_idx)]
+from assets2 import Sprites
 
 class Monsters:
     def __init__(self, x, y, width, height, hero):
@@ -57,7 +17,10 @@ class Monsters:
         self.life = 5
         self.hero = hero
         self.immune = False
+        self.to_right = True
+        self.to_left =  False
         self.is_dead = False
+        self.is_attacking = False
         self.projectiles = []
 
     def move(self):
@@ -70,10 +33,9 @@ class Monsters:
     def new_hero(self, hero):
         self.hero = hero
         
-    def draw (self, screen: pygame.Surface, camera, image_actual):
+    def draw (self, screen: pygame.Surface, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            screen.blit(image_actual, self.rect)
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
             if not screen.get_rect().colliderect(projectile.rect):
@@ -105,81 +67,84 @@ class Dummy(Monsters):
         super().__init__(x, y, width, height, hero)
         self.speed_x = 3
         self.init_x = x
-        self.to_left = True
-        self.to_right = False
         self.range = 100
         
-        imgs_run_r = []
-        imgs_run_l = []
-        imgs_atk_r = []
-        imgs_atk_l = []
-        imgs_death_r = []
-        imgs_death_l = []
-        self.imgs_list = [imgs_run_r, imgs_run_l, imgs_atk_r, imgs_atk_l, imgs_death_r, imgs_death_l]
+        self.sprites = Sprites()
+        self.adjW = 60
+        self.adjH = 80
+        self.adj = 0
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        path_game = os.path.abspath(path_game)
         Dummy_path = os.path.join(path_game, os.pardir, "assets", "Dummy")
-        Dummy_path = os.path.abspath(Dummy_path)
-        ATTACK_path = os.path.join(Dummy_path, "ATTACK.png")
-        RUN_path = os.path.join(Dummy_path, "RUN.png")
-        DEATH_path = os.path.join(Dummy_path, "DEATH.png")
-        self.sheet_im_atk = pygame.image.load(ATTACK_path).convert_alpha()
-        self.sheet_im_run = pygame.image.load(RUN_path).convert_alpha()
-        self.sheet_im_death = pygame.image.load(DEATH_path).convert_alpha()
-        self.action_idx = 0
-        self.img_idx = 0
-        self.is_atking = False
-        self.fps = 0.2
-        for i in range(7):
-            image = self.sheet_im_run.subsurface((i*80, 0), (80, 64))
-            image = pygame.transform.scale(image, (width, height))
-            imgs_run_r.append(image)
-            image = pygame.transform.flip(image, True, False)
-            imgs_run_l.append(image)
-        for i in range(10):
-            image = self.sheet_im_atk.subsurface((i*80, 0), (80, 64))
-            image = pygame.transform.scale(image, (width, height))
-            imgs_atk_r.append(image)
-            image = pygame.transform.flip(image, True, False)
-            imgs_atk_l.append(image)
-        for i in range(15):
-            image = self.sheet_im_death.subsurface((i*80, 0), (80, 64))
-            image = pygame.transform.scale(image, (width, height))
-            imgs_death_r.append(image)
-            image = pygame.transform.flip(image, True, False)
-            imgs_death_l.append(image)
-        self.image_actual = self.imgs_list[self.action_idx][self.img_idx]
+        self.images_directory = {
+            "DWalk" : os.path.join(Dummy_path),
+            "DDeath" : os.path.join(Dummy_path)
+        }
+        self.sizes_directory = {
+            "DWalk" : 7,
+            "DDeath" : 15
+        }
+        self.images = {
+            "DWalk" : [],
+            "DDeath" : []
+        }
+        self.actual_dummy = {
+            "Walk" : 0,
+            "Death" : 0
+        }
+        self.fps = {
+            "Walk" : 0.22,
+            "Death" : 0.27
+        }
+        self.sprites.load_spritesheets(self.sizes_directory, "DWalk", True, self.images_directory, self.images, "RUN", 80, 64, 0, width, height, self.adjW, self.adjH)        
+        self.sprites.load_spritesheets(self.sizes_directory, "DWalk", False, self.images_directory, self.images, "RUN", 80, 64, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "DDeath", True, self.images_directory, self.images, "DEATH", 80, 64, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "DDeath", False, self.images_directory, self.images, "DEATH", 80, 64, 0, width, height, self.adjW, self.adjH)
 
     def on_collision(self, other):
         super().on_collision(other)
         
-        if self.rect.x > self.init_x + self.range and self.to_left:
-            self.speed_x *= -1
-            self.to_left = False
-            self.to_right = True
-        if self.rect.x < self.init_x - self.range and self.to_right:
+        if self.rect.x > self.init_x + self.range and self.to_right:
             self.speed_x *= -1
             self.to_left = True
             self.to_right = False
+        if self.rect.x < self.init_x - self.range and self.to_left:
+            self.speed_x *= -1
+            self.to_left = False
+            self.to_right = True
 
     def update(self):
-        self.move()
+        
+        if self.life <= 0:
+            if self.to_right:
+                self.sprites.assets(self.rect, "Death", self.actual_dummy, "L", self.fps["Death"], self.images, self.adj, "D")
+                if self.actual_dummy["Death"] >= len(self.images["DDeath"])/2:
+                    self.is_dead = True
+            if self.to_left:     
+                self.sprites.assets(self.rect, "Death", self.actual_dummy, "R", self.fps["Death"], self.images, self.adj, "D")
+                if self.actual_dummy["Death"] >= len(self.images["DDeath"]):
+                    self.is_dead = True
+        else:
+            self.move()
+            
         return super().update()
         
     def move(self):
         self.rect.x = self.rect.x + self.speed_x
-        if self.speed_x > 0:
-            change_image(self, "run", "l")
+        if self.to_right:
+            self.sprites.assets(self.rect, "Walk", self.actual_dummy, "L", self.fps["Walk"], self.images, self.adj, "D")
         else:
-            change_image(self, "run", "r")
-        
+            self.sprites.assets(self.rect, "Walk", self.actual_dummy, "R", self.fps["Walk"], self.images, self.adj, "D")
+            
     def draw(self, screen: pygame.Surface, camera):
+        super().draw(screen, camera)
         if camera.TAG == "Camera":
             self.init_x -= camera.position_x
-            if self.rect.x < camera.fix_x - (screen.get_size()[0] // 2) and self.to_right:
+            if self.rect.x < camera.fix_x - (screen.get_size()[0] // 2) and self.to_left:
                 self.speed_x *= -1
                 self.to_left = True
                 self.to_right = False
-        return super().draw(screen, camera, self.image_actual)
+        self.sprites.draw(screen)
 
 class Mage(Monsters):
     def __init__(self, x, y, width, height, hero):
@@ -191,85 +156,100 @@ class Mage(Monsters):
         self.projectile_cooldown = 0
         self.cool_down = 100
         
-        imgs_idle_r = []
-        imgs_idle_l = []
-        imgs_atk_r = []
-        imgs_atk_l = []
-        imgs_death_r = []
-        imgs_death_l = []
-        self.imgs_list = [imgs_idle_r, imgs_idle_l, imgs_atk_r, imgs_atk_l, imgs_death_r, imgs_death_l]
+        self.sprites = Sprites()
+        self.adjW = 50
+        self.adjH = 30
+        self.adj = 0
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        path_game = os.path.abspath(path_game)
         Mage_path = os.path.join(path_game, os.pardir, "assets", "Mage")
-        Mage_path = os.path.abspath(Mage_path)
-        ATTACK_path = os.path.join(Mage_path, "ATTACK.png")
-        IDLE_path = os.path.join(Mage_path, "IDLE.png")
-        DEATH_path = os.path.join(Mage_path, "DEATH.png")
+        self.images_directory = {
+            "MIdle" : os.path.join(Mage_path),
+            "MAttack" : os.path.join(Mage_path),
+            "MDeath" : os.path.join(Mage_path)
+        }
+        self.sizes_directory = {
+            "MIdle" : 10, 
+            "MAttack" : 10,
+            "MDeath" : 10
+        }
+        self.images = {
+            "MIdle" : [],
+            "MAttack" : [],
+            "MDeath" : []
+        }
+        self.actual_mage = {
+            "Idle" : 0,
+            "Attack" : 0,
+            "Death" : 0
+        }
+        self.fps = {
+            "Idle" : 0.2,
+            "Attack" : 0.2,
+            "Death" : 0.2
+        }
+        self.sprites.load_spritesheets(self.sizes_directory, "MIdle", False, self.images_directory, self.images, "IDLE", 80, 80, 0, width, height, self.adjW, self.adjH, 3)        
+        self.sprites.load_spritesheets(self.sizes_directory, "MIdle", True, self.images_directory, self.images, "IDLE", 80, 80, 0, width, height, self.adjW, self.adjH, 3)
+        self.sprites.load_spritesheets(self.sizes_directory, "MAttack", False, self.images_directory, self.images, "ATTACK", 80, 80, 0, width, height, self.adjW, self.adjH, 3)        
+        self.sprites.load_spritesheets(self.sizes_directory, "MAttack", True, self.images_directory, self.images, "ATTACK", 80, 80, 0, width, height, self.adjW, self.adjH, 3)
+        self.sprites.load_spritesheets(self.sizes_directory, "MDeath", False, self.images_directory, self.images, "DEATH", 80, 80, 0, width, height, self.adjW, self.adjH, 3)
+        self.sprites.load_spritesheets(self.sizes_directory, "MDeath", True, self.images_directory, self.images, "DEATH", 80, 80, 0, width, height, self.adjW, self.adjH, 3)
         projectile_path = os.path.join(Mage_path, "projectile.png")
-        self.sheet_im_atk = pygame.image.load(ATTACK_path).convert_alpha()
-        self.sheet_im_idle = pygame.image.load(IDLE_path).convert_alpha()
-        self.sheet_im_death = pygame.image.load(DEATH_path).convert_alpha()
-        self.image_projectile_r = pygame.image.load(projectile_path).convert_alpha()
-        self.image_projectile_l = pygame.transform.flip(self.image_projectile_r, True, False)
-        self.action_idx = 0
-        self.img_idx = 0
-        self.is_atking = False
-        self.fps = 0.20
-        for i in range(4):
-            for j in range(3):
-                if i == 3 and j != 0:
-                    break
-                image = self.sheet_im_idle.subsurface((j*80, i*80), (80, 80))
-                image = pygame.transform.scale(image, (width, height))
-                imgs_idle_l.append(image)
-                image = pygame.transform.flip(image, True, False)
-                imgs_idle_r.append(image)
-
-                image = self.sheet_im_atk.subsurface((j*80, i*80), (80, 80))
-                image = pygame.transform.scale(image, (width, height))
-                imgs_atk_l.append(image)
-                image = pygame.transform.flip(image, True, False)
-                imgs_atk_r.append(image)
-
-                image = self.sheet_im_death.subsurface((j*80, i*80), (80, 80))
-                image = pygame.transform.scale(image, (width, height))
-                imgs_death_l.append(image)
-                image = pygame.transform.flip(image, True, False)
-                imgs_death_r.append(image)
-        self.image_actual = self.imgs_list[self.action_idx][self.img_idx]
+        self.image_projectile_l = pygame.image.load(projectile_path)
+        self.image_projectile_r = pygame.transform.flip(self.image_projectile_l, True, False)
+    
     
     def update(self):
+        
+        if self.hero.rect.x <= self.rect.x:
+            self.to_left = True
+            self.to_right = False
+        else:
+            self.to_left = False
+            self.to_right = True
+        
         if self.projectile_cooldown > 0:
             self.projectile_cooldown -= 1
 
         for projectile in self.projectiles:
             projectile.update()
-
-        if self.hero.rect.x < self.rect.x:
-            change_image(self, "idle", "l")
-        else:
-            change_image(self, "idle", "r")
             
-        self.attack()
+        if self.life <= 0:
+            if self.to_left:
+                self.sprites.assets(self.rect, "Death", self.actual_mage, "L", self.fps["Death"], self.images, self.adj, "M")
+                if self.actual_mage["Death"] >= len(self.images["MDeath"])/2:
+                    self.is_dead = True
+            if self.to_right:     
+                self.sprites.assets(self.rect, "Death", self.actual_mage, "R", self.fps["Death"], self.images, self.adj, "M")
+                if self.actual_mage["Death"] >= len(self.images["MDeath"]):
+                    self.is_dead = True
+        else:
+            self.attack()
         return super().update()
     
     def on_collision(self, other: pygame.Rect):
         return super().on_collision(other)
     
-    
     def draw(self, screen, camera):
-        super().draw(screen, camera, self.image_actual)
+        super().draw(screen, camera) #, self.image_actual
+        self.sprites.draw(screen)
     
     def attack(self):
         if self.projectile_cooldown <= 0:
-            if self.hero.rect.x <= self.rect.x:
-                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 50, 30, self.image_projectile_r)
+            if self.to_left:
+                new_projectile = Projectile(self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 50, 30, self.image_projectile_l)
                 self.projectiles.append(new_projectile)
-                change_image(self, "atk", "l")
+                self.sprites.assets(self.rect, "Attack", self.actual_mage, "L", self.fps["Attack"], self.images, self.adj, "M")
             else:
-                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 50, 30, self.image_projectile_l)
+                new_projectile = Projectile(self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 50, 30, self.image_projectile_r)
                 self.projectiles.append(new_projectile)
-                change_image(self, "atk", "r")
+                self.sprites.assets(self.rect, "Attack", self.actual_mage, "R", self.fps["Attack"], self.images, self.adj, "M")
             self.projectile_cooldown = self.cool_down
+        else:
+            if self.to_left:
+                self.sprites.assets(self.rect, "Idle", self.actual_mage, "L", self.fps["Idle"], self.images, self.adj, "M")
+            else:
+                self.sprites.assets(self.rect, "Idle", self.actual_mage, "R", self.fps["Idle"], self.images, self.adj, "M")
 
 class Flying(Monsters):
     def __init__(self, x, y, width, height, hero):
@@ -288,47 +268,46 @@ class Flying(Monsters):
 
         self.projectile_cooldown = 0
 
-        imgs_fly_r = []
-        imgs_fly_l = []
-        imgs_atk_r = []
-        imgs_atk_l = []
-        imgs_death_r = []
-        imgs_death_l = []
-        self.imgs_list = [imgs_fly_r, imgs_fly_l, imgs_atk_r, imgs_atk_l, imgs_death_r, imgs_death_l]
+        self.sprites = Sprites()
+        self.adjW = 30
+        self.adjH = 30
+        self.adj = 0
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        Flying_path = os.path.join(path_game, os.pardir, "assets", "Flying")
-        Flying_path = os.path.abspath(Flying_path)
-        projectile_path = os.path.join(Flying_path, "projectile.png")
-        ATTACK_path = os.path.join(Flying_path, "ATTACK.png")
-        FLYING_path = os.path.join(Flying_path, "FLYING.png")
-        DEATH_path = os.path.join(Flying_path, "DEATH.png")
-        self.projectile_image = pygame.image.load(projectile_path).convert_alpha()
-        self.sheet_im_atk = pygame.image.load(ATTACK_path).convert_alpha()
-        self.sheet_im_fly = pygame.image.load(FLYING_path).convert_alpha()
-        self.sheet_im_death = pygame.image.load(DEATH_path).convert_alpha()
-        self.action_idx = 0
-        self.img_idx = 0
-        self.is_atking = False
-        self.fps = 0.25
-        for i in range(4):
-            image = self.sheet_im_fly.subsurface((i*81, 0), (81, 71))
-            image = pygame.transform.scale(image, (width, height))
-            imgs_fly_r.append(image)
-            image = pygame.transform.flip(image, True, False)
-            imgs_fly_l.append(image)
-        for i in range(8):
-            image = self.sheet_im_atk.subsurface((i*81, 0), (81, 71))
-            image = pygame.transform.scale(image, (width, height))
-            imgs_atk_r.append(image)
-            image = pygame.transform.flip(image, True, False)
-            imgs_atk_l.append(image)
-        for i in range(7):
-            image = self.sheet_im_death.subsurface((i*81, 0), (81, 71))
-            image = pygame.transform.scale(image, (width, height))
-            imgs_death_r.append(image)
-            image = pygame.transform.flip(image, True, False)
-            imgs_death_l.append(image)
-        self.image_actual = self.imgs_list[self.action_idx][self.img_idx]
+        path_game = os.path.abspath(path_game)
+        Fly_path = os.path.join(path_game, os.pardir, "assets", "Flying")
+        self.images_directory = {
+            "FWalk" : os.path.join(Fly_path),
+            "FAttack" : os.path.join(Fly_path),
+            "FDeath" : os.path.join(Fly_path)
+        }
+        self.sizes_directory = {
+            "FWalk" : 4, 
+            "FAttack" : 8,
+            "FDeath" : 7
+        }
+        self.images = {
+            "FWalk" : [],
+            "FAttack" : [],
+            "FDeath" : []
+        }
+        self.actual_mage = {
+            "Walk" : 0,
+            "Attack" : 0,
+            "Death" : 0
+        }
+        self.fps = {
+            "Walk" : 0.25,
+            "Attack" : 0.25,
+            "Death" : 0.25
+        }
+        self.sprites.load_spritesheets(self.sizes_directory, "FWalk", False, self.images_directory, self.images, "FLYING", 81, 71, 0, width, height, self.adjW, self.adjH)        
+        self.sprites.load_spritesheets(self.sizes_directory, "FWalk", True, self.images_directory, self.images, "FLYING", 81, 71, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "FAttack", False, self.images_directory, self.images, "ATTACK", 81, 71, 0, width, height, self.adjW, self.adjH)        
+        self.sprites.load_spritesheets(self.sizes_directory, "FAttack", True, self.images_directory, self.images, "ATTACK", 81, 71, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "FDeath", False, self.images_directory, self.images, "DEATH", 81, 71, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "FDeath", True, self.images_directory, self.images, "DEATH", 81, 71, 0, width, height, self.adjW, self.adjH)
+        projectile_path = os.path.join(Fly_path, "projectile.png")
+        self.image_projectile = pygame.image.load(projectile_path)
         
     def move(self):
         if self.move_cooldown <= 0:
@@ -339,16 +318,23 @@ class Flying(Monsters):
         
         if self.randomic >= self.probability:
             self.rect.x += self.speed_x
-            change_image(self, "fly", "l")
+            self.to_right = True
+            self.to_left = False
+            if not self.is_attacking:
+                self.sprites.assets(self.rect, "Walk", self.actual_mage, "R", self.fps["Walk"], self.images, self.adj, "F")
         else:
             self.rect.x -= self.speed_x
-            change_image(self, "fly", "r")
+            self.to_right = False
+            self.to_left = True
+            if not self.is_attacking:
+                self.sprites.assets(self.rect, "Walk", self.actual_mage, "L", self.fps["Walk"], self.images, self.adj, "F")
 
     def on_collision(self, other):
         super().on_collision(other)
 
     def update(self):
         super().update()
+        
         if self.move_cooldown > 0:
             self.move_cooldown -= 1
 
@@ -357,19 +343,41 @@ class Flying(Monsters):
 
         for projectile in self.projectiles:
             projectile.update()
-        self.move()
-        self.attack()
+            
+        if self.life <= 0:
+            if self.to_left:
+                self.sprites.assets(self.rect, "Death", self.actual_mage, "L", self.fps["Death"], self.images, self.adj, "F")
+                if self.actual_mage["Death"] >= len(self.images["FDeath"])/2:
+                    self.is_dead = True
+            if self.to_right:     
+                self.sprites.assets(self.rect, "Death", self.actual_mage, "R", self.fps["Death"], self.images, self.adj, "F")
+                if self.actual_mage["Death"] >= len(self.images["FDeath"]):
+                    self.is_dead = True
+        else:
+            self.attack()
+            self.move()
     
     def draw(self, screen, camera):
-        super().draw(screen, camera, self.image_actual)
+        super().draw(screen, camera) #, self.image_actual
+        
+        if self.to_right:
+            if self.actual_mage["Attack"] >= len(self.images["FDeath"]):
+                self.actual_mage["Attack"] = 0
+                self.is_attacking = False
+            if self.is_attacking:
+                self.sprites.assets(self.rect, "Attack", self.actual_mage, "R", self.fps["Attack"], self.images, self.adj, "F")
+        else:
+            if self.actual_mage["Attack"] >= len(self.images["FDeath"])/2:
+                self.actual_mage["Attack"] = 0
+                self.is_attacking = False
+            if self.is_attacking:
+                self.sprites.assets(self.rect, "Attack", self.actual_mage, "L", self.fps["Attack"], self.images, self.adj, "F")
+                
+        self.sprites.draw(screen)
     
     def attack(self):
         if self.projectile_cooldown <= 0:
-            new_projectile = Projectile(self.rect.left, self.rect.bottom, 0, 30, self.TAG, 20, 30, 40, self.projectile_image)
+            new_projectile = Projectile(self.rect.left, self.rect.bottom, 0, 20, self.TAG, 20, 40, 60, self.image_projectile)
             self.projectiles.append(new_projectile)
             self.projectile_cooldown = self.cool_down
-            
-            if self.speed_x > 0:
-                change_image(self, "atk", "l")
-            else:
-                change_image(self, "atk", "r")
+            self.is_attacking = True

@@ -1,6 +1,9 @@
 import pygame
 from interfaces import Menu, Game_Over, Pause
 from game import GameManager
+import random
+
+pygame.init()
 
 class Main():
     
@@ -17,7 +20,12 @@ class Main():
             "over": Game_Over(self)
         }
         self.current_state = self.states["menu"]
-        # self.save_state_game = 0
+        self.is_changed = False
+        self.volume = 0.15
+        music_num = random.randint(1, 2)
+        pygame.mixer.music.load(f"../assets/Music/Menu/M{music_num}.mp3")
+        pygame.mixer.music.set_volume(self.volume)
+        pygame.mixer.music.play()  
         
     def run(self):
         clock = pygame.time.Clock()
@@ -25,29 +33,27 @@ class Main():
         while self.is_running:
             events = pygame.event.get()
             for event in events:
-                
                 if event.type == pygame.QUIT:
-                    self.is_running = False
-                    
+                    self.is_running = False    
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE and self.current_state == self.states["game"]:
-                        self.change_state("pause")
+                        self.change_state("pause", False)
                         break
-                            
                 self.current_state.on_event(event, self)
                 
             if self.current_state == self.states["game"]:
-                self.current_state.on_key_pressed(self)
+                self.current_state.on_key_pressed()
                 self.current_state.update()
                 self.current_state.collision_decetion()
                 self.current_state.elimination(self.change_state)
+            self.current_state.music(self, self.volume)
             self.current_state.draw(self.screen)
             pygame.display.flip()
-            
             clock.tick(30)
     
-    def change_state(self, state):
+    def change_state(self, state, music_bool):
         self.current_state = self.states[state]
+        self.is_changed = music_bool
             
 if __name__ == "__main__":
     game = Main()
