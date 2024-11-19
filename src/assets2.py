@@ -6,7 +6,7 @@ class Sprites():
         self.image = None
         self.image_rect = None
         self.before = 0
-        self.actions = ["Walk", "Idle", "Attack", "Death", "Immune", "Projectile"]
+        self.actions = ["Walk", "Idle", "Attack","Attack_2", "Death", "Immune", "Jump", "Hurt", "Projectile"]
 
     def load_images(self, invert, width, height, action, images, sizes_directory, images_directory, adjW, adjH):
         for i in range(sizes_directory[action]):

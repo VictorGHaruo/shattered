@@ -39,8 +39,8 @@ class GameManager:
             Demagorgon(0, 0, 100, 300, self.hero)
         ]
 
-        self.life_bar = Herolife(self.hero, 400, 20, 5)
-        self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 20, 100, 20, (255,255,255), (0,0,0))
+        self.life_bar = Herolife(self.hero, 400, 20, 10)
+        self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 30, 100, 20, (255,255,255), (0,0, 255))
         # Trade keys
         self.keys_trade = [
                     "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
