@@ -54,7 +54,7 @@ class Player:
     def draw(self, screen, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            # pygame.draw.rect(screen, self.rect_color, self.rect)
+            pygame.draw.rect(screen, self.rect_color, self.rect)
 
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
@@ -102,6 +102,12 @@ class Player:
 
                 if self.on_ground:
                     self.action = "Idle"
+                    pass
+                if self.actual["Jump"] == (len(self.images[f"{self.teste}Jump"])-1)//2 or self.actual["Jump"] == len(self.images[f"{self.teste}Jump"] )-1 :
+                    if self.from_the_front:
+                        self.sprites.assets(self.rect, "Jump", self.actual, "R", 0, self.images, self.adj, self.teste)
+                    else: self.sprites.assets(self.rect, "Jump", self.actual, "L", 0, self.images, self.adj, self.teste)
+                    return
 
             if self.action == "Hurt":
                 if self.from_the_front:
@@ -127,11 +133,11 @@ class Player:
                 else:
                     self.sprites.assets(self.rect, "Idle", self.actual, "L", self.fps["Idle"], self.images, self.adj, self.teste)
             else:   
-                self.actual["Jump"] = 6
                 if self.from_the_front:
-
+                    self.actual["Jump"] = (len(self.images[f"{self.teste}Jump"] )-1)//2
                     self.sprites.assets(self.rect, "Jump", self.actual, "R", 0, self.images, self.adj, self.teste)
-                else:
+                else: 
+                    self.actual["Jump"] = len(self.images[f"{self.teste}Jump"] )-1
                     self.sprites.assets(self.rect, "Jump", self.actual, "L", 0, self.images, self.adj, self.teste)
                 
                 
@@ -147,16 +153,17 @@ class Player:
                 self.can_push_block = True
 
     def jump(self):
-        if self.jump_count >= self.jump_count_max or self.action == "Hurt":
+        if self.jump_count >= self.jump_count_max or self.action == "Hurt" or self.action == "Immune":
             return
         self.speed_y += self.speed_jump
         self.speed_y = max(self.speed_y, self.speed_jump)
         self.jump_count += 1
         #self.sprites.assets(self.rect, "Jump", self.actual, "R", self.fps["Jump"], self.images, self.adj, self.teste)
         self.action = "Jump"
+        self.actual["Jump"] = 0
         
     def on_key_pressed(self, key_map, main):
-        if self.on_ground and self.action != "Hurt" and self.action != "Attack" :
+        if self.on_ground and self.action != "Hurt" and self.action != "Attack" and self.action != "Immune" :
             if key_map[pygame.K_RIGHT] or key_map[pygame.K_d]:
                 self.speed_x += 5
                 self.to_right = True
@@ -251,6 +258,7 @@ class Knight(Player):
     
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
+        self.teste = "K"
         self.jump_count_max = 1
         self.rect_color = (255, 0, 0)
         self.shield_width = 15
@@ -260,11 +268,65 @@ class Knight(Player):
         self.shield_damage = 0.7
         self.shield = None  
 
+        self.sprites = Sprites()
+        self.adjW = 80
+        self.adjH = 80
+        self.adj = 0
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        path_game = os.path.abspath(path_game)
+        Knight_path = os.path.join(path_game, os.pardir, "assets", "Knight")
+        self.images_directory = {
+            "KIdle" : os.path.join(Knight_path),
+            "KWalk" : os.path.join(Knight_path),
+            "KHurt" : os.path.join(Knight_path),
+            "KJump" : os.path.join(Knight_path),
+            "KImmune" : os.path.join(Knight_path),
+        }
+        self.sizes_directory = {
+            "KIdle" : 4,
+            "KWalk" : 8,
+            "KHurt" : 2,
+            "KJump" : 6,
+            "KImmune" : 1
+        }
+        self.images = {
+            "KIdle" : [],
+            "KWalk" : [],
+            "KHurt" : [],
+            "KJump" : [],
+            "KImmune" : []
+        }
+        self.actual = {
+            "Idle" : 0,
+            "Walk" : 0,
+            "Hurt" : 0,
+            "Jump" : 0,
+            "Immune" : 0
+        }
+        self.fps = {
+            "Idle" : 0.5,
+            "Walk" : 0.5,
+            "Hurt" : 0.1,
+            "Jump" : 0.5,
+            "Immune" : 0
+        }
+        self.sprites.load_spritesheets(self.sizes_directory, "KIdle", True, self.images_directory, self.images, "Idle", 128, 128, 0, width, height, self.adjW, self.adjH)        
+        self.sprites.load_spritesheets(self.sizes_directory, "KIdle", False, self.images_directory, self.images, "Idle", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KWalk", True, self.images_directory, self.images, "Walk", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KWalk", False, self.images_directory, self.images, "Walk", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KHurt", True, self.images_directory, self.images, "Hurt", 128, 128, 0, width, height, self.adjW, self.adjH)        
+        self.sprites.load_spritesheets(self.sizes_directory, "KHurt", False, self.images_directory, self.images, "Hurt", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KJump", True, self.images_directory, self.images, "Jump", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KJump", False, self.images_directory, self.images, "Jump", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KImmune", True, self.images_directory, self.images, "Protect", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "KImmune", False, self.images_directory, self.images, "Protect", 128, 128, 0, width, height, self.adjW, self.adjH)
+
     def actions(self, key_map):
 
         if key_map[pygame.K_v]:
             if self.shield is None: 
                 self.shield = Shield(self.shield_x, self.shield_y, self.shield_width, self.shield_height, self.shield_damage)
+                self.action = "Immune"
 
             if self.on_ground:
                 self.speed_x_max = 0
@@ -273,6 +335,8 @@ class Knight(Player):
                     
         else:
             self.shield = None
+            if self.action == "Immune":
+                self.action = None
             self.speed_x_max = 10
             self.speed_x_min = -10
             self.speed_jump = -30
@@ -293,6 +357,8 @@ class Knight(Player):
 
         if self.shield is not None:
             self.shield.draw(screen)
+
+        self.sprites.draw(screen)
 
         
     def update(self):
@@ -320,7 +386,7 @@ class Yokai(Player):
         
         self.sprites = Sprites()
         self.adjW = 60
-        self.adjH = 80
+        self.adjH = 60
         self.adj = 0
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         path_game = os.path.abspath(path_game)
@@ -391,14 +457,17 @@ class Yokai(Player):
                 new_projectile = Projectile(self.rect.centerx, self.rect.centery, 0, -20, self.sub_TAG, self.damage, 30, 30, self.image_projectile_u)
                 self.projectiles.append(new_projectile)
                 self.action = "Attack_2"
+                self.actual["Attack_2"] = 0
             elif self.from_the_front: 
                 new_projectile = Projectile(self.rect.centerx, self.rect.top, 20, 0, self.sub_TAG, self.damage, 30, 30, self.image_projectile_r)
                 self.projectiles.append(new_projectile)
                 self.action = "Attack"
+                self.actual["Attack"] = 0
             else:
                 new_projectile = Projectile(self.rect.centerx, self.rect.top, -20, 0, self.sub_TAG, self.damage, 30, 30, self.image_projectile_l)
                 self.projectiles.append(new_projectile)
                 self.action = "Attack"
+                self.actual["Attack"] = 0
 
             self.projectile_cooldown = self.cooldown_time
 
@@ -421,7 +490,7 @@ class Ninja(Player):
         self.teste = "N"
         self.jump_count_max = 3
         self.rect_color = (255, 255, 255)
-        self.range = self.rect.centerx + 35 if self.from_the_front else self.rect.centerx - 60
+        self.range = self.rect.centerx + 30 if self.from_the_front else self.rect.centerx - 40
         self.attack_cooldown = 0
         self.attack_time = 0
         self.attack_animation = 5
@@ -430,8 +499,8 @@ class Ninja(Player):
         self.attack = None
 
         self.sprites = Sprites()
-        self.adjW = 60
-        self.adjH = 80
+        self.adjW = 50
+        self.adjH = 35
         self.adj = 0
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         path_game = os.path.abspath(path_game)
@@ -486,9 +555,10 @@ class Ninja(Player):
 
         if key_map[pygame.K_v] and self.attack_cooldown <= 0 and not self.action == "Hurt":
 
-            self.attack = Attack(self.range, self.rect.y, 25, 15, self.damage)
+            self.attack = Attack(self.range, self.rect.y, 20, 60, self.damage)
             self.attack_cooldown = self.cooldown_time
             self.action = "Attack"
+            self.actual["Attack"] = 0
             self.attack_time = 0
         else:
             self.attack = None

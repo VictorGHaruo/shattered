@@ -10,9 +10,9 @@ class GameManager:
 
     def __init__(self, main):
         self.heros = [
-            Knight(0 , 0, 40, 50),
-            Yokai(0 , 0, 40, 50),
-            Ninja(0 , 0, 40, 50)
+            Knight(0 , 0, 40, 70),
+            Yokai(0 , 0, 40, 70),
+            Ninja(0 , 0, 40, 70)
         ]
         self.atual_hero = 2
         self.hero = self.heros[self.atual_hero]
