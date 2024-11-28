@@ -14,7 +14,7 @@ class GameManager:
             Yokai(0 , 0, 40, 70),
             Ninja(0 , 0, 40, 70)
         ]
-        self.atual_hero = 2
+        self.atual_hero = 0
         self.hero = self.heros[self.atual_hero]
         
         self.camera = Camera(0, main.WIDTH)
@@ -148,7 +148,7 @@ class GameManager:
                 self.bosses.remove(boss)
                 del boss
         
-        if self.hero.life <= 0 or self.hero.rect.y > 1000:
+        if self.hero.Death:
             chage_state("over", True)
                 
     def draw(self, screen: pygame.Surface):

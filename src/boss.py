@@ -86,6 +86,7 @@ class Bosses:
             if other.TAG == "Player":
                 if projectile.rect.colliderect(other):
                     other.life -= projectile.damage
+                    other.action = "Hurt"
                     self.projectiles.remove(projectile)
                     del projectile
 
@@ -222,6 +223,7 @@ class Balrog(Bosses, pygame.sprite.Sprite):
             if other.TAG == "Player":
                 if atks.rect.colliderect(other) and self.damage_timer == 0:
                     other.life -= atks.damage
+                    other.action = "Hurt"
                     self.damage_timer = self.atk_cooldowns
         return super().on_collision(other)
 
