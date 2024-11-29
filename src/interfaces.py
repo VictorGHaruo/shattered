@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, os, sys
 from game import GameManager
 
 class Button():
@@ -44,10 +44,14 @@ class Menu():
     
     def music(self, main, volume):
         if main.is_changed:
+            path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+            music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
+            
             music_num = random.randint(1, 2)
-            pygame.mixer.music.load(f"../assets/Music/Menu/M{music_num}.mp3")
+            music_path = os.path.join(music_dir_path, "Menu", f"M{music_num}.mp3")
+            pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
-            pygame.mixer.music.play()  
+            pygame.mixer.music.play(-1)  
         main.is_changed = False
     
     def draw(self, screen: pygame.Surface):
@@ -105,10 +109,14 @@ class Game_Over():
     
     def music(self, main, volume):
         if main.is_changed:
+            path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+            music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
+            
             music_num = random.randint(1, 2)
-            pygame.mixer.music.load(f"../assets/Music/Over/D{music_num}.mp3")
+            music_path = os.path.join(music_dir_path, "Over", f"D{music_num}.mp3")
+            pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
-            pygame.mixer.music.play()  
+            pygame.mixer.music.play(-1)  
         main.is_changed = False
                 
     def draw(self, screen):
@@ -136,8 +144,3 @@ def f_reset_game(main):
     del main.states["game"]
     main.states["game"] = GameManager(main)
     main.change_state("game", True)
-    
-    
-
-    # if main.save_state != {}:
-    #     main.states["game"].__dict__ = main.save_state

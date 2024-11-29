@@ -68,17 +68,23 @@ class GameManager:
             
     def music(self, main, volume):
         if main.is_changed:
+            path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+            music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
+            
             if self.camera.boss_fase:
                 music_num = random.randint(1, 2)
-                pygame.mixer.music.load(f"../assets/Music/Boss/B{music_num}.mp3")
+                music_path = os.path.join(music_dir_path, "Boss", f"B{music_num}.mp3")
+                pygame.mixer.music.load(music_path)
             elif self.hero.can_push_block:
                 music_num = random.randint(1, 3)
-                pygame.mixer.music.load(f"../assets/Music/Obelisk/O{music_num}.mp3")
+                music_path = os.path.join(music_dir_path, "Obelisk", f"O{music_num}.mp3")
+                pygame.mixer.music.load(music_path)
             else:    
                 music_num = random.randint(1, 3)
-                pygame.mixer.music.load(f"../assets/Music/World/W{music_num}.mp3")
+                music_path = os.path.join(music_dir_path, "World", f"W{music_num}.mp3")
+                pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
-            pygame.mixer.music.play()  
+            pygame.mixer.music.play(-1)  
         main.is_changed = False
             
     def on_event(self, event, main):

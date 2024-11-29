@@ -1,6 +1,5 @@
 import pygame
 from weapon import Projectile, Shield, Attack
-import copy
 import os, sys
 from assets2 import Sprites
 
@@ -11,7 +10,7 @@ class Player:
         self.sub_TAG = "Player"
         self.teste = "teste"
         self.action = None
-        self.max_life = 100
+        self.max_life = 2000
         self.life = self.max_life
         self.Death = False
         
@@ -626,13 +625,3 @@ class Ninja(Player):
         self.attack_time += 1
         if self.attack_time >= self.attack_animation and self.action == "Attack":
             self.action = None
-
-
-# def f_save(main):
-#     keys_save = ["heros"]
-#     main.save_state_game = main.current_state.__getstate__()
-#     for key in keys_save:
-#         print(main.save_state_game[key])
-#         main.save_state_game = copy.deepcopy(main.save_state_game[key])
-#         print(main.save_state_game)
-#     print("Saved")

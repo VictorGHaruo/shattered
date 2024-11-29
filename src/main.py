@@ -1,4 +1,4 @@
-import pygame
+import pygame, os, sys
 from interfaces import Menu, Game_Over, Pause
 from game import GameManager
 import random
@@ -22,10 +22,13 @@ class Main():
         self.current_state = self.states["menu"]
         self.is_changed = False
         self.volume = 0.15
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
         music_num = random.randint(1, 2)
-        pygame.mixer.music.load(f"../assets/Music/Menu/M{music_num}.mp3")
+        music_path = os.path.join(music_dir_path, "Menu", f"M{music_num}.mp3")
+        pygame.mixer.music.load(music_path)
         pygame.mixer.music.set_volume(self.volume)
-        pygame.mixer.music.play()  
+        pygame.mixer.music.play(-1)  
         
     def run(self):
         clock = pygame.time.Clock()

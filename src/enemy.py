@@ -36,6 +36,7 @@ class Monsters:
     def draw (self, screen: pygame.Surface, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
+            pygame.draw.rect(screen, self.color, self.rect)
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
             if not screen.get_rect().colliderect(projectile.rect):
@@ -201,10 +202,10 @@ class Mage(Monsters):
     
     def update(self):
         
-        if self.hero.rect.x <= self.rect.x:
+        if self.hero.rect.x <= self.rect.x and not self.life <= 0:
             self.to_left = True
             self.to_right = False
-        else:
+        elif not self.life <= 0:
             self.to_left = False
             self.to_right = True
         
@@ -231,7 +232,7 @@ class Mage(Monsters):
         return super().on_collision(other)
     
     def draw(self, screen, camera):
-        super().draw(screen, camera) #, self.image_actual
+        super().draw(screen, camera) 
         self.sprites.draw(screen)
     
     def attack(self):
@@ -290,7 +291,7 @@ class Flying(Monsters):
             "FAttack" : [],
             "FDeath" : []
         }
-        self.actual_mage = {
+        self.actual_flying = {
             "Walk" : 0,
             "Attack" : 0,
             "Death" : 0
@@ -321,13 +322,13 @@ class Flying(Monsters):
             self.to_right = True
             self.to_left = False
             if not self.is_attacking:
-                self.sprites.assets(self.rect, "Walk", self.actual_mage, "R", self.fps["Walk"], self.images, self.adj, "F")
+                self.sprites.assets(self.rect, "Walk", self.actual_flying, "R", self.fps["Walk"], self.images, self.adj, "F")
         else:
             self.rect.x -= self.speed_x
             self.to_right = False
             self.to_left = True
             if not self.is_attacking:
-                self.sprites.assets(self.rect, "Walk", self.actual_mage, "L", self.fps["Walk"], self.images, self.adj, "F")
+                self.sprites.assets(self.rect, "Walk", self.actual_flying, "L", self.fps["Walk"], self.images, self.adj, "F")
 
     def on_collision(self, other):
         super().on_collision(other)
@@ -346,32 +347,32 @@ class Flying(Monsters):
             
         if self.life <= 0:
             if self.to_left:
-                self.sprites.assets(self.rect, "Death", self.actual_mage, "L", self.fps["Death"], self.images, self.adj, "F")
-                if self.actual_mage["Death"] >= len(self.images["FDeath"])/2:
+                self.sprites.assets(self.rect, "Death", self.actual_flying, "L", self.fps["Death"], self.images, self.adj, "F")
+                if self.actual_flying["Death"] >= len(self.images["FDeath"])/2:
                     self.is_dead = True
             if self.to_right:     
-                self.sprites.assets(self.rect, "Death", self.actual_mage, "R", self.fps["Death"], self.images, self.adj, "F")
-                if self.actual_mage["Death"] >= len(self.images["FDeath"]):
+                self.sprites.assets(self.rect, "Death", self.actual_flying, "R", self.fps["Death"], self.images, self.adj, "F")
+                if self.actual_flying["Death"] >= len(self.images["FDeath"]):
                     self.is_dead = True
         else:
             self.attack()
             self.move()
     
     def draw(self, screen, camera):
-        super().draw(screen, camera) #, self.image_actual
+        super().draw(screen, camera)
         
-        if self.to_right:
-            if self.actual_mage["Attack"] >= len(self.images["FDeath"]):
-                self.actual_mage["Attack"] = 0
+        if self.to_right and not self.life <= 0:
+            if self.actual_flying["Attack"] >= len(self.images["FAttack"]):
+                self.actual_flying["Attack"] = 0
                 self.is_attacking = False
             if self.is_attacking:
-                self.sprites.assets(self.rect, "Attack", self.actual_mage, "R", self.fps["Attack"], self.images, self.adj, "F")
-        else:
-            if self.actual_mage["Attack"] >= len(self.images["FDeath"])/2:
-                self.actual_mage["Attack"] = 0
+                self.sprites.assets(self.rect, "Attack", self.actual_flying, "R", self.fps["Attack"], self.images, self.adj, "F")
+        elif not self.life <= 0:
+            if self.actual_flying["Attack"] >= len(self.images["FAttack"])/2:
+                self.actual_flying["Attack"] = 0
                 self.is_attacking = False
             if self.is_attacking:
-                self.sprites.assets(self.rect, "Attack", self.actual_mage, "L", self.fps["Attack"], self.images, self.adj, "F")
+                self.sprites.assets(self.rect, "Attack", self.actual_flying, "L", self.fps["Attack"], self.images, self.adj, "F")
                 
         self.sprites.draw(screen)
     
