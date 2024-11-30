@@ -1,7 +1,7 @@
 import pygame
 from weapon import Projectile, Shield, Attack
 import os, sys
-from assets2 import Sprites
+from assets import Sprites
 
 class Player:
     

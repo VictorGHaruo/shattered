@@ -3,7 +3,7 @@ from weapon import Projectile, Attack
 import random
 import os
 import math
-from assets2 import Sprites
+from assets import Sprites
 
 class Bosses:
     def __init__(self, x, y, width, height, hero):

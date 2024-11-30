@@ -1,388 +1,253 @@
 import pygame
-import sys
 import os
+from typing import Optional
 
-class Assets():
+class Sprites():
+
+    """
+    Loads and applies sprites to characters.
+
+    Notes
+    -----
+    It is important to use the correct variable names in this class. 
+    If there is any typo, some methods may raise an error. For example, "Attack"
+    is valid, but "attack" is not. The `self.action` variable must always hold a
+    valid string representing an action.
+    """
+
     def __init__(self) -> None:
-        self.main_directory = os.path.dirname(os.path.dirname(__file__))
 
-        #Demagorgon
-        self.walkL_images = []
-        self.walkR_images = []
-        self.attackR_images = []
-        self.attackL_images = []
-        self.deathL_images = []
-        self.deathR_images = []
-        self.idleL_images = []
-        self.idleR_images = []
+        """
+        Initializes important attributes used in other methods.
+        """
 
-        self.actual_Walk = 0
-        self.actual_Atk = 0
-        self.actual_Death = 0
-        self.actual_Idle = 0
-        self.Dadjust = 300
+        self.image = None
+        self.image_rect = None
+        self.before = 0
+        self.actions = [
+            "Walk", "Idle", "Attack","Attack_2", "Death", "Immune", "Jump", 
+            "Hurt", "Projectile"
+        ]
 
-        #Ganon
-        self.Ganon_spritesheet = pygame.image.load(f"{self.main_directory}/assets/Ganon/Character_sheet.png").convert_alpha()
-        self.Ganon_projectile = pygame.image.load(f"{self.main_directory}/assets/Ganon/arm_projectile_glowing.png").convert_alpha()
-        self.GidleL_images = []
-        self.GidleR_images = []
-        self.GattackL_images = []
-        self.GattackR_images = []
-        self.GimmuneL_images = []
-        self.GimmuneR_images = []
-        self.GdeathL_images = []
-        self.GdeathR_images = []
-        # self.GprojectileL_images = []
-        self.GprojectileR_images = []
-
-        self.Gactual_Idle = 0
-        self.Gactual_Attack = 0
-        self.Gactual_Immune = 0
-        self.Gactual_Death = 0
-        self.Gadjust = 100
-
-        #Balrog
-        self.BflyL_images = []
-        self.BflyR_images = []
-        self.Blightning_images = []
-
-        self.Bactual_Fly = 0
-        self.Bactual_Lightning = 0
-
-        self.Badjust = 100
-
-    def load_image(self, image_path, width, height, invert):
-        image = pygame.image.load(image_path).convert_alpha()
-        image = pygame.transform.scale(image, (width, height))
-        image = pygame.transform.flip(image, invert, False)
-        return image
-    
-    def load_spritesheet(self, size_x, size_y, line,idle_left, width, height, invert, spritesheet):
-        image = spritesheet.subsurface((idle_left * size_x, line), (size_x, size_y)) #arrumar
-        image = pygame.transform.scale(image, (width, height))
-        image = pygame.transform.flip(image, invert, False)
-        return image
-    
-    def init_Demogorgon(self, width, height):
-        for walk_left in range(10):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/walk/walk_{walk_left+1}.png", width + self.Dadjust, height + self.Dadjust, True)
-            self.walkL_images.append(image)
-
-        for walk_right in range(10):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/walk/walk_{walk_right+1}.png", width + self.Dadjust, height + self.Dadjust, False)
-            self.walkR_images.append(image)
-
-        for attack_right in range(14):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/1_atk/1_atk_{attack_right+1}.png", width + self.Dadjust, height + self.Dadjust, False)
-            self.attackR_images.append(image)
-
-        for attack_left in range(14):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/1_atk/1_atk_{attack_left+1}.png", width + self.Dadjust, height + self.Dadjust, True)
-            self.attackL_images.append(image)
+    def load_images(
+        self, invert: bool, width: int, height: int, action: str, 
+        images: dict[str, list], sizes_directory: dict[str, str],
+        images_directory: dict[str, str], adjW: int, adjH: int
+    ) -> None:
         
-        for death_left in range(16):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/death/death_{death_left+1}.png", width + self.Dadjust, height + self.Dadjust, True)
-            self.deathL_images.append(image)
+        """
+        Loads sprites from separate image files and stores them in a list.
 
-        for death_right in range(16):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/death/death_{death_right+1}.png", width + self.Dadjust, height + self.Dadjust, False)
-            self.deathR_images.append(image)
+        Parameters
+        ----------
+        invert : bool
+            Whether to flip the image horizontally.
+        width : int
+            The character's width, used to adjust sprites to the hitbox.
+        height : int
+            The character's height, used to adjust sprites to the hitbox.
+        action : str
+            The action being performed (e.g., "Walk", "Idle") to store images in
+            the correct list, it must present in self.action list.
+        images : dict[str, list]
+            A dictionary where keys are action names and values are lists of 
+            images for each action.
+        sizes_directory : dict[str, int]
+            A dictionary mapping each action to the number of images available 
+            for that action.
+        images_directory : dict[str, str]
+            A dictionary mapping each action to the directory path where the 
+            sprite images are stored.
+        adjW : int
+            Adjustment to apply to the sprite's width.
+        adjH : int
+            Adjustment to apply to the sprite's height.
+            
+        Returns
+        -------
+        None
+            The function does not return any value. It modifies the `images` 
+            dictionary in-place.
 
-        for idle_left in range(6):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/idle/idle_{idle_left+1}.png", width + self.Dadjust, height + self.Dadjust, True)
-            self.idleL_images.append(image)
+        """
+
+        for i in range(sizes_directory[action]):
+            image = pygame.image.load(
+                os.path.join(images_directory[action], f"{i+1}.png")
+            ).convert_alpha()
+            image = pygame.transform.scale(image, (width + adjW, height + adjH))
+            if invert:
+                image = pygame.transform.flip(image, invert, False)
+            images[action].append(image)
+
+
+    def load_spritesheets(
+        self, sizes_directory: dict[str, int], action: str, invert: bool, 
+        images_directory: dict[str, str], images: dict[str, list], 
+        file_name: str, size_x: int, size_y: int, line: int, width: int, 
+        height: int, adjW: int, adjH: int, gap: Optional[int] = None
+    ) -> None:
         
-        for idle_right in range(6):
-            image = self.load_image(f"{self.main_directory}/assets/Demagorgon/idle/idle_{idle_right+1}.png", width + self.Dadjust, height + self.Dadjust, False)
-            self.idleR_images.append(image)
+        """
+        Loads a spritesheet and stores individual images in a list.
 
-    def assets_Demogorgon(self, action, rect):
-        if action == "WalkLeft" or action == "WalkRight":
-            self.actual_Walk = self.actual_Walk + 0.5
-            if self.actual_Walk >= len(self.walkL_images):
-                self.actual_Walk = 0
-            if action == "WalkLeft":
-                self.image = self.walkL_images[int(self.actual_Walk)]
-            if action == "WalkRight":
-                self.image = self.walkR_images[int(self.actual_Walk)]
+        Parameters
+        ----------
+        sizes_directory : dict[str, int]
+            A dictionary mapping each action to the number of images available 
+            for that action.
+        action : str
+            The action being performed (e.g., "Walk", "Idle") to store images in
+            the correct list. It must be present in the `self.actions` list.
+        invert : bool
+            Whether to flip the image horizontally.
+        images_directory : dict[str, str]
+            A dictionary mapping each action to the directory path where the 
+            sprite images are stored.
+        images : dict[str, list]
+            A dictionary where keys are action names and values are lists of 
+            images for each action.
+        file_name : str
+            The name of the file containing the spritesheet (without extension).
+        size_x : int
+            The width of each individual image in the spritesheet.
+        size_y : int
+            The height of each individual image in the spritesheet.
+        line : int
+            The vertical offset (in pixels) where the action starts in the 
+            spritesheet.
+        width : int
+            The character's width, used to adjust sprites to the hitbox.
+        height : int
+            The character's height, used to adjust sprites to the hitbox.
+        adjW : int
+            Adjustment to apply to the sprite's width.
+        adjH : int
+            Adjustment to apply to the sprite's height.
+        gap : int, optional
+            If the action occupies more than one line in the spritesheet, `gap` 
+            defines how many images are in each line.
+            If `gap` is not provided, the function assumes that all images are 
+            in a single line.
+
+        Returns
+        -------
+        None
+            The function does not return any value. It modifies the `images` 
+            dictionary in-place.
         
-        if action == "AtkLeft" or action == "AtkRight":
-            self.actual_Atk = self.actual_Atk + 0.5
-            if self.actual_Atk >= len(self.attackL_images):
-                self.actual_Atk = 0
-            
-            if action == "AtkLeft":
-                self.image = self.attackL_images[int(self.actual_Atk)]
-            
-            if action == "AtkRight":
-                self.image = self.attackR_images[int(self.actual_Atk)]
+        Notes
+        -----
+        If the action utilizes more than one line in the spritesheet, the `gap` 
+        parameter is used to define how many images are in each line. The 
+        function will correctly read and extract images from different lines 
+        based on this value.
+        """
         
-        if action == "DeathLeft" or action == "DeathRight":
+        sheet = pygame.image.load(
+            os.path.join(images_directory[action], f"{file_name}.png")
+        ).convert_alpha()
+        
+        for i in range(sizes_directory[action]):
+            column = i % gap if gap else i
+            row = i // gap if gap else 0
             
-            if action == "DeathRight" and self.actual_Death < len(self.deathL_images):
-                self.image = self.deathR_images[int(self.actual_Death)]
+            image = sheet.subsurface((column * size_x, line + size_y * row), 
+                                     (size_x, size_y))
+            image = pygame.transform.scale(image, (width + adjW, height + adjH))
             
-            if action == "DeathLeft":
-                self.image = self.deathL_images[int(self.actual_Death)]    
+            if invert:
+                image = pygame.transform.flip(image, invert, False)
+            
+            images[action].append(image)
 
-            self.actual_Death = self.actual_Death + 0.25
+    def assets(
+        self, rect: pygame.Rect, action: str, actual: dict[str, float], 
+        direction: str, fps: dict[str, float], 
+        images: dict[str, list[pygame.Surface]], adjust: int, name: str
+    ) -> None:
+        
+        """
+        Puts and animates assets on the character.
 
-        if action == "IdleLeft" or action == "IdleRight":
-            self.actual_Idle = self.actual_Idle + 0.4
-            if self.actual_Idle >= len(self.idleL_images):
-                self.actual_Idle = 0
-            
-            if action == "IdleLeft":
-                self.image = self.idleL_images[int(self.actual_Idle)]
-            
-            if action == "IdleRight":
-                self.image = self.idleR_images[int(self.actual_Idle)]         
+        Parameters
+        ----------
+        rect : pygame.Rect
+            The character's rectangle, used to position and align the sprite.
+        action : str
+            The action being performed (e.g., "Walk", "Idle") to animate the 
+            character. It must be present in the `self.actions` list.
+        actual : dict[str, float]
+            A counter that determines which image frame to display for the 
+            current action.
+        direction : str
+            The direction the character is facing. Use "L" for left (inverted 
+            sprite) and "R" for right (normal sprite).
+        fps : dict[str, float]
+            Speed at which the frames change. Higher values result in faster 
+            animation.
+        images : dict[str, list[pygame.Surface]]
+            A dictionary where keys are action names and values are lists of 
+            sprites used to animate the character.
+        adjust : int
+            A vertical adjustment value to align the sprite with the hitbox 
+            rectangle.
+        name : str
+            A unique identifier for the character, used as a prefix in the image
+            keys.
+
+        Returns
+        -------
+        None
+            This method updates the `self.image` and `self.image_rect` 
+            attributes.
+        
+        Notes
+        -----
+        The sprites are organized in the dictionary so that each action's list 
+        contains frames for both directions: the first half for the left ("L") 
+        direction and the second half for the right ("R") direction. 
+        The function checks the character's direction and selects the 
+        appropriate frames accordingly. 
+        In the final steps, the method aligns the sprite with the center and 
+        bottom of the given rectangle.
+        """
+
+        for act in self.actions:
+            if action == act:
+                if direction == "L":
+                    if actual[action] >= len(images[name+action])/2:
+                        actual[action] = 0
+                    self.image = images[name+action][int(actual[action])]
+                elif direction == "R":
+                    if (actual[action] >= len(images[name+action]) or 
+                        actual[action] < len(images[name+action])/2) :
+                        actual[action] = len(images[name+action])/2
+                    self.image = images[name+action][int(actual[action])]
+                actual[action] += fps
 
         self.image_rect = self.image.get_rect()
-        self.image_rect.bottom = rect.bottom + 90 
+        self.image_rect.bottom = rect.bottom + adjust
         self.image_rect.centerx = rect.centerx
+        self.before = action
 
-    def init_Projectile (self,width, height):
-        image = self.load_spritesheet(100, 150, 100, 0, width + 200, height + 200, False, self.Ganon_projectile)
-        self.GprojectileR_images.append(image)
+    def draw(self, screen: pygame.Surface) -> None:
 
-        image = self.load_spritesheet(100, 150, 100, 0, width + 1200, height + 1200, True, self.Ganon_projectile)
-        self.GprojectileR_images.append(image)
-    
-    def assets_Projectile(self, action):
+        """
+        Draw the assets on the screen.
 
+        Parameters
+        ----------
+        screen: pygame.Surface
+            Surface where sprites will be drawn.
 
-        if action == "ProjectileLeft":
-            self.projectile = self.GprojectileR_images[0]
-            return self.projectile
-        elif action == "ProjectileRight":
-            self.projectile = self.GprojectileR_images[1]
-            return self.projectile
+        Returns
+        -------
+        None
+            This method doesn't return anything. It only modifies the display.
 
-    def init_Ganon(self, width, height):
-        for idle_left in range(4):
-            image = self.load_spritesheet(100, 100, 0, idle_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
-            self.GidleL_images.append(image)
+        """
         
-        for idle_right in range(4):
-            image = self.load_spritesheet(100, 100, 0, idle_right, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
-            self.GidleR_images.append(image)
-            
-        for attack_left in range(6):
-            image = self.load_spritesheet(100, 100, 100, attack_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
-            self.GattackL_images.append(image)
-
-        for attack_right in range(6):
-            image = self.load_spritesheet(100, 100, 100, attack_right, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
-            self.GattackR_images.append(image)
-
-        for immune_left in range(8):
-            image = self.load_spritesheet(100, 100, 300, immune_left, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
-            self.GimmuneL_images.append(image)
-
-        for immune_right in range(8):
-            image = self.load_spritesheet(100, 100, 300, immune_right, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
-            self.GimmuneR_images.append(image)
+        if self.image and self.image_rect:
+            screen.blit(self.image, self.image_rect)
         
-        for death_left in range(10):
-            image = self.load_spritesheet(100, 100, 700, death_left, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
-            self.GdeathL_images.append(image)
-        
-        for death_left in range(4):
-            image = self.load_spritesheet(100, 100, 800, death_left, width + self.Gadjust, height + self.Gadjust, False, self.Ganon_spritesheet)
-            self.GdeathL_images.append(image)
-
-        for death_right in range(10):
-            image = self.load_spritesheet(100, 100, 700, death_right, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
-            self.GdeathR_images.append(image)
-        
-        for death_right in range(4):
-            image = self.load_spritesheet(100, 100, 800, death_right, width + self.Gadjust, height + self.Gadjust, True, self.Ganon_spritesheet)
-            self.GdeathR_images.append(image)
-
-
-    def assets_Ganon(self, action, rect):
-        if action == "IdleLeft" or action == "IdleRight":
-            self.Gactual_Idle = self.Gactual_Idle + 0.2
-            if self.Gactual_Idle >= len(self.GidleL_images):
-                self.Gactual_Idle = 0
-            
-            if action == "IdleLeft":
-                self.image = self.GidleL_images[int(self.Gactual_Idle)]
-
-            if action == "IdleRight":
-                self.image = self.GidleR_images[int(self.Gactual_Idle)]
-        
-        if action == "AttackLeft" or action == "AttackRight":
-            self.Gactual_Attack = self.Gactual_Attack + 0.1
-            if self.Gactual_Attack >= len(self.GattackL_images):
-                self.Gactual_Attack = 5
-            
-            if action == "AttackLeft":
-                self.image = self.GattackL_images[int(self.Gactual_Attack)]
-            
-            if action == "AttackRight":
-                self.image = self.GattackR_images[int(self.Gactual_Attack)]
-    
-        if action == "ImmuneLeft" or action == "ImmuneRight":
-            if self.Gactual_Immune >= len(self.GimmuneL_images):
-                self.Gactual_Immune = 7
-
-            if action == "ImmuneLeft":
-                self.image = self.GimmuneL_images[int(self.Gactual_Immune)]
-            
-            if action == "ImmuneRight":
-                self.image = self.GimmuneR_images[int(self.Gactual_Immune)]
-            
-            self.Gactual_Immune = self.Gactual_Immune + 0.3
-        
-        if action == "DeathLeft" or action == "DeathRight":
-            if action == "DeathLeft":
-                self.image = self.GdeathL_images[int(self.Gactual_Death)]
-            
-            if action == "DeathRight":
-                self.image = self.GdeathR_images[int(self.Gactual_Death)]
-            self.Gactual_Death = self.Gactual_Death + 0.2
-        
-
-
-        self.image_rect = self.image.get_rect()
-        self.image_rect.bottom = rect.bottom + 30
-        self.image_rect.centerx = rect.centerx 
-
-    def init_Balrog(self, width, height):
-        for fly_left in range(6):
-            image = self.load_image(f"{self.main_directory}/assets/Balrog/fly/fly_{fly_left+1}.png", width + self.Badjust, height + self.Badjust, True)
-            self.BflyL_images.append(image)
-        
-        for fly_right in range(6):
-            image = self.load_image(f"{self.main_directory}/assets/Balrog/fly/fly_{fly_right+1}.png", width + self.Badjust, height + self.Badjust, False)
-            self.BflyR_images.append(image)
-
-        for lightning in range(11):
-            image = self.load_image(f"{self.main_directory}/assets/Balrog/lightning/Lightning{lightning+1}.png", width + self.Badjust + 200, height + self.Badjust + 200, False)
-            self.Blightning_images.append(image)
-
-    def assets_Balrog(self, action, rect):
-        # print(len(self.BflyL_images))
-        if action == "FlyLeft" or action == "FlyRight":
-            self.Bactual_Fly = self.Bactual_Fly + 0.4
-            if self.Bactual_Fly >= len(self.BflyL_images):
-                self.Bactual_Fly = 0
-            if action == "FlyLeft":
-                self.image = self.BflyL_images[int(self.Bactual_Fly)]
-                # print(self.Bactual_Fly)
-            if action == "FlyRight":
-                self.image = self.BflyR_images[int(self.Bactual_Fly)]
-
-            # if self.Bactual_Lightning >= len(self.Blightning_images):
-            #     self.Bactual_Lightning = self.Bactual_Lightning + 0.4
-            #     self.Bactual_Lightning = 0
-            # self.image = self.Blightning_images[int(self.Bactual_Lightning)]
-
-        self.image_rect = self.image.get_rect()
-        self.image_rect.bottom = rect.bottom + 90 
-        self.image_rect.centerx = rect.centerx
-
-class Herolife:
-        
-    def __init__(self, hero, heart, x, y):
-        self.max_life = hero.max_life
-        self.actual_life = 0
-        self.images = []
-        self.heart = heart
-        self.hearts = self.max_life//self.heart
-        self.x = x
-        self.y = y
-        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        Heart_path = os.path.join(path_game, os.pardir, "assets", "Heart")
-        Heart_path = os.path.abspath(Heart_path)
-        for i in range(1, 6):
-            image_path = os.path.join(Heart_path, f"heart_{i}.png")
-            self.image = pygame.image.load(image_path).convert_alpha()
-            self.images.append(self.image)
-
-
-    def update(self, hero):
-        self.actual_life = hero.life
-
-    def draw(self,screen):
-        actual_life = self.actual_life
-        for i in range(1, self.hearts + 1):
-            if actual_life <= 0:
-                screen.blit(self.images[4], (i*self.x , self.y))
-
-            elif actual_life >= self.heart:
-                screen.blit(self.images[0], (i*self.x , self.y))
-                
-            elif actual_life >= self.heart*(3/4):
-                
-                screen.blit(self.images[1], (i*self.x , self.y))
-            elif actual_life >= self.heart*(1/2):
-                
-                screen.blit(self.images[2], (i*self.x , self.y))
-            else:
-                screen.blit(self.images[3], (i*self.x , self.y))
-            actual_life -= self.heart
-
-class Bar:
-    def __init__(self, Value, x, y, width, height, color1, color2):
-        self.max = Value  
-        self.actual = 0     
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.color1 = color1
-        self.color2 = color2
-        self.images = []
-        self.rect = pygame.Rect(self.x, self.y, width, height)
-        self.rect_2 = pygame.Rect(self.x, self.y, width, height)
-
-        # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        # Bars_path = os.path.join(path_game, os.pardir, "assets", "Bars")
-        # Bars_path = os.path.abspath(Bars_path)
-
-        # for i in range(1, 3):
-        #     image_path = os.path.join(Bars_path, f"Bar{i}.png")
-        #     bar_image = pygame.image.load(image_path).convert_alpha()
-        #     bar_image = pygame.transform.scale(bar_image, (self.width, self.height))
-        #     self.images.append(bar_image)
-
-    def update(self, Value):
-
-        self.actual = Value
-        if self.actual > 0 :
-            self.actual = self.max - self.actual
-            self.rect.width = self.width * (self.actual/self.max)
-
-
-    def draw(self, screen):
-
-        #screen.blit(self.images[1], (self.x, self.y), self.rect)
-        pygame.draw.rect(screen, self.color1, self.rect_2)
-        pygame.draw.rect(screen, self.color2, self.rect)
-        pygame.draw.rect(screen, (0,0,0), self.rect_2, 4)
-        #screen.blit(self.images[0], (self.x, self.y))
-
-class Bosslife(Bar):
-    def __init__(self, Value, x, y, width, height, color1, color2):
-        super().__init__(Value, x, y, width, height, color1, color2)
-        self.health_ratio = self.max / self.width
-        self.health_change_speed = 1
-        self.transition = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def update(self, Value):
-
-        self.rect.width = self.width * (Value / self.max)
-
-        if self.transition.width > self.rect.width:
-            self.transition.width -= self.health_change_speed 
-
-    def draw(self, screen):
-        
-        pygame.draw.rect(screen, self.color2, self.transition)
-        pygame.draw.rect(screen, self.color1, self.rect)
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(self.x, self.y, self.width, self.height), 4)
-
