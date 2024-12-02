@@ -173,7 +173,7 @@ class Sprites():
 
         Parameters
         ----------
-        rect : pygame.Rect
+        rect : Player
             The character's rectangle, used to position and align the sprite.
         action : str
             The action being performed (e.g., "Walk", "Idle") to animate the 

@@ -34,9 +34,9 @@ class GameManager:
         ]
         
         self.order = [
+            Demagorgon(0, 0, 100, 300, self.hero),
             Balrog(200, 100, 140, 180, self.hero),
             Ganon(300, 0, 150, 220, self.hero),
-            Demagorgon(0, 0, 100, 300, self.hero)
         ]
 
         self.life_bar = Herolife(self.hero, 400, 20, 10)

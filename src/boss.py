@@ -6,11 +6,73 @@ import math
 from assets import Sprites
 
 class Bosses:
-    def __init__(self, x, y, width, height, hero):
+
+    """
+    Represents a boss character in the game.
+
+    Attributes
+    ----------
+    TAG : str
+        General identifier of the boss.
+    sub_TAG : str
+        Specific identifier or subtype of the boss.
+    rect : pygame.Rect
+        Rectangle representing the boss.
+    gravity : int
+        Acceleration due to gravity affecting the boss.
+    speed_y : float
+        Current vertical speed of the boss.
+    speed_y_max : float
+        Maximum allowed vertical speed of the boss.
+    speed_x : float
+        Current horizontal speed of the boss.
+    life : int
+        Current life points of the boss.
+    hero : pygame.Rect
+        Rectangle representing the hero, used for interactions with the boss.
+    projectiles : list
+        List of projectiles shot by the boss.
+    screen_width : int
+        The width of the game screen.
+    is_dead : bool
+        Indicates whether the boss is dead.
+    immune : bool
+        Indicates whether the boss is immune to attacks.
+    death_position : float or None
+        Stores the last known horizontal position of the boss when it dies, as x
+        coordinates, or None if still alive.
+    """
+
+    def __init__(
+        self, x: float, y: float, width: int, height: int, hero
+    ) -> None:
+        
+        """
+        Initializates the boss character and its attributes.
+
+        Parameters
+        ----------
+        x: float
+            Horizontal position where the boss spawn.
+        y: float
+            Vertical position where the boss spawn.
+        width: int
+            Character's width.
+        height: int
+            Character's height.
+        hero: Player
+            Rectangle representing the hero, used for interaction.
+
+        Returns
+        -------
+        None
+            The function just initializes attributes.
+
+        """
+
         self.TAG = "Monster"
         self.sub_TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
-        self.color = (255, 0, 0)
         self.gravity = 2
         self.speed_y = 0
         self.speed_y_max = 40
@@ -22,42 +84,62 @@ class Bosses:
         self.is_dead = False
         self.immune = False
         self.death_position = None
+        # self.color = (255, 0, 0)
 
     def new_hero(self, hero):
         """
-        Update object hero.
+        Update object hero used in function of the boss.
 
         Parameters
         ----------
-        hero : int
-            O primeiro número.
-       
+        hero: Player
+            Rectangle representing the hero, used for interaction.
 
         Returns
         -------
-        None: This function doesn't return
-            
-
-        Examples
-        --------
-        >>> add_numbers(2, 3)
-        5
-        >>> add_numbers(-1, 1)
-        0
+        None
+            This function updates the hero attribute of the boss.
         """
+
         self.hero = hero
 
     def move(self):
         pass
 
     def update(self):
+        """    
+        This method is responsible for applying gravity to the boss, updating 
+        its vertical position, and updating the movement of all projectiles shot 
+        by the boss.
+
+        Parameters
+        ----------
+        None 
+        """
+
         self.speed_y += self.gravity
         self.rect.y += min(self.speed_y, self.speed_y_max)
 
         for projectile in self.projectiles:
             projectile.update()
         
-    def draw (self, screen, camera):
+    def draw (self, screen: pygame.Surface, camera):
+        """
+        Draws the boss and its projectiles, adjusting their positions based on 
+        the camera movement. Additionally, it draws all the boss sprites.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The surface where the boss and projectiles will be drawn.
+        camera : Camera
+            The camera object used to adjust the boss's position.
+
+        Returns
+        -------
+        None
+        """
+
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
             # pygame.draw.rect(screen, self.color, self.rect)
@@ -65,19 +147,33 @@ class Bosses:
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
                 del projectile
+        
+        self.sprites.draw(screen)
 
-    def on_collision(self, other : pygame.Rect):  
 
-        if other.TAG == "Ground" and self.rect.colliderect(other) and self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
-                self.rect.bottom = other.rect.top
+    def on_collision(self, other):
+        """
+        Tests the boss and boss's projectiles collision with other objects. If
+        the projectile hits a Player, it reduces their life; if it hits the 
+        Ground, it gets deleted. If the boss collides with Ground, it interacts 
+        with the ground and doesn't pass through it.
 
-        if other.TAG == "Monster" :
-            if self.rect.left < other.rect.right and self.rect.right > other.rect.right: 
-                if not other.who == "Monster":             
-                    self.life -= other.damage
-            if self.rect.right > other.rect.left and self.rect.left < other.rect.left:
-                if not other.who == "Monster":   
-                    self.life -= other.damage
+        Parameters
+        ----------
+        other : object
+            The other object that the boss interacts with.
+
+        Return
+        ------
+            None
+
+        """  
+
+        if (other.TAG == "Ground" and self.rect.colliderect(other) and 
+            self.rect.bottom > other.rect.top and self.rect.top < other.rect.top
+        ):
+            self.rect.bottom = other.rect.top
+
         for projectile in self.projectiles:
             if other.TAG == "Ground":
                 if projectile.rect.colliderect(other):
@@ -90,7 +186,29 @@ class Bosses:
                     self.projectiles.remove(projectile)
                     del projectile
 
-class Balrog(Bosses, pygame.sprite.Sprite):
+class Balrog(Bosses):
+    """
+    Represents the boss Balrog
+
+    Attributes
+    ----------
+    sub_TAG: str
+    speed_x: int
+    gravity: int
+    life: int
+    probability: float
+    randomic: float
+    cool_down_max: int
+    cool_donw_min: int
+    cool_down: int
+    move_cooldown: int
+    projectile_cooldown: int
+    atk_cooldown: int
+    atk_cooldowns: int
+    atk_time: 
+
+    """
+
     def __init__(self, x, y, width, height, hero):
         super().__init__(x, y, width, height, hero)
         self.sub_TAG = "Balrog"
@@ -120,7 +238,10 @@ class Balrog(Bosses, pygame.sprite.Sprite):
         self.probability_atk = 0
         self.warning_sign = 50
 
-        self.timers = ["damage_timer", "move_cooldown", "atk_cooldown", "projectile_cooldown"]
+        self.timers = [
+            "damage_timer", "move_cooldown", "atk_cooldown", 
+            "projectile_cooldown"
+            ]
 
         self.number_bars = 3
         self.weapon_damage = 100
@@ -129,7 +250,13 @@ class Balrog(Bosses, pygame.sprite.Sprite):
         self.all_atks = []
         
         for atks in range(self.number_bars):
-            self.all_atks.append(Attack(self.screen_width/self.number_bars * atks, 10 + atks, self.screen_width / self.number_bars, 650, self.weapon_damage))
+            self.all_atks.append(
+                Attack(
+                    self.screen_width/self.number_bars * atks, 10 + atks, 
+                    self.screen_width / self.number_bars, 650, 
+                    self.weapon_damage
+                )
+            )
 
         self.color = (255, 192, 203)
 
@@ -173,14 +300,33 @@ class Balrog(Bosses, pygame.sprite.Sprite):
             "Death" : 0.3
         }
 
-        self.sprites.load_images(True, width, height, "BWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(False, width, height, "BWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(True, width, height, "BAttack", self.images, self.sizes_directory, self.images_directory, self.adjW_atk, self.adjH_atk)
-        self.sprites.load_images(False, width, height, "BAttack", self.images, self.sizes_directory, self.images_directory, self.adjW_atk, self.adjH_atk)
-        self.sprites.load_images(True, width, height, "BDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(False, width, height, "BDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(
+            True, width, height, "BWalk", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            False, width, height, "BWalk", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            True, width, height, "BAttack", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW_atk, self.adjH_atk
+        )
+        self.sprites.load_images(
+            False, width, height, "BAttack", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW_atk, self.adjH_atk
+        )
+        self.sprites.load_images(
+            True, width, height, "BDeath", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            False, width, height, "BDeath", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
 
     def attack(self):
+
         if self.atk_cooldown == self.warning_sign:
             self.probability_atk = random.randint(0, len(self.all_atks) - 1)
             self.rect.x = self.screen_width/self.number_bars * self.probability_atk + self.screen_width/(2*self.number_bars)
@@ -262,7 +408,7 @@ class Ganon(Bosses):
 
         self.color = (160, 32, 240)
 
-        self.life = 50
+        self.life = 1
         self.is_dead = False
 
         self.atk_timer = 100
@@ -457,7 +603,7 @@ class Ganon(Bosses):
 
 class Demagorgon(Bosses):
     """
-    A class used to represent the boss named Demagorgon
+    A class used to represent the boss Demagorgon
 
     ...
 
@@ -481,8 +627,30 @@ class Demagorgon(Bosses):
     def __init__(self, x, y, width, height, hero):
         """
         Inicializes the class Demagorgon with values of atributes
-        """
 
+        Attributes
+        ----------
+        sub_TAG: str
+        speed_x: int
+        attacks
+        atk_cooldown: int
+        atk_timer: float
+        atk_long: int
+        weapon_width
+        weapon_height: int
+        weapon_damage: int
+        damage_timer: float
+        sprites: Sprites
+        main_directory: str
+        assets_directory: st
+        adjH: int
+        adjW: int
+        images_directory: dict[str, str]
+        sizes_directory: dict[str, int]
+        images: dict[str]
+        actual_demagorgon: dict[str, float]
+        fps: dict[str, float]
+        """
 
         super().__init__(x, y, width, height, hero)
         self.sub_TAG = "Demagorgon"
@@ -514,47 +682,95 @@ class Demagorgon(Bosses):
         self.adjW = 200
         self.adj = 75
 
-        self.images_directory = {"DWalk" : os.path.join(assets_directory, "Demagorgon", "walk"),
-                                "DIdle" : os.path.join(assets_directory, "Demagorgon", "idle"),
-                                "DAttack" : os.path.join(assets_directory, "Demagorgon", "1_atk"),
-                                "DDeath" : os.path.join(assets_directory, "Demagorgon", "death")
-                                }
+        self.images_directory = {
+            "DWalk" : os.path.join(assets_directory, "Demagorgon", "walk"),
+            "DIdle" : os.path.join(assets_directory, "Demagorgon", "idle"),
+            "DAttack" : os.path.join(assets_directory, "Demagorgon", "1_atk"),
+            "DDeath" : os.path.join(assets_directory, "Demagorgon", "death")
+        }
 
-        self.sizes_directory = {"DWalk" : 10,
-                                "DIdle" : 6,
-                                "DAttack" : 14,
-                                "DDeath" : 16}
+        self.sizes_directory = {
+            "DWalk" : 10,
+            "DIdle" : 6,
+            "DAttack" : 14,
+            "DDeath" : 16
+        }
 
         self.images = {
-                        "DWalk" : [],
-                        "DIdle" : [],
-                        "DAttack" : [],
-                        "DDeath" : []
+            "DWalk" : [],
+            "DIdle" : [],
+            "DAttack" : [],
+            "DDeath" : []
         }
 
-        self.actual_demagorgon = {"Walk" : 0,
-                                  "Idle" : 0,
-                                  "Attack" : 0,
-                                  "Death" : 0
+        self.actual_demagorgon = {
+            "Walk" : 0,
+            "Idle" : 0,
+            "Attack" : 0,
+            "Death" : 0
         }
 
-        self.fps = {"Walk" : 0.4,
-                    "Idle" : 0.4,
-                    "Attack" : 0.3,
-                    "Death" : 0.25
-
+        self.fps = {
+            "Walk" : 0.4,
+            "Idle" : 0.4,
+            "Attack" : 0.3,
+            "Death" : 0.25
         }
 
-        self.sprites.load_images(True, width, height, "DWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(False, width, height, "DWalk", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(True, width, height, "DIdle", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(False, width, height, "DIdle", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(True, width, height, "DAttack", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(False, width, height, "DAttack", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(True, width, height, "DDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
-        self.sprites.load_images(False, width, height, "DDeath", self.images, self.sizes_directory, self.images_directory, self.adjW, self.adjH)
+        self.sprites.load_images(
+            True, width, height, "DWalk", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            False, width, height, "DWalk", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            True, width, height, "DIdle", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            False, width, height, "DIdle", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            True, width, height, "DAttack", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            False, width, height, "DAttack", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            True, width, height, "DDeath", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
+        self.sprites.load_images(
+            False, width, height, "DDeath", self.images, self.sizes_directory, 
+            self.images_directory, self.adjW, self.adjH
+        )
 
     def attack(self):
+        """
+        Handles Demagorgon's  attack mechanics. When the `atk_timer` is less 
+        than or equal to zero, it creates a rectangle that simulates the 
+        Demagorgon's punch, and the Demagorgon attacks in the direction of the 
+        hero.
+
+        After executing the attack, the `atk_timer` is reset with the cooldown 
+        time and additional attack duration (`atk_long`).
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+            This method does not return any value. It modifies the `attacks` 
+            attribute and resets the `atk_timer`.
+         """
+
         if self.atk_timer <= 0:
             if self.rect.x - self.hero.rect.x <= 0:
                 self.attacks = Attack(self.rect.right, self.rect.top, self.weapon_width, self.weapon_height, self.weapon_damage)
@@ -564,30 +780,78 @@ class Demagorgon(Bosses):
                 self.attacks = Attack(self.rect.left - self.weapon_width, self.rect.top, self.weapon_width, self.weapon_height, self.weapon_damage)
                 self.atk_timer = self.atk_cooldown + self.atk_long
 
-        if self.atk_timer < self.atk_cooldown and self.attacks != None:
-            self.attacks = None
-
     def move(self):
+        """
+        Handles the Demagorgon's movement. If Demagorgon is not attacking, it 
+        follows the hero.
+        If Demagorgon collides with the hero, it stops following.
+
+        This method also handles the boss's animation: 
+        - If the Demagorgon is not colliding with the hero, it walks towards 
+        the hero.
+        - If it collides with the hero, it becomes idle.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+            This method does not return any value. It modifies the position of 
+            the boss and updates its animation state.
+        """
         super().move()
         if self.atk_timer < self.atk_cooldown:
             if self.rect.x - self.hero.rect.x <= 0:
                 
                 if self.rect.colliderect(self.hero) == False:
-                    self.sprites.assets(self.rect, "Walk", self.actual_demagorgon, "L", self.fps["Walk"], self.images, self.adj, "D")
+                    self.sprites.assets(
+                        self.rect, "Walk", self.actual_demagorgon, "L", 
+                        self.fps["Walk"], self.images, self.adj, "D"
+                    )
                     self.rect.x = self.rect.x + self.speed_x
                 else:
-                    self.sprites.assets(self.rect, "Idle", self.actual_demagorgon, "L", self.fps["Idle"], self.images, self.adj, "D")
+                    self.sprites.assets(
+                        self.rect, "Idle", self.actual_demagorgon, "L", 
+                        self.fps["Idle"], self.images, self.adj, "D"
+                    )
 
             elif self.rect.x - self.hero.rect.x > 0:
                 if self.rect.colliderect(self.hero) == False:
-                    self.sprites.assets(self.rect, "Walk", self.actual_demagorgon, "R", self.fps["Walk"], self.images, self.adj, "D")
+                    self.sprites.assets(
+                        self.rect, "Walk", self.actual_demagorgon, "R", 
+                        self.fps["Walk"], self.images, self.adj, "D"
+                    )
 
                     self.rect.x = self.rect.x - self.speed_x
                 else:
-                    self.sprites.assets(self.rect, "Idle", self.actual_demagorgon, "R", self.fps["Idle"], self.images, self.adj, "D")
+                    self.sprites.assets(
+                        self.rect, "Idle", self.actual_demagorgon, "R", 
+                        self.fps["Idle"], self.images, self.adj, "D"
+                    )
 
 
-    def on_collision(self, other: pygame.Rect):
+    def on_collision(self, other):    
+        """
+        Handles the collision of Demagorgon. If Demagorgon collides with the 
+        player, it deals damage to the player once every `self.damage_timer`. 
+        After dealing damage, the damage timer is reset to `self.atk_timer`.
+
+        Parameters
+        ----------
+        other : object
+            The object that Demagorgon collides with. This is typically a 
+            `Player` object, but can also be other objects like `Ground` or 
+            obstacles, depending on the context.
+
+        Returns
+        -------
+        None
+            This method does not return anything. It updates the `life` 
+            attribute of the `Player`(or any other object that the boss collides
+            with), reducing the player's life by the damage of the attack.
+        """
         super().on_collision(other)
 
         if other.TAG == "Player":
@@ -596,14 +860,29 @@ class Demagorgon(Bosses):
                         other.life -= self.attacks.damage
                         self.damage_timer = self.atk_timer
 
-    def draw(self, screen, camera):
-        super().draw(screen, camera)
-        self.sprites.draw(screen)
-
-        # if self.attacks != None:
-        #     self.attacks.draw(screen)
     
     def update(self):
+        """
+        Updates the attributes of the Demagorgon boss. This method manages the 
+        timers, detects when the boss dies, and animates the boss and its 
+        attacks accordingly.
+
+        It updates the attack timer (`atk_timer`) and damage timer 
+        (`damage_timer`), checks for the boss's death and animates the death 
+        sequence, as well as handling the movement and attack animations when 
+        the boss is still alive.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+            This method does not return any value. It modifies the current 
+            attributes of the boss and updates the corresponding animations for 
+            movement, attack, and death.
+        """
         if self.atk_timer > 0:
             self.atk_timer -= 1
         
@@ -614,23 +893,41 @@ class Demagorgon(Bosses):
             self.death_position = self.hero.rect.x
 
         if self.life <= 0 and self.rect.x - self.death_position <= 0:
-            self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "L", self.fps["Death"], self.images, self.adj, "D")
+            self.sprites.assets(
+                self.rect, "Death", self.actual_demagorgon, "L", 
+                self.fps["Death"], self.images, self.adj, "D"
+            )
 
             if self.actual_demagorgon["Death"] >= len(self.images["DDeath"])/2:
                 
                 self.is_dead = True
         elif self.life <= 0 and self.rect.x - self.death_position > 0:
-            self.sprites.assets(self.rect, "Death", self.actual_demagorgon, "R", self.fps["Death"], self.images, self.adj, "D")
+            self.sprites.assets(
+                self.rect, "Death", self.actual_demagorgon, "R", 
+                self.fps["Death"], self.images, self.adj, "D"
+            )
 
             if self.actual_demagorgon["Death"] >= len(self.images["DDeath"]):
                 self.is_dead = True
 
         if self.life > 0:
-            if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x <= 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_demagorgon, "L", self.fps["Attack"], self.images, self.adj, "D")
+            if (
+                self.atk_timer > self.atk_cooldown and 
+                self.rect.x - self.hero.rect.x <= 0
+            ):
+                self.sprites.assets(
+                    self.rect, "Attack", self.actual_demagorgon, "L", 
+                    self.fps["Attack"], self.images, self.adj, "D"
+                )
 
-            if self.atk_timer > self.atk_cooldown and self.rect.x - self.hero.rect.x > 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_demagorgon, "R", self.fps["Attack"], self.images, self.adj, "D")
+            if (
+                self.atk_timer > self.atk_cooldown and 
+                self.rect.x - self.hero.rect.x > 0
+            ):
+                self.sprites.assets(
+                    self.rect, "Attack", self.actual_demagorgon, "R", 
+                    self.fps["Attack"], self.images, self.adj, "D"
+                )
 
             self.move()
             self.attack()
