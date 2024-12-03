@@ -63,6 +63,8 @@ class Main:
         }
         self.current_state = self.states["menu"]
         self.is_changed = False
+        
+        #Music init
         self.volume = 0.15
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")

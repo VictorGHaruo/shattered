@@ -86,7 +86,10 @@ class GameManager:
         self.camera = Camera(0, main.WIDTH)
         self.grounds = []
         self.enemies = []
+        
+        #Making the map with ground and enemies
         maping(self.grounds, self.enemies, self.hero)
+        
         self.WIDTH = main.WIDTH
         self.HEIGHT = main.HEIGHT
         self.main = main
@@ -98,11 +101,14 @@ class GameManager:
         ]
         self.life_bar = Herolife(self.hero, 400, 20, 10)
         self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 30, 100, 20, (255, 255, 255), (0, 0, 255))
+        
         self.keys_trade = [
             "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
             "on_ground", "to_left", "to_right", "from_the_front",
             "invincibility_time", "projectiles", "touched_obelisk", "can_push_block",
         ]
+        
+        #BackGround image
         self.bg_images = []
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         Background_path = os.path.join(path_game, os.pardir, "assets", "Background")
@@ -110,13 +116,15 @@ class GameManager:
         image_path = os.path.join(Background_path, "boss_fase.png")
         self.bg_boss = pygame.image.load(image_path).convert_alpha()
         self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH, self.HEIGHT))
+        self.pos_x = -self.WIDTH
+        self.pos_x_p = -self.WIDTH
+        
+        #Music
         for i in range(1, 4):
             image_path = os.path.join(Background_path, f"background_{i}.png")
             bg_image = pygame.image.load(image_path).convert_alpha()
             bg_image = pygame.transform.scale(bg_image, (self.WIDTH, self.HEIGHT))
             self.bg_images.append(bg_image)
-        self.pos_x = -self.WIDTH
-        self.pos_x_p = -self.WIDTH
 
     def music(self, main, volume: float):
         """
