@@ -11,9 +11,9 @@ class Sprites():
     Notes
     -----
     It is important to use the correct variable names in this class. 
-    If there is any typo, some methods may raise an error. For example, "Attack"
-    is valid, but "attack" is not. The `self.action` variable must always hold a
-    valid string representing an action.
+    If there is any typo, some methods may raise an error. For example, 
+    "Attack" is valid, but "attack" is not. The `self.action` variable 
+    must always hold a valid string representing an action.
     """
 
     def __init__(self) -> None:
@@ -26,8 +26,8 @@ class Sprites():
         self.image_rect = None
         self.before = 0
         self.actions = [
-            "Walk", "Idle", "Attack","Attack_2", "Death", "Immune", "Jump", 
-            "Hurt", "Projectile"
+            "Walk", "Idle", "Attack","Attack_2", "Death", "Immune", 
+            "Jump", "Hurt", "Projectile"
         ]
 
     def load_images(
@@ -37,7 +37,8 @@ class Sprites():
     ) -> None:
         
         """
-        Loads sprites from separate image files and stores them in a list.
+        Loads sprites from separate image files and stores them in a 
+        list.
 
         Parameters
         ----------
@@ -46,19 +47,21 @@ class Sprites():
         width : int
             The character's width, used to adjust sprites to the hitbox.
         height : int
-            The character's height, used to adjust sprites to the hitbox.
+            The character's height, used to adjust sprites to the 
+            hitbox.
         action : str
-            The action being performed (e.g., "Walk", "Idle") to store images in
-            the correct list, it must present in self.action list.
+            The action being performed (e.g., "Walk", "Idle") to store 
+            images in the correct list, it must present in self.action 
+            list.
         images : dict[str, list]
-            A dictionary where keys are action names and values are lists of 
-            images for each action.
+            A dictionary where keys are action names and values are 
+            lists of images for each action.
         sizes_directory : dict[str, int]
-            A dictionary mapping each action to the number of images available 
-            for that action.
+            A dictionary mapping each action to the number of images 
+            available for that action.
         images_directory : dict[str, str]
-            A dictionary mapping each action to the directory path where the 
-            sprite images are stored.
+            A dictionary mapping each action to the directory path 
+            where the sprite images are stored.
         adjW : int
             Adjustment to apply to the sprite's width.
         adjH : int
@@ -67,8 +70,8 @@ class Sprites():
         Returns
         -------
         None
-            The function does not return any value. It modifies the `images` 
-            dictionary in-place.
+            The function does not return any value. It modifies the 
+            `images` dictionary in-place.
 
         """
 
@@ -76,7 +79,9 @@ class Sprites():
             image = pygame.image.load(
                 os.path.join(images_directory[action], f"{i+1}.png")
             ).convert_alpha()
-            image = pygame.transform.scale(image, (width + adjW, height + adjH))
+            image = pygame.transform.scale(
+                image, (width + adjW, height + adjH)
+            )
             if invert:
                 image = pygame.transform.flip(image, invert, False)
             images[action].append(image)
@@ -95,54 +100,57 @@ class Sprites():
         Parameters
         ----------
         sizes_directory : dict[str, int]
-            A dictionary mapping each action to the number of images available 
-            for that action.
+            A dictionary mapping each action to the number of images 
+            available for that action.
         action : str
-            The action being performed (e.g., "Walk", "Idle") to store images in
-            the correct list. It must be present in the `self.actions` list.
+            The action being performed (e.g., "Walk", "Idle") to store 
+            images in the correct list. It must be present in the 
+            `self.actions` list.
         invert : bool
             Whether to flip the image horizontally.
         images_directory : dict[str, str]
-            A dictionary mapping each action to the directory path where the 
-            sprite images are stored.
+            A dictionary mapping each action to the directory path where 
+            the sprite images are stored.
         images : dict[str, list]
-            A dictionary where keys are action names and values are lists of 
-            images for each action.
+            A dictionary where keys are action names and values are 
+            lists of images for each action.
         file_name : str
-            The name of the file containing the spritesheet (without extension).
+            The name of the file containing the spritesheet 
+            (without extension).
         size_x : int
             The width of each individual image in the spritesheet.
         size_y : int
             The height of each individual image in the spritesheet.
         line : int
-            The vertical offset (in pixels) where the action starts in the 
-            spritesheet.
+            The vertical offset (in pixels) where the action starts in 
+            the spritesheet.
         width : int
             The character's width, used to adjust sprites to the hitbox.
         height : int
-            The character's height, used to adjust sprites to the hitbox.
+            The character's height, used to adjust sprites to the 
+            hitbox.
         adjW : int
             Adjustment to apply to the sprite's width.
         adjH : int
             Adjustment to apply to the sprite's height.
         gap : int, optional
-            If the action occupies more than one line in the spritesheet, `gap` 
-            defines how many images are in each line.
-            If `gap` is not provided, the function assumes that all images are 
-            in a single line.
+            If the action occupies more than one line in the 
+            spritesheet, `gap` defines how many images are in each line.
+            If `gap` is not provided, the function assumes that all 
+            images are in a single line.
 
         Returns
         -------
         None
-            The function does not return any value. It modifies the `images` 
-            dictionary in-place.
+            The function does not return any value. It modifies the 
+            `images` dictionary in-place.
         
         Notes
         -----
-        If the action utilizes more than one line in the spritesheet, the `gap` 
-        parameter is used to define how many images are in each line. The 
-        function will correctly read and extract images from different lines 
-        based on this value.
+        If the action utilizes more than one line in the spritesheet, 
+        the `gap` parameter is used to define how many images are in 
+        each line. The function will correctly read and extract images 
+        from different lines based on this value.
         """
         
         sheet = pygame.image.load(
@@ -155,7 +163,9 @@ class Sprites():
             
             image = sheet.subsurface((column * size_x, line + size_y * row), 
                                      (size_x, size_y))
-            image = pygame.transform.scale(image, (width + adjW, height + adjH))
+            image = pygame.transform.scale(
+                image, (width + adjW, height + adjH)
+            )
             
             if invert:
                 image = pygame.transform.flip(image, invert, False)
@@ -174,28 +184,30 @@ class Sprites():
         Parameters
         ----------
         rect : Player
-            The character's rectangle, used to position and align the sprite.
+            The character's rectangle, used to position and align the 
+            sprite.
         action : str
-            The action being performed (e.g., "Walk", "Idle") to animate the 
-            character. It must be present in the `self.actions` list.
+            The action being performed (e.g., "Walk", "Idle") to animate
+            the character. It must be present in the `self.actions` 
+            list.
         actual : dict[str, float]
-            A counter that determines which image frame to display for the 
-            current action.
+            A counter that determines which image frame to display for 
+            the current action.
         direction : str
-            The direction the character is facing. Use "L" for left (inverted 
-            sprite) and "R" for right (normal sprite).
+            The direction the character is facing. Use "L" for left 
+            (inverted sprite) and "R" for right (normal sprite).
         fps : dict[str, float]
-            Speed at which the frames change. Higher values result in faster 
-            animation.
+            Speed at which the frames change. Higher values result in 
+            faster animation.
         images : dict[str, list[pygame.Surface]]
-            A dictionary where keys are action names and values are lists of 
-            sprites used to animate the character.
+            A dictionary where keys are action names and values are 
+            lists of sprites used to animate the character.
         adjust : int
-            A vertical adjustment value to align the sprite with the hitbox 
-            rectangle.
+            A vertical adjustment value to align the sprite with the 
+            hitbox rectangle.
         name : str
-            A unique identifier for the character, used as a prefix in the image
-            keys.
+            A unique identifier for the character, used as a prefix in 
+            the image keys.
 
         Returns
         -------
@@ -205,12 +217,12 @@ class Sprites():
         
         Notes
         -----
-        The sprites are organized in the dictionary so that each action's list 
-        contains frames for both directions: the first half for the left ("L") 
-        direction and the second half for the right ("R") direction. 
-        The function checks the character's direction and selects the 
-        appropriate frames accordingly. 
-        In the final steps, the method aligns the sprite with the center and 
+        The sprites are organized in the dictionary so that each 
+        action's list contains frames for both directions: the first 
+        half for the left ("L") direction and the second half for the 
+        right ("R") direction. The function checks the character's 
+        direction and selects the appropriate frames accordingly. In the 
+        final steps, the method aligns the sprite with the center and 
         bottom of the given rectangle.
         """
 
@@ -245,7 +257,8 @@ class Sprites():
         Returns
         -------
         None
-            This method doesn't return anything. It only modifies the display.
+            This method doesn't return anything. It only modifies the 
+            display.
 
         """
         
