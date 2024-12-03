@@ -1,8 +1,8 @@
 import pygame
-from weapon import Projectile
+from src.weapon import Projectile
 import random
 import os, sys
-from assets import Sprites
+from src.assets import Sprites
 
 class Monsters:
     def __init__(self, x, y, width, height, hero):
