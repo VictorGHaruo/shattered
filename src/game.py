@@ -384,14 +384,17 @@ class GameManager:
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
             change = False
             if event.key == pygame.K_z:
-                self.actual_hero = 0
-                change = True
+                if self.actual_hero != 0:
+                    self.actual_hero = 0
+                    change = True
             if event.key == pygame.K_x:
-                self.actual_hero = 1
-                change = True
+                if self.actual_hero != 1:
+                    self.actual_hero = 1
+                    change = True
             if event.key == pygame.K_c:
-                self.actual_hero = 2
-                change = True
+                if self.actual_hero != 2:
+                    self.actual_hero = 2
+                    change = True
 
             if change:
                 state_dict = self.hero.__dict__

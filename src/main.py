@@ -1,7 +1,9 @@
-import pygame
 import os
 import sys
 import random
+
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "1"
+import pygame
 
 current_dir = os.path.dirname(os.path.abspath(__file__))  
 src_path = os.path.join(current_dir, '..')  
