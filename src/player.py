@@ -1,7 +1,7 @@
 import pygame
-from weapon import Projectile, Shield, Attack
+from src.weapon import Projectile, Shield, Attack
 import os, sys
-from assets import Sprites
+from src.assets import Sprites
 
 class Player:
     
@@ -121,7 +121,7 @@ class Player:
             # Se no pulo estivar apertando para o outro lado, ao tocar no chão zera a velocidade
             if self.to_left:
                 self.speed_x = 0
-            self.rect.x += min(self.speed_x, self.speed_x_max)
+            self.rect.x += min(self.speed_x, self.speed_x_max) 
         elif self.speed_x < 0:
             # Se no pulo estivar apertando para o outro lado, ao tocar no chão zera a velocidade
             if self.to_right:
@@ -158,7 +158,7 @@ class Player:
                 self.can_push_block = True
 
     def jump(self):
-        if self.jump_count >= self.jump_count_max or self.action == "Hurt" or self.action == "Immune" and self.action != "Death":
+        if self.jump_count >= self.jump_count_max or self.action == "Hurt" or self.action == "Immune" or self.action == "Death":
             return
         self.speed_y += self.speed_jump
         self.speed_y = max(self.speed_y, self.speed_jump)
@@ -169,14 +169,14 @@ class Player:
         
     def on_key_pressed(self, key_map, main):
         if self.on_ground and self.action != "Hurt" and self.action != "Attack" and self.action != "Immune" and self.action != "Death":
-            if key_map[pygame.K_RIGHT] or key_map[pygame.K_d]:
+            if  key_map[pygame.K_d]:
                 self.speed_x += 5
                 self.to_right = True
                 self.from_the_front = True
                 # self.sprites.assets(self.rect, "Walk", self.actual, "Walk", self.fps["Walk"], self.images, self.adj, self.teste)
             else:
                 self.to_right = False
-            if key_map[pygame.K_LEFT] or key_map[pygame.K_a]:
+            if  key_map[pygame.K_a]:
                 self.speed_x -= 5
                 self.to_left = True
                 self.from_the_front = False
@@ -475,7 +475,7 @@ class Yokai(Player):
 
         if key_map[pygame.K_v] and self.projectile_cooldown <= 0 and self.action != "Hurt" and self.action != "Death":
             self.attack_time = 0
-            if key_map[pygame.K_UP] or key_map[pygame.K_w]:  
+            if key_map[pygame.K_w]:  
                 new_projectile = Projectile(self.rect.centerx, self.rect.centery, 0, -20, self.sub_TAG, self.damage, 30, 30, self.image_projectile_u)
                 self.projectiles.append(new_projectile)
                 self.action = "Attack_2"
