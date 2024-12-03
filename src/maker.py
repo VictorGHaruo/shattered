@@ -1,5 +1,5 @@
 import pygame, os, sys
-from ground import Ground, Block, Spike, Invsible, Obelisk
+from ground import Ground, Block, Spike, Invisible, Obelisk
 from enemy import Mage, Flying, Dummy
 
 def maping(grounds : list, enemies : list, hero):
@@ -56,7 +56,7 @@ def maping(grounds : list, enemies : list, hero):
             if grid[i][j] == "O":
                 grounds.append(Obelisk(j*50, i*50 - 185, 150, 250, image_obelisk_O))
             if grid[i][j] == "I":
-                grounds.append(Invsible(j*50, i*50, 50, 50, image_ground_X))
+                grounds.append(Invisible(j*50, i*50, 50, 50, image_ground_X))
             if grid[i][j] == "S":
                 grounds.append(Spike(j*50, i*50, 50, 50, image_spike_S))    
             if grid[i][j] == "B":
