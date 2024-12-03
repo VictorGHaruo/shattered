@@ -1,10 +1,15 @@
 import pygame
-from player import Knight, Yokai, Ninja
-from camera import Camera
-from maker import maping
-from boss import Balrog, Ganon, Demagorgon
-from assets import Herolife, Bar, Bosslife
 import os, sys, random
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
+
+from src.player import Knight, Yokai, Ninja
+from src.camera import Camera
+from src.maker import maping
+from src.boss import Balrog, Ganon, Demagorgon
+from src.assets import Herolife, Bar, Bosslife
 
 class GameManager:
     """
@@ -103,10 +108,10 @@ class GameManager:
             Balrog(200, 100, 140, 180, self.hero),
             Ganon(300, 0, 150, 220, self.hero),
         ]
-        self.life_bar = Herolife(self.hero, 400, 20, 10)
+        self.life_bar = Herolife(self.hero, 400, 50, 15, 40, 40, 20)
         self.hero_timer = Bar(
-            self.hero.trade_cooldown_time, 20, 30, 100, 20, 
-            (255, 255, 255), (0, 0, 255)
+            self.hero.trade_cooldown_time, 20, 70, 240, 20, 
+            (255, 255, 255), (160, 32, 240)
         )
         
         self.keys_trade = [

@@ -1,8 +1,13 @@
 import pygame
-from src.weapon import Projectile
 import random
 import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
+
 from src.assets import Sprites
+from src.weapon import Projectile
 
 class Monsters:
     def __init__(self, x, y, width, height, hero):

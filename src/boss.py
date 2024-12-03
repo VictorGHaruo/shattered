@@ -1,10 +1,15 @@
 import pygame
-from weapon import Projectile, Attack
 import random
-import os
+import os, sys
 import math
-from assets import Sprites
 from typing import Union
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
+
+from src.weapon import Projectile, Attack
+from src.assets import Sprites
 
 class Bosses:
 

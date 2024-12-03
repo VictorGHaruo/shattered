@@ -1,6 +1,11 @@
 import pygame, os, sys
-from ground import Ground, Block, Spike, Invisible, Obelisk
-from enemy import Mage, Flying, Dummy
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
+
+from src.ground import Ground, Block, Spike, Invisible, Obelisk
+from src.enemy import Mage, Flying, Dummy
 
 def maping(grounds : list, enemies : list, hero):
     
