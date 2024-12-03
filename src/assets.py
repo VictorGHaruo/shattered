@@ -254,7 +254,7 @@ class Sprites():
 
 class Herolife:
         
-    def __init__(self, hero, heart, x, y):
+    def __init__(self, hero, heart, x, y, width, height, adj = 0):
         self.max_life = hero.max_life
         self.actual_life = 0
         self.images = []
@@ -262,31 +262,33 @@ class Herolife:
         self.hearts = self.max_life//self.heart
         self.x = x
         self.y = y
+        self.adj = adj
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         Heart_path = os.path.join(path_game, os.pardir, "assets", "Heart")
         Heart_path = os.path.abspath(Heart_path)
         for i in range(1, 6):
             image_path = os.path.join(Heart_path, f"heart_{i}.png")
             self.image = pygame.image.load(image_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (width, height))
             self.images.append(self.image)
     def update(self, hero):
         self.actual_life = hero.life
     def draw(self,screen):
         actual_life = self.actual_life
-        for i in range(1, self.hearts + 1):
+        for i in range(self.hearts):
             if actual_life <= 0:
-                screen.blit(self.images[4], (i*self.x , self.y))
+                screen.blit(self.images[4], (i*self.x + self.adj , self.y))
             elif actual_life >= self.heart:
-                screen.blit(self.images[0], (i*self.x , self.y))
+                screen.blit(self.images[0], (i*self.x + self.adj , self.y))
                 
             elif actual_life >= self.heart*(3/4):
                 
-                screen.blit(self.images[1], (i*self.x , self.y))
+                screen.blit(self.images[1], (i*self.x + self.adj , self.y))
             elif actual_life >= self.heart*(1/2):
                 
-                screen.blit(self.images[2], (i*self.x , self.y))
+                screen.blit(self.images[2], (i*self.x + self.adj , self.y))
             else:
-                screen.blit(self.images[3], (i*self.x , self.y))
+                screen.blit(self.images[3], (i*self.x + self.adj , self.y))
             actual_life -= self.heart
 class Bar:
     def __init__(self, Value, x, y, width, height, color1, color2):

@@ -2,7 +2,9 @@ import pygame
 import unittest
 import sys, os
 
-sys.path.append(os.path.abspath('..'))
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
 
 from src.player import Player
 from src.player import Knight, Yokai, Ninja
@@ -173,9 +175,9 @@ class TestPlayerActions(unittest.TestCase):
         self.player.on_ground = True  
         self.player.action = None
 
-        self.enemy1 = Mage(300, 0, 80, 150, self.player)
+        self.enemy1 = Mage(150, 0, 80, 150, self.player)
         self.enemy1.to_left = True
-        self.enemy2 = Dummy(120, 0, 50, 80, self.player)
+        self.enemy2 = Mage(100, 0, 80, 150, self.player)
 
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         path_game = os.path.abspath(path_game)
@@ -216,14 +218,14 @@ class TestPlayerActions(unittest.TestCase):
 
         self.player = self.players[1]
 
-        for _ in range(100):
+        for _ in range(10):
             self.player.actions(pygame.key.get_pressed())
-            self.player.on_collision(self.enemy2)
-            self.enemy2.on_collision(self.player)
+            self.player.on_collision(self.enemy1)
+            self.enemy1.on_collision(self.player)
             self.player.update()
-            self.enemy2.update()
+            self.enemy1.update()
 
-        self.assertTrue(self.enemy2.is_dead)
+        self.assertEqual(self.enemy1.life, 40)
 
     def test_attack(self):
         mock_function = create_key_mock([pygame.K_v])
@@ -231,14 +233,13 @@ class TestPlayerActions(unittest.TestCase):
 
         self.player = self.players[2]
 
-        for _ in range(100):
-            self.player.actions(pygame.key.get_pressed())
-            self.player.on_collision(self.enemy2)
-            self.enemy2.on_collision(self.player)
-            self.player.update()
-            self.enemy2.update()
+        self.player.actions(pygame.key.get_pressed())
+        self.player.on_collision(self.enemy2)
+        self.enemy2.on_collision(self.player)
+        self.player.update()
+        self.enemy2.update()
 
-        self.assertTrue(self.enemy2.is_dead)
+        self.assertEqual(self.enemy2.life, -40)
 
 class TestDead(unittest.TestCase):
 
@@ -254,15 +255,37 @@ class TestDead(unittest.TestCase):
         self.player.on_ground = True  
         self.player.action = None
 
-        self.enemy = Dummy(120, 0, 50, 80, self.player)
+        self.enemy = Mage(150, 0, 80, 150, self.player)
+        self.enemy2 = Mage(100, 0, 80, 150, self.player)
 
-    def test_Death(self):
+    def test_projectile_damage(self):
 
-        for _ in range(100):
+        for _ in range(5):
             self.player.on_collision(self.enemy)
             self.enemy.on_collision(self.player)
             self.player.update()
             self.enemy.update()
+
+        self.assertEqual(self.player.life, 30)
+
+    def test_collision_damage(self):
+
+        self.player.on_collision(self.enemy2)
+        self.enemy2.on_collision(self.player)
+        self.player.update()
+        self.enemy2.update()
+
+        self.assertEqual(self.player.life, 50)
+
+    def test_death(self):
+
+        self.player.life = 10
+
+        for _ in range(5):
+            self.player.on_collision(self.enemy2)
+            self.enemy2.on_collision(self.player)
+            self.player.update()
+            self.enemy2.update()
 
         self.assertEqual(self.player.action, "Death")
 

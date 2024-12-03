@@ -1,6 +1,11 @@
 import pygame
-from src.weapon import Projectile, Shield, Attack
 import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
+
+from src.weapon import Projectile, Shield, Attack
 from src.assets import Sprites
 
 class Player:
@@ -111,7 +116,7 @@ class Player:
         if self.life <= 0 or self.rect.y > 1000:
             self.action = "Death"
             self.speed_x = 0
-            if int(self.actual["Death"]) == len(self.images[f"{self.teste}Death"] )-1 or  self.actual["Death"] == (len(self.images[f"{self.teste}Death"] )-1)//2:
+            if int(self.actual["Death"]) == len(self.images[f"{self.teste}Death"] )-1 or  int(self.actual["Death"]) == (len(self.images[f"{self.teste}Death"] )-1)//2:
                 self.Death = True
         self.speed_y += self.gravity_y
         self.rect.y += min(self.speed_y, self.speed_y_max)
@@ -611,8 +616,6 @@ class Ninja(Player):
 
     def on_key_pressed(self, key_map, main):
         return super().on_key_pressed(key_map, main)
-
-
 
     def update(self):
         super().update()

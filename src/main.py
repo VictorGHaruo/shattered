@@ -1,9 +1,14 @@
 import pygame
 import os
 import sys
-from interfaces import Menu, Game_Over, Pause, Tutorial
-from game import GameManager
 import random
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+src_path = os.path.join(current_dir, '..')  
+sys.path.append(src_path)
+
+from src.interfaces import Menu, Game_Over, Pause, Tutorial
+from src.game import GameManager
 
 pygame.init()
 
