@@ -113,7 +113,7 @@ class GameManager:
             self.hero.trade_cooldown_time, 20, 70, 240, 20, 
             (255, 255, 255), (160, 32, 240)
         )
-        
+        self.bosses_life = []
         self.keys_trade = [
             "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
             "on_ground", "to_left", "to_right", "from_the_front",
@@ -234,6 +234,7 @@ class GameManager:
 
         if len(self.bosses) == 0 and len(self.order) != 0:
             self.bosses.append(self.order[0])
+            self.bosses_life.append(Bosslife(self.order[0].life, 200, 750, 1000, 40,(0, 255, 0), (255, 0, 0)))
             del self.order[0]
 
         for ground in self.grounds:
@@ -246,6 +247,7 @@ class GameManager:
         for boss in self.bosses:
             boss.update()
             boss.new_hero(self.hero)
+            self.bosses_life[0].update(boss.life)
 
     def collision_decetion(self) -> None:
         """
@@ -302,6 +304,7 @@ class GameManager:
         for boss in self.bosses:
             if boss.is_dead:
                 self.bosses.remove(boss)
+                self.bosses_life.pop(0)
                 del boss
 
         if self.hero.Death:
@@ -354,6 +357,7 @@ class GameManager:
 
         for boss in self.bosses:
             boss.draw(screen, self.camera)
+            self.bosses_life[0].draw(screen)
 
         self.hero.draw(screen, self.camera)
         self.life_bar.draw(screen)

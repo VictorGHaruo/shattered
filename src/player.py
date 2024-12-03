@@ -48,7 +48,9 @@ class Player:
         self.invincibility_time = 30
         self.collision_damage = 50
         self.damage = 0
-        self.invincibility_cooldown = self.invincibility_time
+        self.invincibility_cooldown = 0
+        self.hurt_time = 5
+        self.hurt_cooldown = 0
         self.projectiles = []
         self.projectile_cooldown = 0
         self.cooldown_time = 20
@@ -84,7 +86,7 @@ class Player:
                 self.sprites.assets(self.rect, "Hurt", self.actual, "R", 0, self.images, self.adj, self.teste)
             else:
                 self.sprites.assets(self.rect, "Hurt", self.actual, "L", 0, self.images, self.adj, self.teste)
-            if self.on_ground:
+            if self.on_ground and self.hurt_cooldown <= 0:
                 self.action = None
             return
         
@@ -140,9 +142,10 @@ class Player:
             self.speed_x = 0
         
         ##Updating trade_cooldonw
-        if self.trade_cooldown > 0 or self.invincibility_cooldown > 0 :
+        if self.trade_cooldown >= 0 or self.invincibility_cooldown >= 0 :
             self.trade_cooldown -= 1    
             self.invincibility_cooldown -= 1
+            self.hurt_cooldown -= 1
 
         for projectile in self.projectiles:
             projectile.update()
@@ -173,7 +176,9 @@ class Player:
         self.actual["Jump"] = 0
         
     def on_key_pressed(self, key_map, main):
+
         if self.on_ground and self.action != "Hurt" and self.action != "Attack" and self.action != "Immune" and self.action != "Death":
+
             if  key_map[pygame.K_d]:
                 self.speed_x += 5
                 self.to_right = True
@@ -195,7 +200,7 @@ class Player:
             else:
                 self.is_running = False
                 self.speed_x = 0
-                if self.action == "Walk":
+                if self.action == "Walk" :
                     self.action = None
                 
             # if key_map[pygame.K_f] and self.is_touching_obelisk:
@@ -229,6 +234,7 @@ class Player:
                 self.life -= self.collision_damage
                 self.invincibility_cooldown = self.invincibility_time
                 self.action = "Hurt"
+                self.hurt_cooldown = self.hurt_time
                 self.speed_x = 0
                 self.speed_y = 0
 
@@ -238,6 +244,7 @@ class Player:
                     self.life -= projectile.damage
                     self.invincibility_cooldown = self.invincibility_time
                     self.action = "Hurt"
+                    self.hurt_cooldown = self.hurt_time
                     self.speed_x = 0
                     self.speed_y = 0
 
@@ -337,6 +344,7 @@ class Knight(Player):
         self.sprites.load_spritesheets(self.sizes_directory, "KImmune", False, self.images_directory, self.images, "Protect1", 128, 128, 0, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "KDeath", True, self.images_directory, self.images, "Dead1", 128, 128, 0, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "KDeath", False, self.images_directory, self.images, "Dead1", 128, 128, 0, width, height, self.adjW, self.adjH)
+
     def actions(self, key_map):
 
         if key_map[pygame.K_v] and self.action != "Hurt" and self.action != "Death":
@@ -375,12 +383,14 @@ class Knight(Player):
     def draw(self, screen, camera):
         super().draw(screen, camera)
 
-        #if self.shield is not None:
-            #self.shield.draw(screen)
+        if self.invincibility_cooldown >= 0 :
 
-        self.sprites.draw(screen)
+            self.sprites.draw(screen,128)
 
-        
+        else:
+
+            self.sprites.draw(screen)
+
     def update(self):
 
         super().update()
@@ -424,7 +434,7 @@ class Yokai(Player):
             "YIdle" : 8,
             "YWalk" : 8,
             "YHurt" : 2,
-            "YJump" : 10,
+            "YJump" : 9,
             "YAttack" : 7,
             "YAttack_2" : 10,
             "YDeath" : 10
@@ -449,7 +459,7 @@ class Yokai(Player):
         }
         self.fps = {
             "Idle" : 0.2,
-            "Walk" : 0.5,
+            "Walk" : 0.2,
             "Hurt" : 0.1,
             "Jump" : 0.5,
             "Attack" : 1.5,
@@ -458,8 +468,8 @@ class Yokai(Player):
         }
         self.sprites.load_spritesheets(self.sizes_directory, "YIdle", True, self.images_directory, self.images, "Idle", 128, 128, 0, width, height, self.adjW, self.adjH)        
         self.sprites.load_spritesheets(self.sizes_directory, "YIdle", False, self.images_directory, self.images, "Idle", 128, 128, 0, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "YWalk", True, self.images_directory, self.images, "Walk", 128, 128, 0, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "YWalk", False, self.images_directory, self.images, "Walk", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "YWalk", True, self.images_directory, self.images, "Run", 128, 128, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "YWalk", False, self.images_directory, self.images, "Run", 128, 128, 0, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "YHurt", True, self.images_directory, self.images, "Hurt", 128, 128, 0, width, height, self.adjW, self.adjH)        
         self.sprites.load_spritesheets(self.sizes_directory, "YHurt", False, self.images_directory, self.images, "Hurt", 128, 128, 0, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "YJump", True, self.images_directory, self.images, "Jump", 128, 128, 0, width, height, self.adjW, self.adjH)
@@ -507,7 +517,13 @@ class Yokai(Player):
     def draw(self, screen, camera):
         super().draw(screen, camera)
 
-        self.sprites.draw(screen)
+        if self.invincibility_cooldown >= 0 :
+
+            self.sprites.draw(screen,128)
+
+        else:
+
+            self.sprites.draw(screen)
                 
                 
 class Ninja(Player):
@@ -535,6 +551,7 @@ class Ninja(Player):
         self.images_directory = {
             "NIdle" : os.path.join(Ninja_path),
             "NWalk" : os.path.join(Ninja_path),
+            "NRun" : os.path.join(Ninja_path),
             "NHurt" : os.path.join(Ninja_path),
             "NJump" : os.path.join(Ninja_path),
             "NAttack" : os.path.join(Ninja_path),
@@ -542,9 +559,9 @@ class Ninja(Player):
         }
         self.sizes_directory = {
             "NIdle" : 6,
-            "NWalk" : 8,
+            "NWalk" : 6,
             "NHurt" : 2,
-            "NJump" : 8,
+            "NJump" : 7,
             "NAttack" : 6,
             "NDeath" : 4
         }
@@ -574,8 +591,8 @@ class Ninja(Player):
         }
         self.sprites.load_spritesheets(self.sizes_directory, "NIdle", True, self.images_directory, self.images, "Idle", 96, 96, 0, width, height, self.adjW, self.adjH)        
         self.sprites.load_spritesheets(self.sizes_directory, "NIdle", False, self.images_directory, self.images, "Idle", 96, 96, 0, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "NWalk", True, self.images_directory, self.images, "Walk", 96, 96, 0, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "NWalk", False, self.images_directory, self.images, "Walk", 96, 96, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "NWalk", True, self.images_directory, self.images, "Run", 96, 96, 0, width, height, self.adjW, self.adjH)
+        self.sprites.load_spritesheets(self.sizes_directory, "NWalk", False, self.images_directory, self.images, "Run", 96, 96, 0, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "NHurt", True, self.images_directory, self.images, "Hurt", 96, 96, 0, width, height, self.adjW, self.adjH)        
         self.sprites.load_spritesheets(self.sizes_directory, "NHurt", False, self.images_directory, self.images, "Hurt", 96, 96, 0, width, height, self.adjW, self.adjH)
         self.sprites.load_spritesheets(self.sizes_directory, "NJump", True, self.images_directory, self.images, "Jump", 96, 96, 0, width, height, self.adjW, self.adjH)
@@ -596,6 +613,11 @@ class Ninja(Player):
         else:
             self.attack = None
 
+    def on_key_pressed(self, key_map, main):
+
+        super().on_key_pressed(key_map, main)
+
+
     def on_collision(self, other):
         super().on_collision(other)
 
@@ -607,12 +629,16 @@ class Ninja(Player):
 
 
     def draw(self, screen, camera):
+
         super().draw(screen, camera)
 
-        #if self.attack is not None:
-            #self.attack.draw(screen)
+        if self.invincibility_cooldown >= 0 :
 
-        self.sprites.draw(screen)
+            self.sprites.draw(screen,128)
+
+        else:
+
+            self.sprites.draw(screen)
 
     def on_key_pressed(self, key_map, main):
         return super().on_key_pressed(key_map, main)
