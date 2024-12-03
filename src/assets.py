@@ -26,7 +26,7 @@ class Sprites():
         self.image_rect = None
         self.before = 0
         self.actions = [
-            "Walk", "Idle", "Attack","Attack_2", "Death", "Immune", 
+            "Walk", "Run", "Idle", "Attack","Attack_2", "Death", "Immune", 
             "Jump", "Hurt", "Projectile"
         ]
 
@@ -244,7 +244,7 @@ class Sprites():
         self.image_rect.centerx = rect.centerx
         self.before = action
 
-    def draw(self, screen: pygame.Surface) -> None:
+    def draw(self, screen: pygame.Surface, alpha: int = 255) -> None:
 
         """
         Draw the assets on the screen.
@@ -263,6 +263,7 @@ class Sprites():
         """
         
         if self.image and self.image_rect:
+            self.image.set_alpha(alpha)
             screen.blit(self.image, self.image_rect)
 
 class Herolife:
@@ -339,7 +340,7 @@ class Bosslife(Bar):
     def __init__(self, Value, x, y, width, height, color1, color2):
         super().__init__(Value, x, y, width, height, color1, color2)
         self.health_ratio = self.max / self.width
-        self.health_change_speed = 1
+        self.health_change_speed = 3
         self.transition = pygame.Rect(self.x, self.y, self.width, self.height)
     def update(self, Value):
         self.rect.width = self.width * (Value / self.max)

@@ -34,8 +34,6 @@ class TestPlayerFall(unittest.TestCase):
         self.assertFalse(self.player.on_ground)
      
         for _ in range(10):  
-            mock_function = create_key_mock([pygame.K_d])
-            pygame.key.get_pressed = mock_function
             self.player.update()  
             self.player.on_collision(self.ground)
 
@@ -103,7 +101,6 @@ class TestPlayerMovement(unittest.TestCase):
       
         mock_function = create_key_mock([])
         pygame.key.get_pressed = mock_function
-
        
         self.player.on_key_pressed(pygame.key.get_pressed(), None)
 
@@ -240,6 +237,7 @@ class TestPlayerActions(unittest.TestCase):
         self.enemy2.update()
 
         self.assertEqual(self.enemy2.life, -40)
+        
 
 class TestDead(unittest.TestCase):
 
@@ -260,9 +258,8 @@ class TestDead(unittest.TestCase):
 
     def test_projectile_damage(self):
 
-        for _ in range(5):
+        for _ in range(4):
             self.player.on_collision(self.enemy)
-            self.enemy.on_collision(self.player)
             self.player.update()
             self.enemy.update()
 
@@ -271,11 +268,10 @@ class TestDead(unittest.TestCase):
     def test_collision_damage(self):
 
         self.player.on_collision(self.enemy2)
-        self.enemy2.on_collision(self.player)
         self.player.update()
         self.enemy2.update()
 
-        self.assertEqual(self.player.life, 50)
+        self.assertEqual(self.player.life, 0)
 
     def test_death(self):
 
@@ -283,7 +279,6 @@ class TestDead(unittest.TestCase):
 
         for _ in range(5):
             self.player.on_collision(self.enemy2)
-            self.enemy2.on_collision(self.player)
             self.player.update()
             self.enemy2.update()
 

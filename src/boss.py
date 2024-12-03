@@ -107,7 +107,7 @@ class Bosses:
         self.speed_y = 0
         self.speed_y_max = 40
         self.speed_x = 0
-        self.life = 50
+        self.life = 2000
         self.hero = hero
         self.projectiles = []
         self.screen_width = pygame.display.Info().current_w
@@ -344,7 +344,7 @@ class Balrog(Bosses):
 
         self.speed_x = 3
         self.gravity = 0
-        self.life = 1
+        self.life = 20
 
         self.probability = 0.5
         self.randomic = 0.5
@@ -739,7 +739,7 @@ class Ganon(Bosses):
 
         self.color = (160, 32, 240)
 
-        self.life = 1
+        self.life = 20
         self.is_dead = False
 
         self.atk_timer = 100
