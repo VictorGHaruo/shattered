@@ -1,6 +1,5 @@
 import pygame, random, os, sys
 from game import GameManager
-# import time
 
 def f_reset_game(main):
     del main.states["game"]
@@ -73,10 +72,9 @@ class Menu():
     
     def music(self, main, volume):
         if main.is_changed:
-            path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-            music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
+            music_dir_path = os.path.join(main.assets_path, "Music")
             
-            music_num = random.randint(1, 2)
+            music_num = random.randint(1, 4)
             music_path = os.path.join(music_dir_path, "Menu", f"M{music_num}.mp3")
             pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
@@ -161,20 +159,18 @@ class Game_Over():
             os.path.join(main.assets_path, "Interfaces", "quit0.png"),
             os.path.join(main.assets_path, "Interfaces", "quit1.png")
         ]
-        self.b_restart = Button(555, 350, 290, 120, restart_images)
+        self.b_restart = Button(555, 310, 290, 120, restart_images)
         self.b_quit = Button(555, 480, 290, 120, quit_images)
         
         dimention_screen = main.screen.get_size()
         image_path = os.path.join(main.assets_path, "Interfaces", "Over.png")
-        image_pause = pygame.image.load(image_path).convert_alpha()
-        self.image_pause = pygame.transform.scale(image_pause, dimention_screen)
+        image_over = pygame.image.load(image_path).convert_alpha()
+        self.image_over = pygame.transform.scale(image_over, dimention_screen)
     
     def music(self, main, volume):
         if main.is_changed:
-            path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-            music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
-            
-            music_num = random.randint(1, 2)
+            music_dir_path = os.path.join(main.assets_path, "Music")
+            music_num = random.randint(1, 4)
             music_path = os.path.join(music_dir_path, "Over", f"D{music_num}.mp3")
             pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
@@ -182,7 +178,7 @@ class Game_Over():
         main.is_changed = False
                 
     def draw(self, screen):
-        screen.blit(self.image_pause, (0,0))
+        screen.blit(self.image_over, (0,0))
         self.b_restart.draw(screen)
         self.b_quit.draw(screen)
 
@@ -250,4 +246,50 @@ class Tutorial():
                 self.timer = 100
                 self.idx_image = 0
                 
-            
+class Win():
+    
+    def __init__(self, main):
+        again_images = [
+            os.path.join(main.assets_path, "Interfaces", "again0.png"),
+            os.path.join(main.assets_path, "Interfaces", "again1.png")
+        ]
+        quit_images = [
+            os.path.join(main.assets_path, "Interfaces", "quit0.png"),
+            os.path.join(main.assets_path, "Interfaces", "quit1.png")
+        ]
+        
+        self.b_again = Button(555, 350, 290, 120, again_images)
+        self.b_quit = Button(555, 480, 290, 120, quit_images)
+        
+        dimention_screen = main.screen.get_size()
+        image_path = os.path.join(main.assets_path, "Interfaces", "Win.png")
+        image_win = pygame.image.load(image_path).convert_alpha()
+        self.image_win = pygame.transform.scale(image_win, dimention_screen)
+    
+    def music(self, main, volume):
+        if main.is_changed:
+            music_dir_path = os.path.join(main.assets_path, "Music")
+            music_num = random.randint(1, 5)
+            music_path = os.path.join(music_dir_path, "Win", f"V{music_num}.mp3")
+            pygame.mixer.music.load(music_path)
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play(-1)  
+        main.is_changed = False
+    
+    def draw(self, screen):
+        screen.blit(self.image_win, (0,0))
+        self.b_again.draw(screen)
+        self.b_quit.draw(screen)
+    
+    def on_event(self, event, main):
+        self.b_again.reset_game(event, main)
+        
+        self.b_quit.reset_game(event, main)
+        self.b_quit.change_state(event, main, "menu", True)
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                f_reset_game(main)
+            elif event.key == pygame.K_q:
+                f_reset_game(main)
+                main.change_state("menu", True)

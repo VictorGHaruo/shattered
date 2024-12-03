@@ -159,19 +159,19 @@ class GameManager:
         if main.is_changed:
             music_dir_path = os.path.join(main.assets_path, "Music")
             if self.camera.boss_fase:
-                music_num = random.randint(1, 2)
+                music_num = random.randint(1, 5)
                 music_path = os.path.join(
                     music_dir_path, "Boss", f"B{music_num}.mp3"
                 )
                 pygame.mixer.music.load(music_path)
             elif self.hero.can_push_block:
-                music_num = random.randint(1, 3)
+                music_num = random.randint(1, 4)
                 music_path = os.path.join(
                     music_dir_path, "Obelisk", f"O{music_num}.mp3"
                 )
                 pygame.mixer.music.load(music_path)
             else:
-                music_num = random.randint(1, 3)
+                music_num = random.randint(1, 5)
                 music_path = os.path.join(
                     music_dir_path, "World", f"W{music_num}.mp3"
                 )
@@ -285,7 +285,8 @@ class GameManager:
     def elimination(self, change_state) -> None:
         """
         Eliminates defeated enemies or bosses, and transitions to 
-        the game over state if the hero dies.
+        the game over state if the hero dies or to the win state if
+        finished the game.
 
         Parameters
         ----------
@@ -309,6 +310,9 @@ class GameManager:
 
         if self.hero.Death:
             change_state("over", True)
+            
+        if not self.bosses and not self.order:
+            change_state("win", True)
 
     def draw(self, screen: pygame.Surface) -> None:
         """

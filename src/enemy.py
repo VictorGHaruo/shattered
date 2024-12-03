@@ -41,7 +41,6 @@ class Monsters:
     def draw (self, screen: pygame.Surface, camera):
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            pygame.draw.rect(screen, self.color, self.rect)
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
             if not screen.get_rect().colliderect(projectile.rect):

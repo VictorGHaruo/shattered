@@ -7,7 +7,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.join(current_dir, '..')  
 sys.path.append(src_path)
 
-from src.interfaces import Menu, Game_Over, Pause, Tutorial
+from src.interfaces import Menu, Game_Over, Pause, Tutorial, Win
 from src.game import GameManager
 
 pygame.init()
@@ -29,7 +29,7 @@ class Main:
         Indicates whether the game is running.
     states : dict
         A dictionary holding all game states (menu, game, 
-        pause, game over).
+        pause, game over, tutorial and win).
     current_state : object
         The current active state of the game.
     is_changed : bool
@@ -74,7 +74,8 @@ class Main:
             "game": GameManager(self),
             "pause": Pause(self),
             "over": Game_Over(self),
-            "tutorial": Tutorial(self)
+            "tutorial": Tutorial(self),
+            "win": Win(self)
         }
         self.current_state = self.states["menu"]
         self.is_changed = False
