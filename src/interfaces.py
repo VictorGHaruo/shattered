@@ -1,19 +1,29 @@
 import pygame, random, os, sys
 from game import GameManager
 
+def f_reset_game(main):
+    del main.states["game"]
+    main.states["game"] = GameManager(main)
+    main.change_state("game", True)
+
 class Button():
     
-    def __init__(self, x, y, width, height, text, fontsize=36):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.text = text
-        self.font = pygame.font.Font(None, fontsize)
-        
-    def draw(self, screen: pygame.Surface, bool):
-        if bool:
-            pygame.draw.rect(screen, "grey", self.rect)
-        text_box = self.font.render(self.text, True, "white")
-        text_box_rect = text_box.get_rect(center = self.rect.center)
-        screen.blit(text_box, text_box_rect)
+    def __init__(self, x, y, width, height, images_path):
+        self.images_path = images_path
+        image_init = pygame.image.load(self.images_path[0]).convert_alpha()
+        self.image_init = pygame.transform.scale(image_init, (width, height))
+        image_tounching = pygame.image.load(self.images_path[1]).convert_alpha()
+        self.image_tounching = pygame.transform.scale(image_tounching, (width, height))
+        self.rect = self.image_init.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+                
+    def draw(self, screen: pygame.Surface):
+        mouse_position = pygame.mouse.get_pos()
+        if self.rect.collidepoint(mouse_position[0], mouse_position[1]):
+            screen.blit(self.image_tounching, self.rect)
+        else:
+            screen.blit(self.image_init, self.rect)
         
     def change_state(self, event, main, state, music_bool):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -36,11 +46,24 @@ class Button():
 class Menu():
     
     def __init__(self, main):
-        self.b_start = Button(575, 345, 250, 50, "Start")
-        self.b_exit = Button(575, 405, 250, 50, "Exit game")
-        self.title = pygame.font.Font(None, 74)
-        self.title = self.title.render("Shattered", True, "White")
-        self.text_rect = self.title.get_rect(center=(main.WIDTH // 2, 300))
+        
+        start_images = [
+            os.path.join(main.assets_path, "Interfaces", "start0.png"), 
+            os.path.join(main.assets_path, "Interfaces", "start1.png")
+        ]
+        quit_images = [
+            os.path.join(main.assets_path, "Interfaces", "quit0.png"),
+            os.path.join(main.assets_path, "Interfaces", "quit1.png")
+        ]
+        
+        self.b_start = Button(555, 300, 290, 120, start_images)
+        self.b_exit = Button(555, 550, 290, 120, quit_images)
+        
+        #Image
+        dimention_screen = main.screen.get_size()
+        image_path = os.path.join(main.assets_path, "Interfaces", "Menu.png")
+        image_menu = pygame.image.load(image_path).convert_alpha()
+        self.image_menu = pygame.transform.scale(image_menu, dimention_screen)
     
     def music(self, main, volume):
         if main.is_changed:
@@ -55,10 +78,9 @@ class Menu():
         main.is_changed = False
     
     def draw(self, screen: pygame.Surface):
-        screen.fill((0,0,0))
-        screen.blit(self.title, self.text_rect)
-        self.b_start.draw(screen, True)
-        self.b_exit.draw(screen, True)
+        screen.blit(self.image_menu, (0,0))
+        self.b_start.draw(screen)
+        self.b_exit.draw(screen)
         
     def on_event(self, event, main):
         self.b_start.change_state(event, main, "game", True)
@@ -71,18 +93,35 @@ class Menu():
 class Pause():
     
     def __init__(self, main):
-        self.b_continue = Button(575, 320, 250, 50, "Continue")
-        self.b_restart = Button(575, 375, 250, 50, "Restart")
-        self.b_quit = Button(575, 430, 250, 50, "Quit")
+        continue_images = [
+            os.path.join(main.assets_path, "Interfaces", "continue0.png"),
+            os.path.join(main.assets_path, "Interfaces", "continue1.png")
+        ]
+        restart_images = [
+            os.path.join(main.assets_path, "Interfaces", "restart0.png"),
+            os.path.join(main.assets_path, "Interfaces", "restart1.png")
+        ]
+        quit_images = [
+            os.path.join(main.assets_path, "Interfaces", "quit0.png"),
+            os.path.join(main.assets_path, "Interfaces", "quit1.png")
+        ]
+        self.b_continue = Button(555, 300, 290, 120, continue_images)
+        self.b_restart = Button(555, 425, 290, 120, restart_images)
+        self.b_quit = Button(555, 550, 290, 120, quit_images)
+        
+        dimention_screen = main.screen.get_size()
+        image_path = os.path.join(main.assets_path, "Interfaces", "Pause.png")
+        image_pause = pygame.image.load(image_path).convert_alpha()
+        self.image_pause = pygame.transform.scale(image_pause, dimention_screen)
         
     def music(self, main, volume):
         pass
     
     def draw(self, screen):
-        screen.fill((0,0,0))
-        self.b_continue.draw(screen, True)
-        self.b_restart.draw(screen, True)
-        self.b_quit.draw(screen, True)
+        screen.blit(self.image_pause, (0,0))
+        self.b_continue.draw(screen)
+        self.b_restart.draw(screen)
+        self.b_quit.draw(screen)
         
     def on_event(self, event, main):
         self.b_continue.change_state(event, main, "game", False)
@@ -104,8 +143,21 @@ class Pause():
 class Game_Over():
     
     def __init__(self, main):
-        self.WIDTH = main.WIDTH
-        self.HEIGHT = main.HEIGHT
+        restart_images = [
+            os.path.join(main.assets_path, "Interfaces", "restart0.png"),
+            os.path.join(main.assets_path, "Interfaces", "restart1.png")
+        ]
+        quit_images = [
+            os.path.join(main.assets_path, "Interfaces", "quit0.png"),
+            os.path.join(main.assets_path, "Interfaces", "quit1.png")
+        ]
+        self.b_restart = Button(555, 350, 290, 120, restart_images)
+        self.b_quit = Button(555, 480, 290, 120, quit_images)
+        
+        dimention_screen = main.screen.get_size()
+        image_path = os.path.join(main.assets_path, "Interfaces", "Over.png")
+        image_pause = pygame.image.load(image_path).convert_alpha()
+        self.image_pause = pygame.transform.scale(image_pause, dimention_screen)
     
     def music(self, main, volume):
         if main.is_changed:
@@ -120,19 +172,16 @@ class Game_Over():
         main.is_changed = False
                 
     def draw(self, screen):
-        screen.fill([100, 100, 100])
-        font_gameover = pygame.font.Font(None, 74)
-        font_control = pygame.font.Font(None, 36)
-        
-        text_gameover = font_gameover.render("GAME OVER", True, (255, 255, 255))
-        text_rect = text_gameover.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 3))
-        screen.blit(text_gameover, text_rect)
-
-        text_control = font_control.render("Press 'R' to restart or 'Q' to quit.", True, (50, 50, 50))
-        control_rect = text_control.get_rect(center=(self.WIDTH// 2, self.HEIGHT // 2))
-        screen.blit(text_control, control_rect)
+        screen.blit(self.image_pause, (0,0))
+        self.b_restart.draw(screen)
+        self.b_quit.draw(screen)
 
     def on_event(self, event, main):
+        self.b_restart.reset_game(event, main)
+        
+        self.b_quit.reset_game(event, main)
+        self.b_quit.change_state(event, main, "menu", True)
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 f_reset_game(main)
@@ -140,7 +189,3 @@ class Game_Over():
                 f_reset_game(main)
                 main.change_state("menu", True)
                 
-def f_reset_game(main):
-    del main.states["game"]
-    main.states["game"] = GameManager(main)
-    main.change_state("game", True)

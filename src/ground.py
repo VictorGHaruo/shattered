@@ -2,7 +2,8 @@ import pygame
 
 class Ground:
     """
-    Base class for objects representing the ground or static elements in the game.
+    Base class for objects representing the ground or static 
+    elements in the game.
 
     Attributes
     ----------
@@ -25,7 +26,12 @@ class Ground:
         Detects and handles collisions between ground and ohter objects.
     """
 
-    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+    def __init__(
+        self, 
+        x: int, y: int, 
+        width: int, height: int, 
+        image_path: str
+    ) -> None:
         """
         Initializes the ground object with position, size, and image.
         The function initializes the object's attributes.
@@ -55,7 +61,7 @@ class Ground:
         self.rect.x = x
         self.rect.y = y
 
-    def draw(self, screen: pygame.Surface, camera):
+    def draw(self, screen: pygame.Surface, camera) -> None:
         """
         Renders the object on the screen adjusted by the camera.
 
@@ -74,7 +80,7 @@ class Ground:
             self.rect.x -= camera.position_x
             screen.blit(self.image, self.rect)
 
-    def update(self):
+    def update(self) -> None:
         """
         Placeholder for object updates.
 
@@ -88,7 +94,7 @@ class Ground:
         """
         pass
 
-    def on_collision(self, other):
+    def on_collision(self, other) -> None:
         """
         Placeholder for handling collisions with other objects.
 
@@ -106,7 +112,8 @@ class Ground:
 
 class Block(Ground):
     """
-    Represents an interactive Ground affected by gravity and player actions.
+    Represents an interactive Ground affected by gravity 
+    and player actions.
 
     Attributes
     ----------
@@ -139,10 +146,15 @@ class Block(Ground):
         Detects and handles collisions between ground and ohter objects.
     """
 
-    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+    def __init__(
+        self, 
+        x: int, y: int, 
+        width: int, height: int, 
+        image_path: str
+    ) -> None:
         """
-        Initializes the block, object that inherits from the Ground class, with
-        position, size, and image.
+        Initializes the block, object that inherits from the Ground 
+        class, with position, size, and image.
 
         Parameters
         ----------
@@ -169,7 +181,7 @@ class Block(Ground):
         self.is_pushing_r = False
         self.is_pushing_l = False
 
-    def update(self):
+    def update(self) -> None:
         """
         Updates the block's position based on gravity and pushes.
 
@@ -191,7 +203,7 @@ class Block(Ground):
             self.rect.x += 1.5
             self.is_pushing_l = False
 
-    def on_collision(self, other):
+    def on_collision(self, other) -> None:
         """
         Handles collisions with other objects.
 
@@ -206,16 +218,23 @@ class Block(Ground):
         """
         super().on_collision(other)
         if other.TAG == "Ground" and self.rect.colliderect(other.rect):
-            if self.rect.bottom > other.rect.top and self.rect.top < other.rect.top:
+            if (
+                self.rect.bottom > other.rect.top 
+                and self.rect.top < other.rect.top
+            ):
                 self.rect.bottom = other.rect.top
                 self.speed_y = 0
-        if other.TAG == "Player" and other.rect.colliderect(self.rect) and other.can_push_block:
+        if (
+            other.TAG == "Player" 
+            and other.rect.colliderect(self.rect) 
+            and other.can_push_block
+        ):
             if other.speed_x > 0 and self.rect.top < other.rect.top:
                 self.is_pushing_l = True
             if other.speed_x < 0 and self.rect.top < other.rect.top:
                 self.is_pushing_r = True
 
-    def draw(self, screen: pygame.Surface, camera):
+    def draw(self, screen: pygame.Surface, camera) -> None:
         """
         Renders the object on the screen adjusted by the camera.
 
@@ -249,7 +268,12 @@ class Spike(Ground):
         Rectangular boundary defining the object's position and size.
     """
     
-    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+    def __init__(
+        self, 
+        x: int, y: int,
+        width: int, height: int, 
+        image_path: str
+    ) -> None:
         """
         Initializes a spike, object that inherits from the Ground class.
 
@@ -294,22 +318,30 @@ class Invisible(Ground):
         Updates the coordinate of ground.
     """
     
-    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+    def __init__(
+        self, 
+        x: int, y: int, 
+        width: int, height: int,
+        image_path: str
+    ) -> None:
         """
         Initializes an invisible ground object.
 
         Parameters
         ----------
         x : int
-            The horizontal position where the invisible object will be placed.
+            The horizontal position where the invisible object will
+            be placed.
         y : int
-            The vertical position where the invisible object will be placed.
+            The vertical position where the invisible object will
+            be placed.
         width : int
             The width of the invisible object.
         height : int
             The height of the invisible object.
         image_path : str
-            The file path to the image that will represent the invisible object.
+            The file path to the image that will represent the 
+            invisible object.
 
         Returns
         -------
@@ -318,7 +350,7 @@ class Invisible(Ground):
         super().__init__(x, y, width, height, image_path)
         self.sub_TAG = "Invisible"
         
-    def draw(self, screen: pygame.Surface, camera):
+    def draw(self, screen: pygame.Surface, camera) -> None:
         """
         Placeholder for object draws.
         Updates the coordinate of ground.
@@ -328,7 +360,8 @@ class Invisible(Ground):
         screen : pygame.Surface
             The surface to which the object will be drawn.
         camera : Camera
-            The camera used to adjust the object's position based on scrolling.
+            The camera used to adjust the object's position based 
+            on scrolling.
 
         Returns
         -------
@@ -340,7 +373,8 @@ class Invisible(Ground):
 class Obelisk:
     
     """
-    Represents the object that the player touches to be able to push blocks.
+    Represents the object that the player touches to be able to 
+    push blocks.
     
     Attributes
     ----------
@@ -369,9 +403,15 @@ class Obelisk:
         Placeholder to updates the obelisk object.
     """
     
-    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+    def __init__(
+        self, 
+        x: int, y: int, 
+        width: int, height: int, 
+        image_path: str
+    ) -> None:
         """
-        Initializes an obelisk object with multiple frames from a sprite sheet.
+        Initializes an obelisk object with multiple frames from 
+        a sprite sheet.
 
         Parameters
         ----------
@@ -404,16 +444,18 @@ class Obelisk:
         self.rect.y = y
         self.touched = False
     
-    def draw(self, screen: pygame.Surface, camera):
+    def draw(self, screen: pygame.Surface, camera) -> None:
         """
-        Draws the obelisk object on the screen, updating its sprite based on the interaction.
+        Draws the obelisk object on the screen, updating its sprite 
+        based on the interaction.
 
         Parameters
         ----------
         screen : pygame.Surface
             The surface to which the obelisk will be drawn.
         camera : Camera
-            The camera used to adjust the object's position based on scrolling.
+            The camera used to adjust the object's position based 
+            on scrolling.
 
         Returns
         -------
@@ -429,14 +471,15 @@ class Obelisk:
                 self.num_image = 0
                 self.touched = False
             
-    def on_collision(self, other):
+    def on_collision(self, other) -> None:
         """
         Placeholder to handles collision with other objects.
 
         Parameters
         ----------
         other : object
-            The other object that the obelisk collides as Hero, Ground, etc.
+            The other object that the obelisk collides as 
+            Hero, Ground, etc.
 
         Returns
         -------
@@ -444,7 +487,7 @@ class Obelisk:
         """
         pass
             
-    def update(self):
+    def update(self) -> None:
         """
         Placeholder to updates the obelisk object.
 

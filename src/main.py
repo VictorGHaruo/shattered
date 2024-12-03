@@ -9,7 +9,8 @@ pygame.init()
 
 class Main:
     """
-    Main class for managing the game's primary loop and state transitions.
+    Main class for managing the game's primary loop and 
+    state transitions.
 
     Attributes
     ----------
@@ -22,7 +23,8 @@ class Main:
     is_running : bool
         Indicates whether the game is running.
     states : dict
-        A dictionary holding all game states (menu, game, pause, game over).
+        A dictionary holding all game states (menu, game, 
+        pause, game over).
     current_state : object
         The current active state of the game.
     is_changed : bool
@@ -40,7 +42,8 @@ class Main:
 
     def __init__(self):
         """
-        Initializes the main game setup, including screen dimensions, states, and music.
+        Initializes the main game setup, including screen 
+        dimensions, states, and music.
 
         Parameters
         ----------
@@ -55,6 +58,12 @@ class Main:
         screen_size = (self.WIDTH, self.HEIGHT)
         self.screen = pygame.display.set_mode(screen_size)
         self.is_running = True
+        
+        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
+        self.assets_path = os.path.join(
+            os.path.dirname(path_game), "assets"
+        )
+        
         self.states = {
             "menu": Menu(self),
             "game": GameManager(self),
@@ -66,17 +75,17 @@ class Main:
         
         #Music init
         self.volume = 0.15
-        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
+        music_menu_path = os.path.join(self.assets_path, "Music", "Menu")
         music_num = random.randint(1, 2)
-        music_path = os.path.join(music_dir_path, "Menu", f"M{music_num}.mp3")
+        music_path = os.path.join(music_menu_path, f"M{music_num}.mp3")
         pygame.mixer.music.load(music_path)
         pygame.mixer.music.set_volume(self.volume)
         pygame.mixer.music.play(-1)
 
     def run(self):
         """
-        Executes the main game loop, handling events, updates, and rendering.
+        Executes the main game loop, handling events, updates, 
+        and rendering.
 
         Parameters
         ----------
@@ -94,7 +103,10 @@ class Main:
                 if event.type == pygame.QUIT:
                     self.is_running = False
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE and self.current_state == self.states["game"]:
+                    if (
+                        event.key == pygame.K_ESCAPE 
+                        and self.current_state == self.states["game"]
+                    ):
                         self.change_state("pause", False)
                         break
                 self.current_state.on_event(event, self)
@@ -116,7 +128,8 @@ class Main:
         Parameters
         ----------
         state : str
-            The new state to switch to ("menu", "game", "pause", or "over").
+            The new state to switch to "menu", "game", "pause" 
+            or "over".
         music_bool : bool
             Indicates whether the music should change with the state.
 

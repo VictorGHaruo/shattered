@@ -8,7 +8,8 @@ import os, sys, random
 
 class GameManager:
     """
-    Manages the core game mechanics, including hero selection, enemies, bosses, and environment.
+    Manages the core game mechanics, including hero selection, enemies, 
+    bosses, and environment.
 
     Attributes
     ----------
@@ -52,20 +53,23 @@ class GameManager:
     on_key_pressed()
         Handles continuous key presses.
     update()
-        Updates all game elements, including enemies, bosses, and camera.
+        Updates all game elements, including enemies, bosses, 
+        and camera.
     collision_decetion()
         Detects and handles collisions between game entities.
     elimination(change_state)
-        Removes defeated enemies or bosses, and transitions state if the hero dies.
+        Removes defeated enemies or bosses, and transitions state 
+        if the hero dies.
     draw(screen)
         Draws all game elements to the screen.
     trade(event)
         Switches between available heroes.
     """
 
-    def __init__(self, main):
+    def __init__(self, main: object) -> None:
         """
-        Initializes the GameManager with heroes, enemies, bosses, and other game elements.
+        Initializes the GameManager with heroes, enemies, bosses, and 
+        other game elements.
 
         Parameters
         ----------
@@ -83,7 +87,7 @@ class GameManager:
         ]
         self.atual_hero = 0
         self.hero = self.heros[self.atual_hero]
-        self.camera = Camera(0, main.WIDTH)
+        self.camera = Camera(main.WIDTH)
         self.grounds = []
         self.enemies = []
         
@@ -100,33 +104,39 @@ class GameManager:
             Ganon(300, 0, 150, 220, self.hero),
         ]
         self.life_bar = Herolife(self.hero, 400, 20, 10)
-        self.hero_timer = Bar(self.hero.trade_cooldown_time, 20, 30, 100, 20, (255, 255, 255), (0, 0, 255))
+        self.hero_timer = Bar(
+            self.hero.trade_cooldown_time, 20, 30, 100, 20, 
+            (255, 255, 255), (0, 0, 255)
+        )
         
         self.keys_trade = [
             "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
             "on_ground", "to_left", "to_right", "from_the_front",
-            "invincibility_time", "projectiles", "touched_obelisk", "can_push_block",
+            "invincibility_time", "projectiles", "touched_obelisk", 
+            "can_push_block",
         ]
         
         #BackGround image
         self.bg_images = []
-        path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        Background_path = os.path.join(path_game, os.pardir, "assets", "Background")
-        Background_path = os.path.abspath(Background_path)
+        Background_path = os.path.join(main.assets_path, "Background")
         image_path = os.path.join(Background_path, "boss_fase.png")
         self.bg_boss = pygame.image.load(image_path).convert_alpha()
-        self.bg_boss = pygame.transform.scale(self.bg_boss, (self.WIDTH, self.HEIGHT))
-        self.pos_x = -self.WIDTH
-        self.pos_x_p = -self.WIDTH
+        self.bg_boss = pygame.transform.scale(
+            self.bg_boss, (self.WIDTH, self.HEIGHT)
+        )
         
-        #Music
+        #Parallax
         for i in range(1, 4):
             image_path = os.path.join(Background_path, f"background_{i}.png")
             bg_image = pygame.image.load(image_path).convert_alpha()
-            bg_image = pygame.transform.scale(bg_image, (self.WIDTH, self.HEIGHT))
+            bg_image = pygame.transform.scale(
+                bg_image, (self.WIDTH, self.HEIGHT)
+            )
             self.bg_images.append(bg_image)
+        self.pos_x = -self.WIDTH
+        self.pos_x_p = -self.WIDTH
 
-    def music(self, main, volume: float):
+    def music(self, main: object, volume: float) -> None:
         """
         Manages background music based on the current game state.
 
@@ -142,25 +152,30 @@ class GameManager:
         None
         """
         if main.is_changed:
-            path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-            music_dir_path = os.path.join(os.path.dirname(path_game), "assets", "Music")
+            music_dir_path = os.path.join(main.assets_path, "Music")
             if self.camera.boss_fase:
                 music_num = random.randint(1, 2)
-                music_path = os.path.join(music_dir_path, "Boss", f"B{music_num}.mp3")
+                music_path = os.path.join(
+                    music_dir_path, "Boss", f"B{music_num}.mp3"
+                )
                 pygame.mixer.music.load(music_path)
             elif self.hero.can_push_block:
                 music_num = random.randint(1, 3)
-                music_path = os.path.join(music_dir_path, "Obelisk", f"O{music_num}.mp3")
+                music_path = os.path.join(
+                    music_dir_path, "Obelisk", f"O{music_num}.mp3"
+                )
                 pygame.mixer.music.load(music_path)
             else:
                 music_num = random.randint(1, 3)
-                music_path = os.path.join(music_dir_path, "World", f"W{music_num}.mp3")
+                music_path = os.path.join(
+                    music_dir_path, "World", f"W{music_num}.mp3"
+                )
                 pygame.mixer.music.load(music_path)
             pygame.mixer.music.set_volume(volume)
             pygame.mixer.music.play(-1)
         main.is_changed = False
 
-    def on_event(self, event: pygame.event.Event, main):
+    def on_event(self, event: pygame.event.Event, main: object) -> None:
         """
         Handles events during gameplay, such as user inputs.
 
@@ -178,7 +193,7 @@ class GameManager:
         self.trade(event)
         self.hero.on_event(event, main)
 
-    def on_key_pressed(self):
+    def on_key_pressed(self) -> None:
         """
         Handles continuous key presses for hero movement and actions.
 
@@ -194,10 +209,10 @@ class GameManager:
         self.hero.on_key_pressed(key_map, self.main)
         self.hero.actions(key_map)
 
-    def update(self):
+    def update(self) -> None:
         """
-        Updates the state of all game entities, including the hero, enemies,
-        bosses, camera, and associated objects.
+        Updates the state of all game entities, including the hero,
+        enemies, bosses, camera, and associated objects.
 
         Parameters
         ----------
@@ -227,10 +242,10 @@ class GameManager:
             boss.update()
             boss.new_hero(self.hero)
 
-    def collision_decetion(self):
+    def collision_decetion(self) -> None:
         """
-        Detects and resolves collisions between all entities in the game,
-        such as the hero, enemies, bosses, and ground objects.
+        Detects and resolves collisions between all entities in the 
+        game, such as the hero, enemies, bosses, and ground objects.
 
         Parameters
         ----------
@@ -260,10 +275,10 @@ class GameManager:
                 for gro in self.grounds:
                     ground.on_collision(gro)
 
-    def elimination(self, change_state):
+    def elimination(self, change_state) -> None:
         """
-        Eliminates defeated enemies or bosses, and transitions to the game over
-        state if the hero dies.
+        Eliminates defeated enemies or bosses, and transitions to 
+        the game over state if the hero dies.
 
         Parameters
         ----------
@@ -287,10 +302,10 @@ class GameManager:
         if self.hero.Death:
             change_state("over", True)
 
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pygame.Surface) -> None:
         """
-        Draws all game elements to the screen, including the hero, enemies,
-        bosses, and background.
+        Draws all game elements to the screen, including the hero, 
+        enemies, bosses, and background.
 
         Parameters
         ----------
@@ -316,11 +331,15 @@ class GameManager:
         x = 0
         for i in self.bg_images:
             for j in range(8):
-                screen.blit(i, (self.pos_x + x * self.pos_x_p + j * self.WIDTH, 0))
+                screen.blit(
+                    i, (self.pos_x + x * self.pos_x_p + j * self.WIDTH, 0)
+                )
             x += 1
 
         # Boss fight background
-        screen.blit(self.bg_boss, (((132 * 50) - 700) + self.camera.fix_x, 0))
+        screen.blit(
+            self.bg_boss, (((132 * 50) - 700) + self.camera.fix_x, 0)
+        )
 
         for ground in self.grounds:
             ground.draw(screen, self.camera)
@@ -335,9 +354,10 @@ class GameManager:
         self.life_bar.draw(screen)
         self.hero_timer.draw(screen)
 
-    def trade(self, event):
+    def trade(self, event: pygame.event.Event) -> None:
         """
-        Switches the current hero with the chosen one, exchanging equivalent attributes.
+        Switches the current hero with the chosen one, exchanging
+        equivalent attributes.
 
         Parameters
         ----------
