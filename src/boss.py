@@ -44,7 +44,7 @@ class Bosses:
     """
 
     def __init__(
-        self, x: float, y: float, width: int, height: int, hero
+        self, x: float, y: float, width: int, height: int, hero: "Player"
     ) -> None:
         
         """
@@ -149,7 +149,10 @@ class Bosses:
                 del projectile
         
         self.sprites.draw(screen)
-
+        
+        for projectile in self.projectiles:
+            projectile.draw(screen, camera)
+            self.shot.draw(screen)
 
     def on_collision(self, other):
         """
@@ -400,7 +403,72 @@ class Balrog(Bosses):
         return super().update()
 
 class Ganon(Bosses):
+    """
+    A class representing the boss character Ganon, inheriting from the 
+    Bosses base class. This class handles Ganon's attributes, animations, 
+    and attack logic within the game.
+
+    Attributes
+    ----------
+    sub_TAG : str
+        The sub-type identifier for the boss (set to "Ganon").
+    width : int
+        The width of Ganon's hitbox.
+    life : int
+        The current life of Ganon.
+    is_dead : bool
+        Flag indicating whether Ganon is dead.
+    atk_timer : int
+        Timer controlling Ganon's attack frequency.
+    atk_cooldown : int
+        The cooldown period after each attack.
+    atk_long : int
+        The duration of the attack's cooldown period.
+    teleport : int
+        The duration for which Ganon can teleport.
+    teleport_cooldown : int
+        Timer for teleportation cooldown.
+    adjH : int
+        Adjustment value for height used in sprite rendering.
+    adjW : int
+        Adjustment value for width used in sprite rendering.
+    adj : int
+        General adjustment value for Ganon's position.
+    sprites : Sprites
+        Instance of the Sprites class used to manage Ganon's sprite sheets.
+    shot : Sprites
+        Instance of the Sprites class used for Ganon's projectile sprites.
+    images_directory : dict
+        A dictionary storing the paths to Ganon's image directories.
+    sizes_directory : dict
+        A dictionary storing the sprite sizes for different animation states.
+    images : dict
+        A dictionary storing the loaded images for each animation state.
+    actual_ganon : dict
+        A dictionary tracking the current frame of each animation state.
+    fps : dict
+        A dictionary specifying the frames per second for each animation.
+
+    """
+
     def __init__(self, x, y, width, height, hero):
+        """
+        Inicializes the class Ganon with values of atributes
+
+        Parameters
+        ----------
+        x: float
+            Horizontal position where the boss spawn.
+        y: float
+            Vertical position where the boss spawn.
+        width: int
+            Character's width.
+        height: int
+            Character's height.
+        hero: Player
+            Rectangle representing the hero, used for interaction.
+        
+        """
         super().__init__(x, y, width, height, hero)
 
         self.sub_TAG = "Ganon"
@@ -418,12 +486,10 @@ class Ganon(Bosses):
         self.teleport = 40
         self.teleport_cooldown = self.teleport
 
-
         self.adjH = 100
         self.adjW = 120 
         self.adj = 25
 
-        #SPRITES V2
         self.sprites = Sprites()
         self.shot = Sprites()
 
@@ -459,7 +525,6 @@ class Ganon(Bosses):
             "Attack" : 0,
             "Immune" : 0,
             "Death" : 0
-
         }
 
         self.fps = {
@@ -469,21 +534,72 @@ class Ganon(Bosses):
             "Death" : 0.2
         }
 
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GIdle", True, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 0, width, height, 
+            self.adjW, self.adjH
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GIdle", False, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 0, width, height, 
+            self.adjW, self.adjH
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GAttack", True, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 100, width, height, 
+            self.adjW, self.adjH
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GAttack", False, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 100, width, height, 
+            self.adjW, self.adjH
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GImmune", True, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 300, width, height, 
+            self.adjW, self.adjH
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GImmune", False, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 300, width, height, 
+            self.adjW, self.adjH
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GDeath", False, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 700, width, height, 
+            self.adjW, self.adjH, 10
+        )
+        self.sprites.load_spritesheets(
+            self.sizes_directory, "GDeath", True, self.images_directory, 
+            self.images, "Character_sheet", 100, 100, 700, width, height, 
+            self.adjW, self.adjH, 10
+        )
+        self.sprites.load_images(
+            True, 70, 28, "GProjectile", self.images, self.sizes_directory, 
+            self.images_directory, 0, 0
+        )
+        self.sprites.load_images(
+            False, 70, 28, "GProjectile", self.images, self.sizes_directory, 
+            self.images_directory, 0, 0
+        ) 
 
 
-        self.sprites.load_spritesheets(self.sizes_directory, "GIdle", True, self.images_directory, self.images, "Character_sheet", 100, 100, 0, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "GIdle", False, self.images_directory, self.images, "Character_sheet", 100, 100, 0, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "GAttack", True, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "GAttack", False, self.images_directory, self.images, "Character_sheet", 100, 100, 100, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "GImmune", True, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "GImmune", False, self.images_directory, self.images, "Character_sheet", 100, 100, 300, width, height, self.adjW, self.adjH)
-        self.sprites.load_spritesheets(self.sizes_directory, "GDeath", False, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, self.adjW, self.adjH, 10)
-        self.sprites.load_spritesheets(self.sizes_directory, "GDeath", True, self.images_directory, self.images, "Character_sheet", 100, 100, 700, width, height, self.adjW, self.adjH, 10)
-        self.sprites.load_images(True, 70, 28, "GProjectile", self.images, self.sizes_directory, self.images_directory, 0, 0)
-        self.sprites.load_images(False, 70, 28, "GProjectile", self.images, self.sizes_directory, self.images_directory, 0, 0) 
+    def update(self) -> None:
+        """
+        Updates the attributes of the Ganon boss. This method manages the 
+        timers, detects when the boss dies, and animates the boss.
 
+        Parameters
+        ----------
+        None
 
-    def update(self):
+        Returns
+        -------
+        None
+            This method does not return any value. It modifies the current 
+            attributes of the boss and updates the corresponding animations for 
+            movement and death.
+        """
 
         if self.atk_timer > 0:
             self.atk_timer -= 1        
@@ -492,14 +608,19 @@ class Ganon(Bosses):
             self.death_position = self.hero.rect.x
 
         if self.life <= 0 and self.rect.x - self.death_position <= 0:
-
-            self.sprites.assets(self.rect, "Death", self.actual_ganon, "L", self.fps["Death"], self.images, self.adj, "G")
+            self.sprites.assets(
+                self.rect, "Death", self.actual_ganon, "L", self.fps["Death"], 
+                self.images, self.adj, "G"
+            )
 
             if self.actual_ganon["Death"] >= len(self.images["GDeath"])/2:
                 
                 self.is_dead = True
         elif self.life <= 0 and self.rect.x - self.death_position > 0:
-            self.sprites.assets(self.rect, "Death", self.actual_ganon, "R", self.fps["Death"], self.images, self.adj, "G")
+            self.sprites.assets(
+                self.rect, "Death", self.actual_ganon, "R", self.fps["Death"], 
+                self.images, self.adj, "G"
+            )
 
             if self.actual_ganon["Death"] >= len(self.images["GDeath"]):
                 self.is_dead = True
@@ -508,33 +629,73 @@ class Ganon(Bosses):
             self.attack()
             self.move()
         return super().update()
-    
-    def draw(self, screen, camera):
-        super().draw(screen, camera)
 
-        self.sprites.draw(screen)
+    def attack(self) -> None:
+        """
+        Handles Ganon's attack mechanics. When the `atk_timer` reaches zero and 
+        the distance between Ganon and the Player exceeds 200 units, Ganon 
+        launches multiple projectiles in the direction of the Player. The attack 
+        animation and projectile creation are managed within this method.
 
-        for projectile in self.projectiles:
-            projectile.draw(screen, camera)
+        After executing the attack, the attack timer (`atk_timer`) is reset to 
+        control the cooldown.
 
-            self.shot.draw(screen)
+        Parameters
+        ----------
+        None
 
-
-    def attack(self):
+        Returns
+        -------
+        None
+            This method does not return any value. It modifies 
+            `self.projectiles` by adding new instances of `Projectile` and 
+            updates the attack timer.
+        """
         if self.atk_timer <= self.atk_long and self.distance(self.hero) > 200:
 
             if self.hero.rect.x - self.rect.x <= 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_ganon, "L", self.fps["Attack"], self.images, self.adj, "G")
+                self.sprites.assets(
+                    self.rect, "Attack", self.actual_ganon, "L", 
+                    self.fps["Attack"], self.images, self.adj, "G"
+                )
                 if self.atk_timer <= 0:
                     self.actual_ganon["Attack"] = 0
                     self.new_projectiles = [
-                                Projectile(self.rect.left -50, self.rect.centery + 47, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
-                                Projectile(self.rect.left -31, self.rect.centery + 8, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
-                                Projectile(self.rect.left -42, self.rect.centery - 54, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
-                                Projectile(self.rect.left + 5, self.rect.centery  - 113, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
-                                Projectile(self.rect.left - 37, self.rect.centery - 150, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
-                                Projectile(self.rect.left - 33, self.rect.centery  - 212, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),                    
-                                Projectile(self.rect.left - 50, self.rect.centery - 257, -10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][1]),
+                                Projectile(
+                                    self.rect.left -50, self.rect.centery + 47,
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),
+                                Projectile(
+                                    self.rect.left -31, self.rect.centery + 8,
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),
+                                Projectile(
+                                    self.rect.left -42, self.rect.centery - 54, 
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),
+                                Projectile(
+                                    self.rect.left + 5, self.rect.centery - 113,
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),
+                                Projectile(
+                                    self.rect.left - 37, self.rect.centery -150,
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),
+                                Projectile(
+                                    self.rect.left - 33, self.rect.centery -212,
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),                    
+                                Projectile(
+                                    self.rect.left - 50, self.rect.centery -257,
+                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    self.images["GProjectile"][1]
+                                ),
                     ]
 
                     for projectile in self.new_projectiles:
@@ -542,138 +703,241 @@ class Ganon(Bosses):
                     self.atk_timer = self.atk_cooldown + self.atk_long 
 
             if self.hero.rect.x - self.rect.x  > 0:
-                self.sprites.assets(self.rect, "Attack", self.actual_ganon, "R", self.fps["Attack"], self.images, self.adj, "G")
+                self.sprites.assets(
+                    self.rect, "Attack", self.actual_ganon, "R", 
+                    self.fps["Attack"], self.images, self.adj, "G"
+                )
 
                 if self.atk_timer <= 0:
                     self.actual_ganon["Attack"] = 0
                     self.new_projectiles = [
-                        Projectile(self.rect.right +50, self.rect.centery + 47, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
-                        Projectile(self.rect.right +31, self.rect.centery + 8, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
-                        Projectile(self.rect.right +42, self.rect.centery - 54, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
-                        Projectile(self.rect.right - 5, self.rect.centery  - 113, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
-                        Projectile(self.rect.right + 37, self.rect.centery - 150, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
-                        Projectile(self.rect.right + 33, self.rect.centery  - 212, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),                    
-                        Projectile(self.rect.right + 50, self.rect.centery - 257, 10, 0, self.TAG, 20, 35*2, 14*2, self.images["GProjectile"][0]),
+                        Projectile(
+                            self.rect.right +50, self.rect.centery + 47, 10, 0, 
+                            self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),
+                        Projectile(
+                            self.rect.right +31, self.rect.centery + 8, 10, 0, 
+                            self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),
+                        Projectile(
+                            self.rect.right +42, self.rect.centery - 54, 10, 0, 
+                            self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),
+                        Projectile(
+                            self.rect.right - 5, self.rect.centery  - 113, 10, 
+                            0, self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),
+                        Projectile(
+                            self.rect.right + 37, self.rect.centery - 150, 10, 
+                            0, self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),
+                        Projectile(
+                            self.rect.right + 33, self.rect.centery  - 212, 10, 
+                            0, self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),                    
+                        Projectile(
+                            self.rect.right + 50, self.rect.centery - 257, 10, 
+                            0, self.TAG, 20, 35*2, 14*2, 
+                            self.images["GProjectile"][0]
+                        ),
                     ]
                     for projectile in self.new_projectiles:
                         self.projectiles.append(projectile)
                     self.atk_timer = self.atk_cooldown + self.atk_long
 
-    def distance(self, other):
+    def distance(self, other) -> float:
+        """
+        Calcuates the Euclidean distance between boss and another object.
+
+        Parameters
+        ----------
+        other: 
+            Object to be calcute the distance. Must have a `rect` attribute with
+            `centerx` and `centery` properties.
+
+        Return
+        float
+            Euclidean distance between Ganon and other.
+
+        """
+
         delta_x = self.rect.centerx - other.rect.centerx
         delta_y = self.rect.centery - other.rect.centery
 
         distance = math.sqrt(math.pow(delta_x, 2) + math.pow(delta_y, 2))
         return distance
 
-    def move(self):
+    def move(self) -> None:
+        """
+        Manages Ganon's movement and teleportation mechanics based on the 
+        distance from the Player. If Ganon is far from the Player and not 
+        attacking, he remains idle. When the Player is close, Ganon activates 
+        his "Immune" animation and teleports to the opposite side of the screen.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+            This method does not return any value. It updates Ganon's position, 
+            animation state, and teleport cooldown.
+        """
 
         if self.distance(self.hero) > 200 and self.atk_timer > self.atk_long:
             self.immune = False
             self.teleport_cooldown = self.teleport
             if self.hero.rect.centerx - self.rect.centerx < 0:
                 self.actual_ganon["Immune"] = 0 
-                self.sprites.assets(self.rect, "Idle", self.actual_ganon, "L", self.fps["Idle"], self.images, self.adj, "G")
+                self.sprites.assets(
+                    self.rect, "Idle", self.actual_ganon, "L", 
+                    self.fps["Idle"], self.images, self.adj, "G"
+                )
 
             elif self.hero.rect.centerx - self.rect.centerx > 0:
                 self.actual_ganon["Immune"] = 8
-                self.sprites.assets(self.rect, "Idle", self.actual_ganon, "R", self.fps["Idle"], self.images, self.adj, "G")
+                self.sprites.assets(
+                    self.rect, "Idle", self.actual_ganon, "R", 
+                    self.fps["Idle"], self.images, self.adj, "G"
+                )
 
         if self.distance(self.hero) <= 200:
             self.immune = True
             if self.teleport_cooldown > 0:
                 self.teleport_cooldown -= 1
-                if self.hero.rect.centerx - self.rect.centerx < 0 and self.actual_ganon["Immune"] < 8:
-                    self.sprites.assets(self.rect, "Immune", self.actual_ganon, "L", self.fps["Immune"], self.images, self.adj, "G")
+                if (
+                    self.hero.rect.centerx - self.rect.centerx < 0 and 
+                    self.actual_ganon["Immune"] < 8
+                ):
+                    self.sprites.assets(
+                        self.rect, "Immune", self.actual_ganon, "L", 
+                        self.fps["Immune"], self.images, self.adj, "G"
+                    )
 
-                if self.hero.rect.centerx - self.rect.centerx > 0 and self.actual_ganon["Immune"] < 16 and self.actual_ganon["Immune"] >= 8:
-
-                    self.sprites.assets(self.rect, "Immune", self.actual_ganon, "R", self.fps["Immune"], self.images, self.adj, "G")
+                if (
+                    self.hero.rect.centerx - self.rect.centerx > 0 and 
+                    self.actual_ganon["Immune"] < 16 and 
+                    self.actual_ganon["Immune"] >= 8
+                ):
+                    self.sprites.assets(
+                        self.rect, "Immune", self.actual_ganon, "R", 
+                        self.fps["Immune"], self.images, self.adj, "G"
+                    )
                     
 
-
-            if self.hero.rect.centerx - self.rect.centerx < 0 and self.teleport_cooldown <= 0:
+            if (
+                self.hero.rect.centerx - self.rect.centerx < 0 and 
+                self.teleport_cooldown <= 0
+            ):
                 self.actual_ganon["Immune"] = 0
                 self.rect.x = 0.1 * self.screen_width
                 self.rect.y = 0 #retirar dps
-            elif self.hero.rect.centerx - self.rect.centerx > 0 and self.teleport_cooldown <= 0:
+            elif (
+                self.hero.rect.centerx - self.rect.centerx > 0 and 
+                self.teleport_cooldown <= 0
+            ):
                 self.actual_ganon["Immune"] = 8
                 self.rect.x = 0.9 * self.screen_width
                 self.rect.y = 0 #retirar dps
 
 class Demagorgon(Bosses):
-    """
-    A class used to represent the boss Demagorgon
 
-    ...
+    """
+    A class representing the boss character Demagorgon, inheriting from the 
+    Bosses base class. This class handles Demagorgon's attributes, animations, 
+    and attack logic within the game.
 
     Attributes
     ----------
-    says_str : str
-        a formatted string to print out what the animal says
-    name : str
-        the name of the animal
-    sound : str
-        the sound that the animal makes
-    num_legs : int
-        the number of legs the animal has (default 4)
+    sub_TAG : str
+        A unique identifier for Demagorgon.
+    speed_x : int
+        The horizontal movement speed of Demagorgon.
+    attacks : None or Attack
+        The attack object associated with Demagorgon.
+    atk_cooldown : int
+        The cooldown time (frames) between attacks.
+    atk_timer : float
+        A timer tracking attack cooldown.
+    atk_long : int
+        The duration (frames) of Demagorgon's attack animation.
+    weapon_width : int
+        The width of Demagorgon's weapon.
+    weapon_height : int
+        The height of Demagorgon's weapon.
+    weapon_damage : int
+        The damage dealt by Demagorgon's weapon.
+    damage_timer : float
+        A timer tracking invulnerability frames after attacking.
+    sprites : Sprites
+        An object responsible for handling sprite animations and image loading.
+    main_directory : str
+        The main directory path of the project.
+    assets_directory : str
+        The directory path containing asset files.
+    adjH : int
+        Height adjustment factor for sprites.
+    adjW : int
+        Width adjustment factor for sprites.
+    adj : int
+        General adjustment factor for positioning.
+    images_directory : dict[str, str]
+        Paths to different Demagorgon animation folders.
+    sizes_directory : dict[str, int]
+        Frame counts for each animation type.
+    images : dict[str, list]
+        Loaded image frames for each animation type.
+    actual_demagorgon : dict[str, float]
+        Current frame indices for each animation type.
+    fps : dict[str, float]
+        Frame rates for each animation type.
 
-    Methods
-    -------
-
-    says(sound=None)
-        Prints the animals name and what sound it makes
     """
-    def __init__(self, x, y, width, height, hero):
+    def __init__(
+            self, x: float, y: float, width: int, height: int, hero: "Player"
+    ) ->None :
         """
         Inicializes the class Demagorgon with values of atributes
 
-        Attributes
+        Parameters
         ----------
-        sub_TAG: str
-        speed_x: int
-        attacks
-        atk_cooldown: int
-        atk_timer: float
-        atk_long: int
-        weapon_width
-        weapon_height: int
-        weapon_damage: int
-        damage_timer: float
-        sprites: Sprites
-        main_directory: str
-        assets_directory: st
-        adjH: int
-        adjW: int
-        images_directory: dict[str, str]
-        sizes_directory: dict[str, int]
-        images: dict[str]
-        actual_demagorgon: dict[str, float]
-        fps: dict[str, float]
+        x: float
+            Horizontal position where the boss spawn.
+        y: float
+            Vertical position where the boss spawn.
+        width: int
+            Character's width.
+        height: int
+            Character's height.
+        hero: Player
+            Rectangle representing the hero, used for interaction.
         """
 
         super().__init__(x, y, width, height, hero)
         self.sub_TAG = "Demagorgon"
 
         #hitbox
-        self.color = (255, 255, 0)
+        # self.color = (255, 255, 0)
 
-        #movement speed
         self.speed_x = 3
 
-        #attack
         self.attacks = None
         self.atk_cooldown = 100
         self.atk_timer = self.atk_cooldown
         self.atk_long = 50
 
-        #weapon
         self.weapon_width = 130
         self.weapon_height = height
         self.weapon_damage = 100
         self.damage_timer = 0
 
-        #SPRITESV2
         self.sprites = Sprites()
         main_directory = os.path.dirname(os.path.dirname(__file__))
         assets_directory = os.path.join(main_directory, "assets")
@@ -750,7 +1014,7 @@ class Demagorgon(Bosses):
             self.images_directory, self.adjW, self.adjH
         )
 
-    def attack(self):
+    def attack(self) -> None:
         """
         Handles Demagorgon's  attack mechanics. When the `atk_timer` is less 
         than or equal to zero, it creates a rectangle that simulates the 
@@ -773,14 +1037,20 @@ class Demagorgon(Bosses):
 
         if self.atk_timer <= 0:
             if self.rect.x - self.hero.rect.x <= 0:
-                self.attacks = Attack(self.rect.right, self.rect.top, self.weapon_width, self.weapon_height, self.weapon_damage)
+                self.attacks = Attack(
+                    self.rect.right, self.rect.top, self.weapon_width, 
+                    self.weapon_height, self.weapon_damage
+                )
                 self.atk_timer = self.atk_cooldown + self.atk_long
 
             if self.rect.x - self.hero.rect.x > 0:
-                self.attacks = Attack(self.rect.left - self.weapon_width, self.rect.top, self.weapon_width, self.weapon_height, self.weapon_damage)
+                self.attacks = Attack(
+                    self.rect.left - self.weapon_width, self.rect.top, 
+                    self.weapon_width, self.weapon_height, self.weapon_damage
+                )
                 self.atk_timer = self.atk_cooldown + self.atk_long
 
-    def move(self):
+    def move(self) -> None:
         """
         Handles the Demagorgon's movement. If Demagorgon is not attacking, it 
         follows the hero.
@@ -831,8 +1101,7 @@ class Demagorgon(Bosses):
                         self.fps["Idle"], self.images, self.adj, "D"
                     )
 
-
-    def on_collision(self, other):    
+    def on_collision(self, other) -> None:    
         """
         Handles the collision of Demagorgon. If Demagorgon collides with the 
         player, it deals damage to the player once every `self.damage_timer`. 
@@ -856,12 +1125,12 @@ class Demagorgon(Bosses):
 
         if other.TAG == "Player":
             if self.attacks != None:
-                if self.attacks.rect.colliderect(other) and self.damage_timer == 0:
+                if (self.attacks.rect.colliderect(other) and 
+                    self.damage_timer == 0):
                         other.life -= self.attacks.damage
                         self.damage_timer = self.atk_timer
-
     
-    def update(self):
+    def update(self) -> None:
         """
         Updates the attributes of the Demagorgon boss. This method manages the 
         timers, detects when the boss dies, and animates the boss and its 
