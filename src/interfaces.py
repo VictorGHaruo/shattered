@@ -1,5 +1,6 @@
 import pygame, random, os, sys
 from game import GameManager
+# import time
 
 def f_reset_game(main):
     del main.states["game"]
@@ -51,12 +52,17 @@ class Menu():
             os.path.join(main.assets_path, "Interfaces", "start0.png"), 
             os.path.join(main.assets_path, "Interfaces", "start1.png")
         ]
+        tutorial_images = [
+            os.path.join(main.assets_path, "Interfaces", "tutorial0.png"),
+            os.path.join(main.assets_path, "Interfaces", "tutorial1.png")
+        ]
         quit_images = [
             os.path.join(main.assets_path, "Interfaces", "quit0.png"),
             os.path.join(main.assets_path, "Interfaces", "quit1.png")
         ]
         
         self.b_start = Button(555, 300, 290, 120, start_images)
+        self.b_tutorial = Button(555, 425, 290, 120, tutorial_images)
         self.b_exit = Button(555, 550, 290, 120, quit_images)
         
         #Image
@@ -80,10 +86,14 @@ class Menu():
     def draw(self, screen: pygame.Surface):
         screen.blit(self.image_menu, (0,0))
         self.b_start.draw(screen)
+        self.b_tutorial.draw(screen)
         self.b_exit.draw(screen)
         
     def on_event(self, event, main):
         self.b_start.change_state(event, main, "game", True)
+        
+        self.b_tutorial.change_state(event, main, "tutorial", False)
+        
         self.b_exit.exit(event, main)
         
         if event.type == pygame.KEYDOWN:
@@ -189,3 +199,55 @@ class Game_Over():
                 f_reset_game(main)
                 main.change_state("menu", True)
                 
+class Tutorial():
+    
+    def __init__(self, main):
+        
+        self.main = main
+        self.timer = 100
+        self.idx_image = 0
+        
+        dimention_screen = main.screen.get_size()
+        images_path = [
+        os.path.join(main.assets_path, "Interfaces", "Controls.png"),
+        os.path.join(main.assets_path, "Interfaces", "August.png"),
+        os.path.join(main.assets_path, "Interfaces", "Stella.png"),
+        os.path.join(main.assets_path, "Interfaces", "Erik.png"),   
+        ]
+        self.images = []
+        for i in range(4):
+            image = pygame.image.load(images_path[i]).convert_alpha()
+            self.images.append(pygame.transform.scale(image, dimention_screen))
+            
+    def music(self, main, volume):
+        pass
+    
+    def draw(self, screen):
+        self.timer += 1
+        if self.timer >= 100 and self.idx_image < 4:
+            self.timer = 0
+            screen.blit(self.images[self.idx_image], (0,0))
+            self.idx_image += 1
+        if self.timer >= 100 and self.idx_image >= 4:
+            self.main.change_state("menu", False)
+            self.timer = 100
+            self.idx_image = 0
+            
+    
+    def on_event(self, event, main):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                if self.idx_image > 1:
+                    self.timer = 100
+                    self.idx_image -= 2
+            
+            if event.key == pygame.K_RIGHT:
+                if self.idx_image < 5:
+                    self.timer = 100
+                                
+            if event.key == pygame.K_q:
+                main.change_state("menu", False)
+                self.timer = 100
+                self.idx_image = 0
+                
+            

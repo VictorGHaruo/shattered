@@ -1,7 +1,7 @@
 import pygame
 import os
 import sys
-from interfaces import Menu, Game_Over, Pause
+from interfaces import Menu, Game_Over, Pause, Tutorial
 from game import GameManager
 import random
 
@@ -69,6 +69,7 @@ class Main:
             "game": GameManager(self),
             "pause": Pause(self),
             "over": Game_Over(self),
+            "tutorial": Tutorial(self)
         }
         self.current_state = self.states["menu"]
         self.is_changed = False

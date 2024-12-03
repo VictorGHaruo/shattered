@@ -15,7 +15,7 @@ class GameManager:
     ----------
     heros : list
         List of hero characters available for selection.
-    atual_hero : int
+    actual_hero : int
         Index of the currently active hero.
     hero : object
         The currently active hero instance.
@@ -85,8 +85,8 @@ class GameManager:
             Yokai(0, 0, 40, 70),
             Ninja(0, 0, 40, 70),
         ]
-        self.atual_hero = 0
-        self.hero = self.heros[self.atual_hero]
+        self.actual_hero = 0
+        self.hero = self.heros[self.actual_hero]
         self.camera = Camera(main.WIDTH)
         self.grounds = []
         self.enemies = []
@@ -371,19 +371,19 @@ class GameManager:
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
             change = False
             if event.key == pygame.K_z:
-                self.atual_hero = 0
+                self.actual_hero = 0
                 change = True
             if event.key == pygame.K_x:
-                self.atual_hero = 1
+                self.actual_hero = 1
                 change = True
             if event.key == pygame.K_c:
-                self.atual_hero = 2
+                self.actual_hero = 2
                 change = True
 
             if change:
                 state_dict = self.hero.__dict__
 
-                self.hero = self.heros[self.atual_hero]
+                self.hero = self.heros[self.actual_hero]
 
                 for key in self.keys_trade:
                     self.hero.__dict__[key] = state_dict[key]
