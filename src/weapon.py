@@ -300,8 +300,4 @@ class Attack:
         """
         self.TAG = "Attack"
         self.rect = pygame.Rect(x, y, width, height)
-        self.damage = damage
-
-
-
-                        
+        self.damage = damage    
