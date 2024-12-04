@@ -316,7 +316,7 @@ class GameManager:
 
         for boss in self.bosses:
             if boss.is_dead:
-                self.hero.points += 10
+                self.hero.points += 30
                 self.bosses.remove(boss)
                 self.bosses_life.pop(0)
                 del boss
