@@ -54,23 +54,23 @@ class GameManager:
 
     Methods
     -------
-    music(main, volume)
+    music(main, volume) -> None
         Manages music playback based on game state.
-    on_event(event, main)
+    on_event(event, main) -> None
         Handles events during gameplay.
-    on_key_pressed()
+    on_key_pressed() -> None
         Handles continuous key presses.
-    update()
+    update() -> None
         Updates all game elements, including enemies, bosses, 
         and camera.
-    collision_decetion()
+    collision_decetion() -> None
         Detects and handles collisions between game entities.
-    elimination(change_state)
+    elimination(change_state) -> None
         Removes defeated enemies or bosses, and transitions state 
         if the hero dies.
-    draw(screen)
+    draw(screen) -> None
         Draws all game elements to the screen.
-    trade(event)
+    trade(event) -> None
         Switches between available heroes.
     """
 
@@ -126,7 +126,7 @@ class GameManager:
         
         self.score_text = Score(
             "Score", 0, 1150, 10, 250, 70, 40, 
-            transparece= 100, font_stile="Lumios Typewriter New"
+            transparece= 100, font_stile="Lumios Typewriter New.otf"
         )
         
         #BackGround image

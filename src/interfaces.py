@@ -38,17 +38,17 @@ class Button:
 
     Methods
     -------
-    draw(screen):
+    draw(screen) -> None
         Draws the button on the screen, changing its appearance based 
         on mouse hover.
 
-    change_state(event, main, state, music_bool):
+    change_state(event, main, state, music_bool) -> None
         Changes the game state when the button is clicked.
 
-    reset_game(event, main):
+    reset_game(event, main) -> None
         Resets the game when the button is clicked.
 
-    exit(event, main):
+    exit(event, main) -> None
         Exits the game when the button is clicked.
     """
     def __init__(
@@ -193,13 +193,13 @@ class Menu:
 
     Methods
     -------
-    music(main, volume):
+    music(main, volume) -> None
         Plays a random music track when the menu is displayed.
 
-    draw(screen):
+    draw(screen) -> None
         Draws the menu screen and the buttons.
 
-    on_event(event, main):
+    on_event(event, main) -> None
         Handles user input (clicking buttons and pressing keys).
     """
     def __init__(self, main: object) -> None:
@@ -329,13 +329,13 @@ class Pause:
 
     Methods
     -------
-    music(main, volume):
+    music(main, volume) -> None
         Placeholder method for playing music in the pause menu.
 
-    draw(screen):
+    draw(screen) -> None
         Draws the pause screen and the buttons.
 
-    on_event(event, main):
+    on_event(event, main) -> None
         Handles user input for resuming, restarting, or quitting
         the game.
     """
@@ -370,13 +370,15 @@ class Pause:
         
         self.score_text = Score(
             "Score", 0, 530, 220, 340, 70, 55, 
-            transparece= 100, font_stile="Lumios Typewriter New"
+            transparece= 100, font_stile="Lumios Typewriter New.otf"
         )
         
         dimention_screen = main.screen.get_size()
         image_path = os.path.join(main.assets_path, "Interfaces", "Pause.png")
         image_pause = pygame.image.load(image_path).convert_alpha()
-        self.image_pause = pygame.transform.scale(image_pause, dimention_screen)
+        self.image_pause = pygame.transform.scale(
+            image_pause, dimention_screen
+        )
 
     def music(self, main: object, volume: float) -> None:
         """
@@ -469,13 +471,13 @@ class Game_Over:
 
     Methods
     -------
-    music(main, volume):
+    music(main, volume) -> None
         Plays a random game over music track.
 
-    draw(screen):
+    draw(screen) -> None
         Draws the game over screen and its buttons.
 
-    on_event(event, main):
+    on_event(event, main) -> None
         Handles user input for restarting or quitting the game.
     """
     def __init__(self, main: object) -> None:
@@ -495,16 +497,21 @@ class Game_Over:
             os.path.join(main.assets_path, "Interfaces", "restart0.png"),
             os.path.join(main.assets_path, "Interfaces", "restart1.png")
         ]
+        tutorial_images = [
+            os.path.join(main.assets_path, "Interfaces", "tutorial0.png"),
+            os.path.join(main.assets_path, "Interfaces", "tutorial1.png")
+        ]
         quit_images = [
             os.path.join(main.assets_path, "Interfaces", "quit0.png"),
             os.path.join(main.assets_path, "Interfaces", "quit1.png")
         ]
         self.b_restart = Button(555, 310, 290, 120, restart_images)
-        self.b_quit = Button(555, 480, 290, 120, quit_images)
+        self.b_tutorial = Button(555, 435, 290, 120, tutorial_images)
+        self.b_quit = Button(555, 560, 290, 120, quit_images)
         
         self.score_text = Score(
             "Score", 0, 530, 25, 340, 70, 60, 
-            transparece= 100, font_stile="Lumios Typewriter New"
+            transparece= 100, font_stile="Lumios Typewriter New.otf"
         )
         
         dimention_screen = main.screen.get_size()
@@ -558,6 +565,7 @@ class Game_Over:
         self.score_text.draw(screen)
         
         self.b_restart.draw(screen)
+        self.b_tutorial.draw(screen)
         self.b_quit.draw(screen)
 
     def on_event(self, event: pygame.event.Event, main: object) -> None:
@@ -577,6 +585,9 @@ class Game_Over:
         """
         self.b_restart.reset_game(event, main)
         
+        self.b_tutorial.reset_game(event, main)
+        self.b_tutorial.change_state(event, main, "tutorial", True)
+        
         self.b_quit.reset_game(event, main)
         self.b_quit.change_state(event, main, "menu", True)
         
@@ -589,7 +600,8 @@ class Game_Over:
 
 class Tutorial:
     """
-    Displays the tutorial screen with images explaining the controls and characters.
+    Displays the tutorial screen with images explaining the controls
+    and characters.
 
     Attributes
     ----------
@@ -598,7 +610,8 @@ class Tutorial:
     duration: int
         Transition time.
     timer : int
-        A timer used to control the image transitions during the tutorial.
+        A timer used to control the image transitions during
+        the tutorial.
     idx_image : int
         The index of the current tutorial image.
     images : list of pygame.Surface
@@ -606,24 +619,26 @@ class Tutorial:
     
     Methods
     -------
-    music(main, volume):
+    music(main, volume) -> None
         Placeholder method for playing music in the tutorial.
 
-    draw(screen):
+    draw(screen) -> None
         Draws the game over screen and its buttons.
 
-    on_event(event, main):
+    on_event(event, main) -> None
         Handles user input for restarting or quitting the game.
     """
     
     def __init__(self, main: object) -> None:
         """
-        Initializes the tutorial with a timer, index for image display, and loading tutorial images.
+        Initializes the tutorial with a timer, index for image display,
+        and loading tutorial images.
         
         Parameters
         ----------
         main : object
-            The main game instance, used to access global settings and assets.
+            The main game instance, used to access global settings
+            and assets.
         
         Returns
         -------
@@ -648,8 +663,7 @@ class Tutorial:
 
     def music(self, main: object, volume: float) -> None:
         """
-        Placeholder method for playing music in the tutorial. 
-        Currently does nothing.
+        Plays the music of Menu screen.
 
         Parameters
         ----------
@@ -662,7 +676,17 @@ class Tutorial:
         -------
         None
         """
-        pass
+        if main.is_changed:
+            music_dir_path = os.path.join(main.assets_path, "Music")
+            
+            music_num = random.randint(1, 4)
+            music_path = os.path.join(
+                music_dir_path, "Menu", f"M{music_num}.mp3"
+            )
+            pygame.mixer.music.load(music_path)
+            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.play(-1)  
+        main.is_changed = False
     
     def draw(self, screen: pygame.Surface) -> None:
         """
@@ -723,15 +747,7 @@ class Win:
     """
     Handles the win screen, where the player can either restart
     the game or quit to the main menu.
-
-    Parameters
-    ----------
-    main : object
-        The main game instance, used to access global settings
-        and assets.
-    score_text : Score
-        Used to show the score in the win screen.
-
+    
     Attributes
     ----------
     b_again : Button
@@ -740,6 +756,16 @@ class Win:
         A button to quit to the main menu.
     image_win : pygame.Surface
         The background image displayed on the win screen.
+        
+    Methods
+    -------
+    music(main, volume) -> None
+        Plays random background music for the win screen.
+    draw(screen) -> None
+        Draws the win screen background and buttons on the screen.
+    on_event(event, main)
+        Handles events for the win screen, including button interactions
+        and keyboard input.
     """
 
     def __init__(self, main: object) -> None:
@@ -773,7 +799,7 @@ class Win:
         
         self.score_text = Score(
             "Final Score", 0, 515, 240, 370, 70, 55, 
-            transparece= 100, font_stile="Lumios Typewriter New"
+            transparece= 100, font_stile="Lumios Typewriter New.otf"
         )
         
         dimention_screen = main.screen.get_size()

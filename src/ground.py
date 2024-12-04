@@ -18,11 +18,11 @@ class Ground:
         
     Methods
     -------
-    draw(screen, camera)
+    draw(screen, camera) -> None
         Draws the object in the screen
-    update()
+    update() -> None
         Updates posicion in the interactive type
-    on_collision(other)
+    on_collision(other) -> None
         Detects and handles collisions between ground and ohter objects.
     """
 
@@ -138,11 +138,11 @@ class Block(Ground):
     
     Methods
     -------
-    draw(screen, camera)
+    draw(screen, camera) -> None
         Draws the object in the screen
-    update()
+    update() -> None
         Updates posicion in the interactive type
-    on_collision(other)
+    on_collision(other) -> None
         Detects and handles collisions between ground and ohter objects.
     """
 
@@ -314,7 +314,7 @@ class Invisible(Ground):
 
     Methods
     -------
-    draw(screen, camera)
+    draw(screen, camera) -> None
         Updates the coordinate of ground.
     """
     
@@ -395,11 +395,11 @@ class Obelisk:
         
     Methods
     -------
-    draw(screen, camera)
+    draw(screen, camera) -> None
         Draws the object in the screen
-    on_collision(other)
+    on_collision(other) -> None
         Placeholder to handles collision with other objects.
-    update()
+    update() -> None
         Placeholder to updates the obelisk object.
     """
     

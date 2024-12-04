@@ -21,7 +21,7 @@ class Camera:
         
     Methods
     -------
-    update_coods(hero, main)
+    update_coods(hero, main) -> None
         Updates the coordinate of the attributes.
     """
     
