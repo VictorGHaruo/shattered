@@ -10,7 +10,84 @@ from src.assets import Sprites
 from src.weapon import Projectile
 
 class Monsters:
-    def __init__(self, x, y, width, height, hero):
+    """
+    Represents a monster character in the game with attributes for 
+    movement, health, and interactions with the hero.
+
+    Attributes
+    ----------
+    TAG : str
+        A general tag identifying the object as a "Monster".
+    sub_TAG : str
+        A more specific tag, also set to "Monster" by default.
+    rect : pygame.Rect
+        The rectangular area representing the monster's position and 
+        size.
+    gravity : int
+        The gravity force applied to the monster's vertical movement.
+    speed_y : int
+        The current vertical speed of the monster.
+    speed_y_max : int
+        The maximum vertical speed of the monster.
+    speed_x : int
+        The horizontal speed of the monster.
+    life : int
+        The monster's health points.
+    hero : object
+        A reference to the hero object, used for interactions.
+    immune : bool
+        Indicates whether the monster is currently immune to damage.
+    to_right : bool
+        Indicates whether the monster is moving or facing to the right 
+        (default is True).
+    to_left : bool
+        Indicates whether the monster is moving or facing to the left 
+        (default is False).
+    is_dead : bool
+        Indicates whether the monster is dead.
+    is_attacking : bool
+        Indicates whether the monster is currently attacking.
+    projectiles : list
+        A list of projectiles associated with the monster.
+
+    Methods
+    -------
+    update() -> None
+        Update monsters attributes.
+    new_hero(hero) -> None
+        Update the position and the hero himself.
+    draw(screen, camera) -> None
+        Draws the monster and its projectiles on the screen.
+    on_collision(other) -> None
+        Handles collision detection and response for the monster.
+
+    Notes
+    -----
+    This class manages the monster's state and interactions with the 
+    game environment, including movement, health, and attacking logic.
+    """
+
+    def __init__(
+        self, x : float, y : float, width : int, height : int, 
+        hero : object
+    ) -> None:
+        """
+        Initializes the class Monsters with values of atributes
+
+        Parameters
+        ----------
+        x : float
+            The x-coordinate of the monster's position.
+        y : float
+            The y-coordinate of the monster's position.
+        width : int
+            The width of the monster's bounding rectangle.
+        height : int
+            The height of the monster's bounding rectangle.
+        hero : object
+            The hero object for interactions and logic involving the 
+            player character.
+        """
         self.TAG = "Monster"
         self.sub_TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
@@ -28,17 +105,59 @@ class Monsters:
         self.is_attacking = False
         self.projectiles = []
 
-    def move(self):
+    def move(self) -> None:
         pass
 
-    def update(self):
+    def update(self) -> None:
+        """
+        Updates the monster's vertical position by applying gravity and 
+        limiting the fall speed.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         self.speed_y += self.gravity
         self.rect.y += min(self.speed_y, self.speed_y_max)
     
-    def new_hero(self, hero):
+    def new_hero(self, hero : object) -> None:
+        """
+        Updates the reference to the hero object.
+
+        Parameters
+        ----------
+        hero : object
+            The new hero object to be associated with the monster.
+
+        Returns
+        -------
+        None
+        """
         self.hero = hero
         
-    def draw (self, screen: pygame.Surface, camera):
+    def draw (self, screen: pygame.Surface, camera : object) -> None:
+        """
+        Draws the monster and its projectiles on the screen, adjusting 
+        for the camera's position.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The surface where the monster and its projectiles will be 
+            drawn.
+        camera : object
+            The camera object, used to adjust the monster's position 
+            based on its `position_x` attribute.
+
+        Returns
+        -------
+        None
+        """
+
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
         for projectile in self.projectiles:
@@ -47,7 +166,35 @@ class Monsters:
                 self.projectiles.remove(projectile)
                 del projectile
                         
-    def on_collision(self, other):  
+    def on_collision(self, other : object) -> None:  
+        """
+        Handles collision detection and response for the monster, 
+        including interactions with the ground, projectiles, and the 
+        player.
+
+        Parameters
+        ----------
+        other : object
+            The object that the monster is colliding with. This can be 
+            a "Ground", "Projectile", or "Player".
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        - If the collision is with a "Ground" object and the monster is 
+        falling, its vertical position (`rect.bottom`) is adjusted to 
+        land on top of the ground.
+        - If the collision is with a "Projectile", the monster's 
+        health (`life`) is reduced by the damage of the projectile.
+        - If a projectile collides with the "Ground", it is removed 
+        from the monster's projectiles list.
+        - If a projectile collides with the "Player", the player's 
+        health (`life`) is reduced by the projectile's damage, and the 
+        projectile is removed from the monster's projectiles list.
+        """
 
         if (other.TAG == "Ground" and self.rect.colliderect(other) and 
             self.rect.bottom > other.rect.top and 
@@ -71,7 +218,85 @@ class Monsters:
                     del projectile
 
 class Dummy(Monsters):
-    def __init__(self, x, y, width, height, hero):
+    """
+    Represents a dummy monster character with specific attributes for 
+    movement, animation, and behavior.
+
+    Attributes
+    ----------
+    speed_x : int
+        The horizontal speed of the dummy.
+    init_x : int
+        The initial x-coordinate of the dummy's position.
+    range : int
+        The range within which the dummy can move horizontally.
+    sprites : Sprites
+        The `Sprites` object that manages the dummy's animations and 
+        sprite loading.
+    adjW : int
+        The horizontal adjustment for the dummy's sprite positioning.
+    adjH : int
+        The vertical adjustment for the dummy's sprite positioning.
+    adj : int
+        An additional adjustment for sprite positioning (default is 0).
+    images_directory : dict
+        A dictionary containing the paths to the sprite sheets for 
+        different actions.
+    sizes_directory : dict
+        A dictionary specifying the number of frames for each animation 
+        type.
+    images : dict
+        A dictionary that stores the loaded sprite images for the 
+        dummy's different actions.
+    actual_dummy : dict
+        A dictionary tracking the current frame of the dummy's 
+        animations.
+    fps : dict
+        A dictionary specifying the frame rate for the dummy's 
+        animations (walking and death).
+
+    Methods
+    -------
+    on_collision(other) -> None
+        Handles collision detection and response for the dummy monster.
+    update() -> None
+        Updates the dummy's state.
+    move() -> None
+        Handles the mechanic of movement of dummy monster.
+    draw(screen, camera) -> None
+        Draws the dummy and its associated sprites on the screen
+    
+    Notes
+    -----
+    - The `Dummy` class inherits from `Monsters` and specializes the 
+    monster with specific animations for walking and dying.
+    - The `sprites.load_spritesheets` method is used to load sprite 
+    sheets for both walking and death animations, 
+      adjusting for both left and right directions.
+    - The dummy is designed to move horizontally within a specified 
+    range (`range`), and its position is updated using the `speed_x` 
+    attribute.
+    """
+
+    def __init__(
+        self, x : float, y : float, width : int, height : int, 
+        hero : object
+    ) -> None:
+        """
+        Parameters
+        ----------
+        x : float
+            The x-coordinate of the dummy's position.
+        y : float
+            The y-coordinate of the dummy's position.
+        width : int
+            The width of the dummy's bounding rectangle.
+        height : int
+            The height of the dummy's bounding rectangle.
+        hero : object
+            The hero object, used for interactions and logic involving 
+            the player character.
+        """
         super().__init__(x, y, width, height, hero)
         self.speed_x = 3
         self.init_x = x
@@ -123,7 +348,38 @@ class Dummy(Monsters):
             self.adjH
         )
 
-    def on_collision(self, other):
+    def on_collision(self, other : object) -> None:
+        """
+        Handles collision detection and response for the dummy monster, 
+        including direction reversal when the monster reaches its 
+        movement range.
+
+        Parameters
+        ----------
+        other : object
+            The object that the dummy is colliding with. This can be 
+            any object in the game world.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        - This method calls the `on_collision` method from the parent 
+        `Monsters` class to handle basic collision logic.
+        - If the dummy collides with a boundary (based on its movement 
+        range, `range`), its horizontal direction is reversed:
+        - If the dummy is moving right (`to_right`) and exceeds 
+        its initial position (`init_x + range`), it will reverse 
+        direction and start moving left (`to_left`).
+        - If the dummy is moving left (`to_left`) and goes beyond its 
+        initial position (`init_x - range`), it will reverse 
+        direction and start moving right (`to_right`).
+        - The `speed_x` is multiplied by `-1` to change the direction 
+        of the dummy's movement.
+        """
+
         super().on_collision(other)
         
         if self.rect.x > self.init_x + self.range and self.to_right:
@@ -135,7 +391,20 @@ class Dummy(Monsters):
             self.to_left = False
             self.to_right = True
 
-    def update(self):
+    def update(self) -> None:
+        """
+        Updates the dummy's state, including handling death animation 
+        and movement.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         
         if self.life <= 0:
             if self.to_right:
@@ -157,7 +426,21 @@ class Dummy(Monsters):
             
         return super().update()
         
-    def move(self):
+    def move(self) -> None:
+        """
+        Moves the dummy horizontally and updates its walking animation 
+        based on its current direction.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        """ 
+
         self.rect.x = self.rect.x + self.speed_x
         if self.to_right:
             self.sprites.assets(
@@ -170,7 +453,20 @@ class Dummy(Monsters):
                 self.images, self.adj, "D"
             )
             
-    def draw(self, screen: pygame.Surface, camera):
+    def draw(self, screen: pygame.Surface, camera : object) -> None:
+        """
+        Draws the dummy and its associated sprites on the screen, 
+        adjusting for the camera's position.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The surface where the dummy and its sprites will be drawn.
+        camera : object
+            The camera object, used to adjust the dummy's position based on the camera's `position_x` and `fix_x`.
+
+        """
+
         super().draw(screen, camera)
         if camera.TAG == "Camera":
             self.init_x -= camera.position_x

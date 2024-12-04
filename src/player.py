@@ -115,6 +115,7 @@ class Player:
         
     def update(self):
         ##Updating Y:
+
         if self.life <= 0 or self.rect.y > 1000:
             self.action = "Death"
             self.speed_x = 0
