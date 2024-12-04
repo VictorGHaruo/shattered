@@ -767,13 +767,13 @@ class Flying(Monsters):
         Parameters
         ----------
         x : float
-            Initial x-coordinate of the mage.
+            Initial x-coordinate of the flying.
         y : float
-            Initial y-coordinate of the mage.
+            Initial y-coordinate of the flying.
         width : int
-            Width of the mage's bounding box.
+            Width of the flying's bounding box.
         height : int
-            Height of the mage's bounding box.
+            Height of the flying's bounding box.
         hero : object
             Reference to the hero object for interaction.
         """
