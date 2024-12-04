@@ -12,6 +12,8 @@ from src.enemy import Mage, Flying, Dummy
 from src.weapon import Projectile, Shield, Attack
 from src.ground import Ground
 
+#auxiliary function used to simulate that certain keys have been pressed
+
 def create_key_mock(pressed_keys):
     def mocked_get_pressed(): 
         tmp = [0] * 300
@@ -21,13 +23,18 @@ def create_key_mock(pressed_keys):
     return mocked_get_pressed 
 
 class TestPlayerFall(unittest.TestCase):
+
+    #we started an environment to do the tests
+
     def setUp(self): 
         self.player = Player(0, 0, 50, 50)  
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         path_game = os.path.abspath(path_game)
         ground_path = os.path.join(path_game, os.pardir, "assets", "Ground")
         image_path = os.path.join(ground_path, "Ground_01.png")
-        self.ground = Ground(0, 100, 1000, 20, image_path) 
+        self.ground = Ground(0, 100, 1000, 20, image_path)
+
+    #testing whether the player has y speed and collides with the ground
 
     def test_player_ground_collision(self):
 
@@ -40,6 +47,7 @@ class TestPlayerFall(unittest.TestCase):
         self.assertTrue(self.player.on_ground)
 
 class TestPlayerMovement(unittest.TestCase):
+
     def setUp(self):
         self.players = [
             Knight(100, 0, 40, 70),
@@ -48,10 +56,15 @@ class TestPlayerMovement(unittest.TestCase):
         ]
         self.actual_player = 0 
         self.player = self.players[self.actual_player]
+
+        #We start the player with true on_ground status so as not to need to do the player ground crash test
+
         self.player.on_ground = True  
         self.player.action = None  
 
     def test_move_left(self):
+
+        #we test the player's actions when the key a is pressed
  
         mock_function = create_key_mock([pygame.K_a])
         pygame.key.get_pressed = mock_function
@@ -74,6 +87,8 @@ class TestPlayerMovement(unittest.TestCase):
         self.assertEqual(self.player.rect.x, 0)
 
     def test_move_right(self):
+
+        #we test the player's actions when the key d is pressed
         
         mock_function = create_key_mock([pygame.K_d])
         pygame.key.get_pressed = mock_function
@@ -98,6 +113,8 @@ class TestPlayerMovement(unittest.TestCase):
         self.assertEqual(self.player.rect.x, 200)
 
     def test_stop_moving(self):
+
+        #we test the player's actions when no keys are pressed
       
         mock_function = create_key_mock([])
         pygame.key.get_pressed = mock_function
@@ -113,6 +130,8 @@ class TestPlayerMovement(unittest.TestCase):
 
     def test_stop_moving_after_right_and_left(self):
 
+        #we test the player's actions when the a and d keys are pressed at the same time
+
         mock_function = create_key_mock([pygame.K_d, pygame.K_a])
         pygame.key.get_pressed = mock_function
 
@@ -123,7 +142,10 @@ class TestPlayerMovement(unittest.TestCase):
         self.assertFalse(self.player.is_running)  
         self.assertIsNone(self.player.action) 
 
+    #tests what happens when the player calls the jump function in different situations
+
     def test_jump(self):
+
         self.player.jump()
         self.assertEqual(self.player.jump_count, 1)
         self.assertEqual(self.player.speed_y, -30)
@@ -182,6 +204,8 @@ class TestPlayerActions(unittest.TestCase):
         image_path = os.path.join(ground_path, "Ground_01.png")
         self.image = pygame.image.load(image_path).convert_alpha()
 
+    #tests whether the knight gains the immune stat when using the shield and whether it reflects enemy projectiles
+
     def test_protect(self):
         
         mock_function = create_key_mock([pygame.K_v])
@@ -224,6 +248,8 @@ class TestPlayerActions(unittest.TestCase):
 
         self.assertEqual(self.enemy1.life, 40)
 
+    #tests the player's attack forms (projectile for yokai and attack for ninja)
+
     def test_attack(self):
         mock_function = create_key_mock([pygame.K_v])
         pygame.key.get_pressed = mock_function
@@ -238,6 +264,7 @@ class TestPlayerActions(unittest.TestCase):
 
         self.assertEqual(self.enemy2.life, -40)
         
+#tests the player's ways of receiving damage
 
 class TestDead(unittest.TestCase):
 
@@ -272,6 +299,8 @@ class TestDead(unittest.TestCase):
         self.enemy2.update()
 
         self.assertEqual(self.player.life, 0)
+
+#tests whether the player receives the dead stats only after the death animation
 
     def test_death(self):
 
