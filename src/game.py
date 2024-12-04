@@ -7,6 +7,7 @@ sys.path.append(src_path)
 
 from src.player import Knight, Yokai, Ninja
 from src.camera import Camera
+from src.score import Score
 from src.maker import maping
 from src.boss import Balrog, Ganon, Demagorgon
 from src.assets import Herolife, Bar, Bosslife
@@ -40,6 +41,8 @@ class GameManager:
         Timer for hero switching cooldown.
     keys_trade : list
         Attributes shared among heroes when switching.
+    score_text : Score
+        Used to show the score in the game screen.
     bg_images : list
         Background images for parallax scrolling.
     bg_boss : Surface
@@ -118,8 +121,13 @@ class GameManager:
             "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
             "on_ground", "to_left", "to_right", "from_the_front",
             "invincibility_time", "projectiles", "touched_obelisk", 
-            "can_push_block",
+            "can_push_block", "points"
         ]
+        
+        self.score_text = Score(
+            "Score", 0, 1150, 10, 250, 70, 40, 
+            transparece= 100, font_stile="Lumios Typewriter New"
+        )
         
         #BackGround image
         self.bg_images = []
@@ -231,6 +239,8 @@ class GameManager:
         self.life_bar.update(self.hero)
         self.hero_timer.update(self.hero.trade_cooldown)
         self.camera.update_coods(self.hero, self.main)
+        points = self.hero.points
+        self.score_text.update(points)
 
         if len(self.bosses) == 0 and len(self.order) != 0:
             self.bosses.append(self.order[0])
@@ -299,11 +309,13 @@ class GameManager:
         """
         for monster in self.enemies:
             if monster.is_dead:
+                self.hero.points += 10
                 self.enemies.remove(monster)
                 del monster
 
         for boss in self.bosses:
             if boss.is_dead:
+                self.hero.points += 10
                 self.bosses.remove(boss)
                 self.bosses_life.pop(0)
                 del boss
@@ -366,6 +378,7 @@ class GameManager:
         self.hero.draw(screen, self.camera)
         self.life_bar.draw(screen)
         self.hero_timer.draw(screen)
+        self.score_text.draw(screen)
 
     def trade(self, event: pygame.event.Event) -> None:
         """

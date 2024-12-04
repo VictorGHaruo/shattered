@@ -18,6 +18,7 @@ class Player:
         self.max_life = 2000
         self.life = self.max_life
         self.Death = False
+        self.points = 0
         
         self.rect = pygame.Rect(x, y, width, height)
         self.rect.x = x

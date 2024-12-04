@@ -1,7 +1,6 @@
 import pygame, random, os
 from typing import List
 from game import GameManager
-from score import Score
 
 def f_reset_game(main: object):
     """
@@ -297,7 +296,7 @@ class Menu:
         -------
         None
         """
-        self.b_start.change_state(event, main, "game", True) 
+        self.b_start.change_state(event, main, "game", True)
         
         self.b_tutorial.change_state(event, main, "tutorial", False)
         
@@ -314,16 +313,12 @@ class Pause:
 
     Attributes
     ----------
-    main : Object
-        Themain game instance. 
     b_continue : Button
         Button for continuing the game.
     b_restart : Button
         Button for restarting the game.
     b_quit : Button
         Button for quitting the game.
-    score_text : Score
-        Used to show the score in pause screen.
     image_pause : pygame.Surface
         Background image of the pause screen.
 
@@ -350,8 +345,6 @@ class Pause:
             The main game instance, used to access global
             settings and assets.
         """
-        self.main = main
-        
         continue_images = [
             os.path.join(main.assets_path, "Interfaces", "continue0.png"),
             os.path.join(main.assets_path, "Interfaces", "continue1.png")
@@ -367,11 +360,6 @@ class Pause:
         self.b_continue = Button(555, 300, 290, 120, continue_images)
         self.b_restart = Button(555, 425, 290, 120, restart_images)
         self.b_quit = Button(555, 550, 290, 120, quit_images)
-        
-        self.score_text = Score(
-            "Score", 0, 530, 220, 340, 70, 55, 
-            transparece= 100, font_stile="Lumios Typewriter New"
-        )
         
         dimention_screen = main.screen.get_size()
         image_path = os.path.join(main.assets_path, "Interfaces", "Pause.png")
@@ -409,11 +397,6 @@ class Pause:
         None
         """
         screen.blit(self.image_pause, (0, 0))
-        
-        points = self.main.states["game"].hero.points
-        self.score_text.update(points)
-        self.score_text.draw(screen)
-        
         self.b_continue.draw(screen)
         self.b_restart.draw(screen)
         self.b_quit.draw(screen)
@@ -462,8 +445,6 @@ class Game_Over:
         Button for restarting the game.
     b_quit : Button
         Button for quitting the game.
-    score_text : Score
-        Used to show the score in game over screen.
     image_over : pygame.Surface
         Background image of the game over screen.
 
@@ -501,11 +482,6 @@ class Game_Over:
         ]
         self.b_restart = Button(555, 310, 290, 120, restart_images)
         self.b_quit = Button(555, 480, 290, 120, quit_images)
-        
-        self.score_text = Score(
-            "Score", 0, 530, 25, 340, 70, 60, 
-            transparece= 100, font_stile="Lumios Typewriter New"
-        )
         
         dimention_screen = main.screen.get_size()
         image_path = os.path.join(main.assets_path, "Interfaces", "Over.png")
@@ -554,8 +530,15 @@ class Game_Over:
         screen.blit(self.image_over, (0, 0))
         
         points = self.main.states["game"].hero.points
-        self.score_text.update(points)
-        self.score_text.draw(screen)
+        font = ajustar_fonte(f"Points: {points}/140", "assets/Interfaces/Lumios Typewriter New.otf", 340, 55, 50) 
+        text = font.render(f"Points: {points}/140", True, (255,255,255))
+        rect_max = pygame.rect.Rect(530, 30, 340, 55)
+        rect_surface = pygame.Surface(rect_max.size, pygame.SRCALPHA)
+        rect_surface.set_alpha(100)
+        rect_surface.fill((0,0,0))
+        rect_text = text.get_rect(center = (rect_max.center))
+        screen.blit(rect_surface, rect_max)
+        screen.blit(text, rect_text)
         
         self.b_restart.draw(screen)
         self.b_quit.draw(screen)
@@ -729,8 +712,6 @@ class Win:
     main : object
         The main game instance, used to access global settings
         and assets.
-    score_text : Score
-        Used to show the score in the win screen.
 
     Attributes
     ----------
@@ -757,8 +738,6 @@ class Win:
         -------
         None
         """
-        self.main = main
-        
         again_images = [
             os.path.join(main.assets_path, "Interfaces", "again0.png"),
             os.path.join(main.assets_path, "Interfaces", "again1.png")
@@ -770,11 +749,6 @@ class Win:
         
         self.b_again = Button(555, 350, 290, 120, again_images)
         self.b_quit = Button(555, 480, 290, 120, quit_images)
-        
-        self.score_text = Score(
-            "Final Score", 0, 515, 240, 370, 70, 55, 
-            transparece= 100, font_stile="Lumios Typewriter New"
-        )
         
         dimention_screen = main.screen.get_size()
         image_path = os.path.join(main.assets_path, "Interfaces", "Win.png")
@@ -822,11 +796,6 @@ class Win:
         None
         """
         screen.blit(self.image_win, (0, 0))
-        
-        points = self.main.states["game"].hero.points
-        self.score_text.update(points)
-        self.score_text.draw(screen)
-        
         self.b_again.draw(screen)
         self.b_quit.draw(screen)
     
@@ -857,3 +826,14 @@ class Win:
             elif event.key == pygame.K_q:
                 f_reset_game(main)
                 main.change_state("menu", True)
+    
+def ajustar_fonte(texto, fonte_path, largura_max, altura_max, tamanho_inicial=50):
+    tamanho = tamanho_inicial
+    while True:
+        fonte = pygame.font.Font(fonte_path, tamanho)
+        largura, altura = fonte.size(texto)
+        if largura <= largura_max and altura <= altura_max:
+            return fonte
+        tamanho -= 1
+        if tamanho < 1:  # Impede tamanho de fonte inválido
+            raise ValueError("Texto muito grande para caber no retângulo!")    
