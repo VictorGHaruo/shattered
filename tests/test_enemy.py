@@ -14,6 +14,7 @@ from src.ground import Ground
 
 class Test_enemy(unittest.TestCase):
 
+#We simulate an environment where we will carry out the tests
     def setUp(self):
 
         self.player = Yokai(0 ,0, 40, 70)
@@ -30,9 +31,13 @@ class Test_enemy(unittest.TestCase):
 
     def test_fall(self):
 
+        #This function tests whether enemies have y speed and collide with the ground
+
         self.assertEqual(self.mage.rect.y, 0)
         self.assertEqual(self.flying.rect.y, 0)
         self.assertEqual(self.dummy.rect.y, 0)
+
+        #simulating the passage of some frames
 
         for _ in range(50):
             self.flying.on_collision(self.ground)
@@ -46,7 +51,10 @@ class Test_enemy(unittest.TestCase):
         self.assertEqual(self.mage.rect.y, 390)
         self.assertEqual(self.flying.rect.y, 0)
 
+    #these functions tests whether the dummy enemy changes direction when reaching the end of a block
+
     def test_dummy_movement_right(self):
+
 
         self.dummy.to_right = True
 
@@ -68,6 +76,8 @@ class Test_enemy(unittest.TestCase):
 
         self.assertFalse(self.dummy.to_left)
 
+    #This function tests whether the enemy mage changes its direction depending on the player's position
+
     def test_mage_movement(self):
 
         self.mage.to_left = True
@@ -82,6 +92,8 @@ class Test_enemy(unittest.TestCase):
         self.mage.on_collision(self.player)
         self.mage.update()
         self.assertTrue(self.mage.to_left)
+
+    #This function tests whether enemies suffer collision damage only from projectiles launched by the player
 
     def test_projectile_damage(self):
 
@@ -108,6 +120,8 @@ class Test_enemy(unittest.TestCase):
             self.assertEqual(self.mage.life, 40)
             self.assertEqual(self.dummy.life, 5)
             self.assertEqual(self.flying.life, 5)
+
+    #This function tests whether enemies gain dead status only after their death animation ends
 
     def test_dead(self):
 
