@@ -48,6 +48,8 @@ class Bosses:
     death_position : float or None
         Stores the last known horizontal position of the boss when it 
         dies, as x coordinates, or None if still alive.
+    touch : bool
+        If the boss collides with a wall.
 
     Methods
     -------
@@ -114,6 +116,7 @@ class Bosses:
         self.is_dead = False
         self.immune = False
         self.death_position = None
+        self.touch = False
         # self.color = (255, 0, 0)
 
     def new_hero(self, hero: object):
@@ -182,7 +185,7 @@ class Bosses:
 
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            pygame.draw.rect(screen, self.color, self.rect)
+            # pygame.draw.rect(screen, self.color, self.rect)
         for projectile in self.projectiles:
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
@@ -222,28 +225,15 @@ class Bosses:
         ):
             self.rect.bottom = other.rect.top
 
-
-
-
-        ##REVER
-
         if (
             other.TAG == "Ground" and 
             self.rect.colliderect(other)
         ):
-            # Verifica colisões laterais
             if (
                 self.rect.right > other.rect.left and 
                 self.rect.left < other.rect.right
             ):
-                # self.rect.left = other.rect.right
-                if self.speed_x > 0:
-                    self.rect.left = other.rect.right
-                else:
-                    self.rect.right = other.rect.left
-
-
-        
+                self.touch = True
 
         for projectile in self.projectiles:
             if other.TAG == "Ground":
@@ -539,6 +529,24 @@ class Balrog(Bosses):
         
         """
 
+
+        if self.speed_x > 0:
+            self.sprites.assets(
+                self.rect, "Walk", self.actual_balrog, "R", self.fps["Walk"], 
+                self.images, self.adj, "B"
+            )
+        else :
+            self.sprites.assets(
+                self.rect, "Walk", self.actual_balrog, "L", 
+                self.fps["Walk"], self.images, self.adj, "B"
+            )
+
+        if self.touch: 
+            
+            self.speed_x = -self.speed_x
+            self.touch = False
+
+
         if self.move_cooldown <= 0 :
             self.randomic = random.random()
             self.cool_down = random.randint(
@@ -548,17 +556,9 @@ class Balrog(Bosses):
         
         if self.randomic >= self.probability:
             self.rect.x = self.rect.x + self.speed_x
-            self.sprites.assets(
-                self.rect, "Walk", self.actual_balrog, "R", self.fps["Walk"], 
-                self.images, self.adj, "B"
-            )
 
         else:
-            self.rect.x = self.rect.x - self.speed_x
-            self.sprites.assets(
-                self.rect, "Walk", self.actual_balrog, "L", 
-                self.fps["Walk"], self.images, self.adj, "B"
-            )
+            self.rect.x = self.rect.x + self.speed_x
 
     def draw(self, screen: pygame.Surface, camera: object) -> None:
         """
@@ -625,7 +625,7 @@ class Balrog(Bosses):
 
     def update(self) -> None:
         """        
-        Updates the attributes of the Ganon boss. This method 
+        Updates the attributes of the Balrog boss. This method 
         manages the timers, detects when and where the boss dies, 
         and animates the boss.
         
@@ -1131,14 +1131,14 @@ class Ganon(Bosses):
             ):
                 self.actual_ganon["Immune"] = 0
                 self.rect.x = 0.1 * self.screen_width
-                self.rect.y = 0 #retirar dps
+                self.rect.y = 0 
             elif (
                 self.hero.rect.centerx - self.rect.centerx > 0 and 
                 self.teleport_cooldown <= 0
             ):
                 self.actual_ganon["Immune"] = 8
-                self.rect.x = 0.9 * self.screen_width
-                self.rect.y = 0 #retirar dps
+                self.rect.x = 0.8 * self.screen_width
+                self.rect.y = 0 
 
 class Demagorgon(Bosses):
 

@@ -107,9 +107,9 @@ class GameManager:
         self.main = main
         self.bosses = []
         self.order = [
+            Ganon(1100, 500, 150, 220, self.hero),
             Balrog(1000, 100, 140, 180, self.hero),
             Demagorgon(1000, 400, 100, 300, self.hero),
-            Ganon(1100, 400, 150, 220, self.hero),
         ]
         self.life_bar = Herolife(self.hero, 400, 50, 15, 40, 40, 20)
         self.hero_timer = Bar(
