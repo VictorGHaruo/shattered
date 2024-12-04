@@ -86,7 +86,7 @@ class GameManager:
         None
         """
         self.heros = [
-            Knight(140*50, 0, 40, 70),
+            Knight(0, 0, 40, 70),
             Yokai(0, 0, 40, 70),
             Ninja(0, 0, 40, 70),
         ]
