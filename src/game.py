@@ -107,9 +107,9 @@ class GameManager:
         self.main = main
         self.bosses = []
         self.order = [
-            Demagorgon(0, 0, 100, 300, self.hero),
-            Balrog(200, 100, 140, 180, self.hero),
-            Ganon(300, 0, 150, 220, self.hero),
+            Balrog(1000, 100, 140, 180, self.hero),
+            Demagorgon(1000, 400, 100, 300, self.hero),
+            Ganon(1100, 400, 150, 220, self.hero),
         ]
         self.life_bar = Herolife(self.hero, 400, 50, 15, 40, 40, 20)
         self.hero_timer = Bar(
@@ -242,10 +242,11 @@ class GameManager:
         points = self.hero.points
         self.score_text.update(points)
 
-        if len(self.bosses) == 0 and len(self.order) != 0:
-            self.bosses.append(self.order[0])
-            self.bosses_life.append(Bosslife(self.order[0].life, 200, 750, 1000, 40,(0, 255, 0), (255, 0, 0)))
-            del self.order[0]
+        if self.camera.boss_fase:
+            if len(self.bosses) == 0 and len(self.order) != 0:
+                self.bosses.append(self.order[0])
+                self.bosses_life.append(Bosslife(self.order[0].life, 200, 750, 1000, 40,(0, 255, 0), (255, 0, 0)))
+                del self.order[0]
 
         for ground in self.grounds:
             ground.update()

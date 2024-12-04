@@ -74,7 +74,7 @@ class Bosses:
     """
 
     def __init__(
-        self, x: float, y: float, width: int, height: int, hero: "Player"
+        self, x: float, y: float, width: int, height: int, hero: object
     ) -> None:
         
         """
@@ -90,7 +90,7 @@ class Bosses:
             Character's width.
         height : int
             Character's height.
-        hero : Player
+        hero : object
             Rectangle representing the hero, used for interaction.
 
         Returns
@@ -116,13 +116,13 @@ class Bosses:
         self.death_position = None
         # self.color = (255, 0, 0)
 
-    def new_hero(self, hero: "Player"):
+    def new_hero(self, hero: object):
         """
         Update object hero used in methods of the boss.
 
         Parameters
         ----------
-        hero : Player
+        hero : object
             Rectangle representing the hero, used for interaction.
 
         Returns
@@ -160,7 +160,7 @@ class Bosses:
         for projectile in self.projectiles:
             projectile.update()
         
-    def draw (self, screen: pygame.Surface, camera: "Camera"):
+    def draw (self, screen: pygame.Surface, camera: object):
         """
         Draws the boss and its projectiles, adjusting their positions 
         based on the camera movement. Additionally, it draws all the 
@@ -170,7 +170,7 @@ class Bosses:
         ----------
         screen : pygame.Surface
             The surface where the boss and projectiles will be drawn.
-        camera : Camera
+        camera : object
             The camera object used to adjust the boss's position.
 
         Returns
@@ -182,7 +182,7 @@ class Bosses:
 
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            # pygame.draw.rect(screen, self.color, self.rect)
+            pygame.draw.rect(screen, self.color, self.rect)
         for projectile in self.projectiles:
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
@@ -194,7 +194,7 @@ class Bosses:
             projectile.draw(screen, camera)
             self.shot.draw(screen)
 
-    def on_collision(self, other: Union["Player", "Ground"]):
+    def on_collision(self, other: object):
         """
         Tests the boss and boss's projectiles collision with other 
         objects. If the projectile hits a Player, it reduces their 
@@ -204,7 +204,7 @@ class Bosses:
 
         Parameters
         ----------
-        other : Union[Player, Ground]
+        other : object
             The other object that the boss interacts with.
 
         Return
@@ -217,10 +217,33 @@ class Bosses:
         """  
 
         if (other.TAG == "Ground" and self.rect.colliderect(other) and 
-            self.rect.bottom > other.rect.top and 
+            self.rect.bottom > other.rect.top and self.speed_y > 0 and
             self.rect.top < other.rect.top
         ):
             self.rect.bottom = other.rect.top
+
+
+
+
+        ##REVER
+
+        if (
+            other.TAG == "Ground" and 
+            self.rect.colliderect(other)
+        ):
+            # Verifica colisões laterais
+            if (
+                self.rect.right > other.rect.left and 
+                self.rect.left < other.rect.right
+            ):
+                # self.rect.left = other.rect.right
+                if self.speed_x > 0:
+                    self.rect.left = other.rect.right
+                else:
+                    self.rect.right = other.rect.left
+
+
+        
 
         for projectile in self.projectiles:
             if other.TAG == "Ground":
@@ -321,7 +344,7 @@ class Balrog(Bosses):
     """
 
     def __init__(
-        self, x: float, y: float, width: int, height: int, hero: "Player"
+        self, x: float, y: float, width: int, height: int, hero: object
     ) -> None:
         """
         Initializes the class Balrog with values of atributes.
@@ -336,7 +359,7 @@ class Balrog(Bosses):
             Character's width.
         height : int
             Character's height.
-        hero : Player
+        hero : object
             Rectangle representing the hero, used for interaction.
         """
         super().__init__(x, y, width, height, hero)
@@ -515,6 +538,7 @@ class Balrog(Bosses):
             position of the boss and updates its animation state.
         
         """
+
         if self.move_cooldown <= 0 :
             self.randomic = random.random()
             self.cool_down = random.randint(
@@ -536,7 +560,7 @@ class Balrog(Bosses):
                 self.fps["Walk"], self.images, self.adj, "B"
             )
 
-    def draw(self, screen: pygame.Surface, camera: "Camera") -> None:
+    def draw(self, screen: pygame.Surface, camera: object) -> None:
         """
         Draws the boss lightning attacks putting its sprites.
 
@@ -544,7 +568,7 @@ class Balrog(Bosses):
         ----------
         screen : pygame.Surface
             The surface where the lightning will be drawn.
-        camera : Camera
+        camera : object
             The camera object used to adjust the boss's position.
 
         Returns 
@@ -564,7 +588,7 @@ class Balrog(Bosses):
                 )
                 self.lightning.draw(screen)       
 
-    def on_collision(self, other: "Player") -> None:
+    def on_collision(self, other: object) -> None:
         """
         Tests for collisions between the boss's attacks and the player.
         If an attack (lightning) hits the player, the player's life is 
@@ -579,7 +603,7 @@ class Balrog(Bosses):
 
         Parameters
         ----------
-        other : Player
+        other : object
             The Player that the boss interacts with.
 
         Return
@@ -713,7 +737,7 @@ class Ganon(Bosses):
     """
 
     def __init__(
-        self, x: float, y: float, width: int, height: int, hero: "Player"
+        self, x: float, y: float, width: int, height: int, hero: object
     ) -> None:
         """
         Inicializes the class Ganon with values of atributes
@@ -728,7 +752,7 @@ class Ganon(Bosses):
             Character's width.
         height : int
             Character's height.
-        hero : Player
+        hero : object
             Rectangle representing the hero, used for interaction.
         
         """
@@ -1018,14 +1042,14 @@ class Ganon(Bosses):
                         self.projectiles.append(projectile)
                     self.atk_timer = self.atk_cooldown + self.atk_long
 
-    def distance(self, other: "Player") -> float:
+    def distance(self, other: object) -> float:
         """
         Calculates the Euclidean distance between boss and another 
         object.
 
         Parameters
         ----------
-        other : Player
+        other : object
             Object to be calcute the distance. Must have a `rect` 
             attribute with `centerx` and `centery` properties.
 
@@ -1181,7 +1205,7 @@ class Demagorgon(Bosses):
     """
 
     def __init__(
-            self, x: float, y: float, width: int, height: int, hero: "Player"
+            self, x: float, y: float, width: int, height: int, hero: object
     ) ->None :
         """
         Initializes the class Demagorgon with values of atributes
@@ -1196,7 +1220,7 @@ class Demagorgon(Bosses):
             Character's width.
         height : int
             Character's height.
-        hero : Player
+        hero : object
             Rectangle representing the hero, used for interaction.
         """
 
@@ -1204,7 +1228,7 @@ class Demagorgon(Bosses):
         self.sub_TAG = "Demagorgon"
 
         #hitbox
-        # self.color = (255, 255, 0)
+        self.color = (255, 255, 0)
 
         self.speed_x = 3
 
@@ -1352,6 +1376,8 @@ class Demagorgon(Bosses):
             position of the boss and updates its animation state.
         """
         super().move()
+
+        # self.rect.x = self.rect.x + self.speed_x
         if self.atk_timer < self.atk_cooldown:
             if self.rect.x - self.hero.rect.x <= 0:
                 

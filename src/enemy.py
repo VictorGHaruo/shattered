@@ -10,7 +10,84 @@ from src.assets import Sprites
 from src.weapon import Projectile
 
 class Monsters:
-    def __init__(self, x, y, width, height, hero):
+    """
+    Represents a monster character in the game with attributes for 
+    movement, health, and interactions with the hero.
+
+    Attributes
+    ----------
+    TAG : str
+        A general tag identifying the object as a "Monster".
+    sub_TAG : str
+        A more specific tag, also set to "Monster" by default.
+    rect : pygame.Rect
+        The rectangular area representing the monster's position and 
+        size.
+    gravity : int
+        The gravity force applied to the monster's vertical movement.
+    speed_y : int
+        The current vertical speed of the monster.
+    speed_y_max : int
+        The maximum vertical speed of the monster.
+    speed_x : int
+        The horizontal speed of the monster.
+    life : int
+        The monster's health points.
+    hero : object
+        A reference to the hero object, used for interactions.
+    immune : bool
+        Indicates whether the monster is currently immune to damage.
+    to_right : bool
+        Indicates whether the monster is moving or facing to the right 
+        (default is True).
+    to_left : bool
+        Indicates whether the monster is moving or facing to the left 
+        (default is False).
+    is_dead : bool
+        Indicates whether the monster is dead.
+    is_attacking : bool
+        Indicates whether the monster is currently attacking.
+    projectiles : list
+        A list of projectiles associated with the monster.
+
+    Methods
+    -------
+    update() -> None
+        Update monsters attributes.
+    new_hero(hero) -> None
+        Update the position and the hero himself.
+    draw(screen, camera) -> None
+        Draws the monster and its projectiles on the screen.
+    on_collision(other) -> None
+        Handles collision detection and response for the monster.
+
+    Notes
+    -----
+    This class manages the monster's state and interactions with the 
+    game environment, including movement, health, and attacking logic.
+    """
+
+    def __init__(
+        self, x : float, y : float, width : int, height : int, 
+        hero : object
+    ) -> None:
+        """
+        Initializes the class Monsters with values of atributes
+
+        Parameters
+        ----------
+        x : float
+            The x-coordinate of the monster's position.
+        y : float
+            The y-coordinate of the monster's position.
+        width : int
+            The width of the monster's bounding rectangle.
+        height : int
+            The height of the monster's bounding rectangle.
+        hero : object
+            The hero object for interactions and logic involving the 
+            player character.
+        """
         self.TAG = "Monster"
         self.sub_TAG = "Monster"
         self.rect = pygame.Rect(x, y, width, height)
@@ -28,17 +105,61 @@ class Monsters:
         self.is_attacking = False
         self.projectiles = []
 
-    def move(self):
+    def move(self) -> None:
         pass
 
-    def update(self):
+    def update(self) -> None:
+        """
+        Updates the monster's vertical position by applying gravity and 
+        limiting the fall speed.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         self.speed_y += self.gravity
         self.rect.y += min(self.speed_y, self.speed_y_max)
     
-    def new_hero(self, hero):
+    def new_hero(self, hero : object) -> None:
+        """
+        Updates the reference to the hero object.
+
+        Parameters
+        ----------
+        hero : object
+            The new hero object to be associated with the monster.
+
+        Returns
+        -------
+        None
+        """
         self.hero = hero
         
-    def draw (self, screen: pygame.Surface, camera):
+    def draw (self, screen: pygame.Surface, camera : object) -> None:
+        """
+        Draws the monster and its projectiles on the screen, adjusting 
+        for the camera's position.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The surface where the monster and its projectiles will be 
+            drawn.
+        camera : object
+            The camera object, used to adjust the monster's position 
+            based on its `position_x` attribute.
+
+        Returns
+        -------
+        None
+        """
+        self.sprites.draw(screen)
+
+
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
         for projectile in self.projectiles:
@@ -47,7 +168,30 @@ class Monsters:
                 self.projectiles.remove(projectile)
                 del projectile
                         
-    def on_collision(self, other):  
+    def on_collision(self, other : object) -> None:  
+        """
+        Handles collision detection and response for the monster, 
+        including interactions with the ground, projectiles, and the 
+        player. If the collision is with a "Ground" object and the 
+        monster is falling, its vertical position is adjusted to land 
+        on top of the ground. If the collision is with a "Projectile", 
+        the monster's health is reduced by the damage of the projectile.
+        If a projectile collides with the "Ground", it is removed 
+        from the monster's projectiles list. If a projectile collides 
+        with the "Player", the player's health is reduced by the 
+        projectile's damage, and the projectile is removed from the 
+        monster's projectiles list.
+
+        Parameters
+        ----------
+        other : object
+            The object that the monster is colliding with. This can be 
+            a "Ground", "Projectile", or "Player".
+
+        Returns
+        -------
+        None
+        """
 
         if (other.TAG == "Ground" and self.rect.colliderect(other) and 
             self.rect.bottom > other.rect.top and 
@@ -71,7 +215,74 @@ class Monsters:
                     del projectile
 
 class Dummy(Monsters):
-    def __init__(self, x, y, width, height, hero):
+    """
+    Represents a dummy monster character with specific attributes for 
+    movement, animation, and behavior.
+
+    Attributes
+    ----------
+    speed_x : int
+        The horizontal speed of the dummy.
+    init_x : int
+        The initial x-coordinate of the dummy's position.
+    range : int
+        The range within which the dummy can move horizontally.
+    sprites : Sprites
+        The `Sprites` object that manages the dummy's animations and 
+        sprite loading.
+    adjW : int
+        The horizontal adjustment for the dummy's sprite positioning.
+    adjH : int
+        The vertical adjustment for the dummy's sprite positioning.
+    adj : int
+        An additional adjustment for sprite positioning (default is 0).
+    images_directory : dict
+        A dictionary containing the paths to the sprite sheets for 
+        different actions.
+    sizes_directory : dict
+        A dictionary specifying the number of frames for each animation 
+        type.
+    images : dict
+        A dictionary that stores the loaded sprite images for the 
+        dummy's different actions.
+    actual_dummy : dict
+        A dictionary tracking the current frame of the dummy's 
+        animations.
+    fps : dict
+        A dictionary specifying the frame rate for the dummy's 
+        animations (walking and death).
+
+    Methods
+    -------
+    on_collision(other) -> None
+        Handles collision detection and response for the dummy monster.
+    update() -> None
+        Updates the dummy's state.
+    move() -> None
+        Handles the mechanic of movement of dummy monster.
+    draw(screen, camera) -> None
+        Draws the dummy and its associated sprites on the screen.
+    """
+
+    def __init__(
+        self, x : float, y : float, width : int, height : int, 
+        hero : object
+    ) -> None:
+        """
+        Parameters
+        ----------
+        x : float
+            The x-coordinate of the dummy's position.
+        y : float
+            The y-coordinate of the dummy's position.
+        width : int
+            The width of the dummy's bounding rectangle.
+        height : int
+            The height of the dummy's bounding rectangle.
+        hero : object
+            The hero object, used for interactions and logic involving 
+            the player character.
+        """
         super().__init__(x, y, width, height, hero)
         self.speed_x = 3
         self.init_x = x
@@ -123,7 +334,25 @@ class Dummy(Monsters):
             self.adjH
         )
 
-    def on_collision(self, other):
+    def on_collision(self, other : object) -> None:
+        """
+        Handles collision detection and response for the dummy monster, 
+        including direction reversal when the monster reaches its 
+        movement range. If the dummy collides with a boundary, 
+        its horizontal direction is reversed.
+
+        Parameters
+        ----------
+        other : object
+            The object that the dummy is colliding with. This can be 
+            any object in the game world.
+
+        Returns
+        -------
+        None
+
+        """
+
         super().on_collision(other)
         
         if self.rect.x > self.init_x + self.range and self.to_right:
@@ -135,7 +364,20 @@ class Dummy(Monsters):
             self.to_left = False
             self.to_right = True
 
-    def update(self):
+    def update(self) -> None:
+        """
+        Updates the dummy's state, including handling death animation 
+        and movement.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         
         if self.life <= 0:
             if self.to_right:
@@ -157,7 +399,21 @@ class Dummy(Monsters):
             
         return super().update()
         
-    def move(self):
+    def move(self) -> None:
+        """
+        Moves the dummy horizontally and updates its walking animation 
+        based on its current direction.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        """ 
+
         self.rect.x = self.rect.x + self.speed_x
         if self.to_right:
             self.sprites.assets(
@@ -170,7 +426,21 @@ class Dummy(Monsters):
                 self.images, self.adj, "D"
             )
             
-    def draw(self, screen: pygame.Surface, camera):
+    def draw(self, screen: pygame.Surface, camera : object) -> None:
+        """
+        Draws the dummy and its associated sprites on the screen, 
+        adjusting for the camera's position.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The surface where the dummy and its sprites will be drawn.
+        camera : object
+            The camera object, used to adjust the dummy's position 
+            based on the camera's `position_x` and `fix_x`.
+
+        """
+
         super().draw(screen, camera)
         if camera.TAG == "Camera":
             self.init_x -= camera.position_x
@@ -183,7 +453,75 @@ class Dummy(Monsters):
         self.sprites.draw(screen)
 
 class Mage(Monsters):
-    def __init__(self, x, y, width, height, hero):
+    """
+    Represents a Mage enemy with unique animations, projectiles, and 
+    movement behavior.
+
+    Attributes
+    ----------
+    width : int
+        Width of the mage.
+    speed_x : int
+        Horizontal speed of the mage.
+    life : int
+        Health points of the mage.
+    projectile_cooldown : int
+        Current cooldown state for projectile firing.
+    cool_down : int
+        Maximum cooldown time between projectiles.
+    sprites : Sprites
+        Instance of `Sprites` for handling mage animations.
+    adjW : int
+        Horizontal adjustment for mage sprites.
+    adjH : int
+        Vertical adjustment for mage sprites.
+    adj : int
+        General adjustment for sprite drawing.
+    images_directory : dict
+        Paths to sprite sheets for different animations.
+    sizes_directory : dict
+        Number of frames in each sprite animation set.
+    images : dict
+        Dictionary holding loaded sprite frames for each action.
+    actual_mage : dict
+        Tracks the current frame for each animation state.
+    fps : dict
+        Frame rate settings for each animation.
+    image_projectile_l : pygame.Surface
+        Image of the projectile when facing left.
+    image_projectile_r : pygame.Surface
+        Image of the projectile when facing right.
+
+    Methods
+    -------
+    update() -> None
+        Updates the Mage's states.
+    attack() -> None
+         Handles the Mage's attack actions.
+
+
+    """
+
+    def __init__(
+        self, x : float, y : float, width : int, height : int, 
+        hero : object
+    ) -> None:
+        """
+        Initializes the class Mage with values of atributes
+
+        Parameters
+        ----------
+        x : float
+            Initial x-coordinate of the mage.
+        y : float
+            Initial y-coordinate of the mage.
+        width : int
+            Width of the mage's bounding box.
+        height : int
+            Height of the mage's bounding box.
+        hero : object
+            Reference to the hero object for interaction.
+        """
         super().__init__(x, y, width, height, hero)
         self.width = width
         self.speed_x = 3
@@ -260,8 +598,23 @@ class Mage(Monsters):
             self.image_projectile_l, True, False
         )
     
-    
-    def update(self):
+    def update(self) -> None:
+        """
+        Updates the Mage's state, including movement, animations, 
+        projectiles, and handling death. The Mage adjusts its facing 
+        direction (`to_left` or `to_right`) based on the hero's 
+        position. If the projectile cooldown is active, it decrements 
+        the timer.
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         
         if self.hero.rect.x <= self.rect.x and not self.life <= 0:
             self.to_left = True
@@ -295,14 +648,21 @@ class Mage(Monsters):
             self.attack()
         return super().update()
     
-    def on_collision(self, other: pygame.Rect):
-        return super().on_collision(other)
-    
-    def draw(self, screen, camera):
-        super().draw(screen, camera) 
-        self.sprites.draw(screen)
-    
-    def attack(self):
+    def attack(self) -> None:
+        """
+        Handles the Mage's attack actions, including spawning 
+        projectiles and playing animations. The Mage attacks by 
+        launching projectiles in the direction it is facing. 
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         if self.projectile_cooldown <= 0:
             if self.to_left:
                 new_projectile = Projectile(
@@ -316,8 +676,8 @@ class Mage(Monsters):
                 )
             else:
                 new_projectile = Projectile(
-                    self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 50,
-                    30, self.image_projectile_r
+                    self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 
+                    50, 30, self.image_projectile_r
                 )
                 self.projectiles.append(new_projectile)
                 self.sprites.assets(
@@ -338,7 +698,85 @@ class Mage(Monsters):
                 )
 
 class Flying(Monsters):
-    def __init__(self, x, y, width, height, hero):
+    """
+    Represents a flying enemy character in the game, inheriting from the 
+    Monsters class.
+
+    Attributes
+    ----------
+    speed_x : int
+        Horizontal speed of the flying enemy.
+    gravity : int
+        Gravity affecting the flying enemy. Set to 0 as flying enemies 
+        do not need gravity.
+    probability : float
+        Probability factor used for random movements or attacks.
+    randomic : float
+        Randomization factor influencing behavior.
+    cool_down_max : int
+        Maximum cooldown time for attacking.
+    cool_down_min : int
+        Minimum cooldown time for attacking.
+    cool_down : int
+        Current cooldown time for attack actions.
+    move_cooldown : int
+        Cooldown time for movement actions.
+    projectile_cooldown : int
+        Cooldown time for firing projectiles.
+    sprites : Sprites
+        An instance of the Sprites class for managing animations.
+    adjW : int
+        Width adjustment for sprite scaling.
+    adjH : int
+        Height adjustment for sprite scaling.
+    adj : int
+        General adjustment parameter for sprite alignment.
+    images_directory : dict
+        Dictionary mapping animation types to their file paths.
+    sizes_directory : dict
+        Dictionary specifying the number of frames in each animation.
+    images : dict
+        Dictionary holding loaded image frames for each animation.
+    actual_flying : dict
+        Dictionary tracking the current frame of each animation type.
+    fps : dict
+        Dictionary defining the frame rate for each animation type.
+    image_projectile : pygame.Surface
+        Image used for the flying enemy's projectile.
+    
+    Methods
+    -------
+    move() -> None
+        Moves the flying enemy horizontally.
+    update() -> None
+        Updates the flying enemy's states.
+    draw(screen, camera) -> None
+        Draws the flying enemy.
+    attack() -> None 
+        Handles the flying enemy's attack behavior.
+    
+    """
+
+    def __init__(
+        self, x : float, y : float, width : int, height : int, 
+        hero : object
+    ) -> None:
+        """
+        Initializes the class Flying with values of atributes
+
+        Parameters
+        ----------
+        x : float
+            Initial x-coordinate of the mage.
+        y : float
+            Initial y-coordinate of the mage.
+        width : int
+            Width of the mage's bounding box.
+        height : int
+            Height of the mage's bounding box.
+        hero : object
+            Reference to the hero object for interaction.
+        """
         super().__init__(x, y, width, height, hero)
         self.speed_x = 3
         self.gravity = 0
@@ -419,7 +857,24 @@ class Flying(Monsters):
         projectile_path = os.path.join(Fly_path, "projectile.png")
         self.image_projectile = pygame.image.load(projectile_path)
         
-    def move(self):
+    def move(self) -> None:
+        """
+        Moves the flying enemy horizontally and triggers appropriate 
+        animations. The direction of movement is determined by a random 
+        factor, and movement alternates between left and right based on 
+        a probability threshold. The function also resets the movement 
+        cooldown after each decision, ensuring varied behavior over 
+        time. 
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         if self.move_cooldown <= 0:
             
             self.randomic = random.random()
@@ -447,10 +902,22 @@ class Flying(Monsters):
                     self.fps["Walk"], self.images, self.adj, "F"
                 )
 
-    def on_collision(self, other):
-        super().on_collision(other)
+    def update(self) -> None:
+        """
+        Updates the flying enemy's state, including movement, 
+        animations, projectiles, and handling of the death state. This 
+        method is called every frame to ensure continuous behavior and 
+        state transitions.
 
-    def update(self):
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         super().update()
         
         if self.move_cooldown > 0:
@@ -481,7 +948,25 @@ class Flying(Monsters):
             self.attack()
             self.move()
     
-    def draw(self, screen, camera):
+    def draw(self, screen : pygame.Surface, camera: object) -> None:
+        """
+        Draws the flying enemy and its current animation state to the 
+        screen.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The screen or surface where the enemy's sprite should be 
+            drawn.
+        camera : object
+            The camera used for adjusting the enemy's position on the 
+            screen.
+        
+        Returns
+        -------
+        None
+        """
+
         super().draw(screen, camera)
         
         if self.to_right and not self.life <= 0:
@@ -501,11 +986,22 @@ class Flying(Monsters):
                 self.sprites.assets(
                     self.rect, "Attack", self.actual_flying, "L", 
                     self.fps["Attack"], self.images, self.adj, "F"
-                )
-                
-        self.sprites.draw(screen)
+                )           
     
-    def attack(self):
+    def attack(self) -> None:
+        """
+        Handles the flying enemy's attack behavior, including 
+        projectile creation.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         if self.projectile_cooldown <= 0:
             new_projectile = Projectile(
                 self.rect.left, self.rect.bottom, 0, 20, self.TAG, 20, 40, 60, 

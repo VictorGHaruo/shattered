@@ -267,8 +267,65 @@ class Sprites():
             screen.blit(self.image, self.image_rect)
 
 class Herolife:
+    """
+    Represents the hero's health bar using heart images to visualize 
+    health points.
+
+    Attributes
+    ----------
+    max_life : int
+        The maximum health points of the hero.
+    actual_life : int
+        The current health points of the hero.
+    images : list of pygame.Surface
+        A list of heart images representing different health states.
+    heart : int
+        The health value represented by a single heart.
+    hearts : int
+        The total number of hearts required to represent the maximum health.
+    x : int
+        The x-coordinate of the health bar.
+    y : int
+        The y-coordinate of the health bar.
+    adj : int
+        The adjustment applied to heart positions.
+
+    """
+
         
-    def __init__(self, hero, heart, x, y, width, height, adj = 0):
+    def __init__(
+            self, hero : object, heart : int, x : float, y : float, 
+            width : int, height : int, adj : int = 0
+    ) -> None:
+        """
+        Initializes the class Herolife with values of atributes.
+        
+        Parameters
+        ----------
+        hero : Player or Monster
+            The hero object containing the `max_life` attribute.
+        heart : int
+            The amount of health each heart represents.
+        x : int
+            The horizontal position of the health bar on the screen.
+        y : int
+            The vertical position of the health bar on the screen.
+        width : int
+            The width of each heart image.
+        height : int
+            The height of each heart image.
+        adj : int, optional
+            Horizontal adjustment for positioning hearts (default is 0).
+
+        Methods
+        -------
+        update(hero) -> None
+            Updates the current health of the hero.
+        draw(screen) -> None
+            Draws the hero's health bar on the screen.
+        
+
+        """
         self.max_life = hero.max_life
         self.actual_life = 0
         self.images = []
@@ -285,9 +342,40 @@ class Herolife:
             self.image = pygame.image.load(image_path).convert_alpha()
             self.image = pygame.transform.scale(self.image, (width, height))
             self.images.append(self.image)
-    def update(self, hero):
+
+    def update(self, hero : object) -> None:
+        """
+        Updates the current health of the hero.
+
+        Parameters
+        ----------
+        hero : object
+            The hero object containing the `life` attribute, which 
+            represents the current health points.
+        
+        Returns
+        -------
+        None
+
+        """
+
         self.actual_life = hero.life
+
     def draw(self,screen):
+        """
+        Draws the hero's health bar on the screen using heart images to 
+        represent different health states.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The screen surface where the health bar will be drawn.
+
+        Returns
+        -------
+        None
+
+        """
         actual_life = self.actual_life
         for i in range(self.hearts):
             if actual_life <= 0:
@@ -317,37 +405,111 @@ class Bar:
         self.images = []
         self.rect = pygame.Rect(self.x, self.y, width, height)
         self.rect_2 = pygame.Rect(self.x, self.y, width, height)
-        # path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
-        # Bars_path = os.path.join(path_game, os.pardir, "assets", "Bars")
-        # Bars_path = os.path.abspath(Bars_path)
-        # for i in range(1, 3):
-        #     image_path = os.path.join(Bars_path, f"Bar{i}.png")
-        #     bar_image = pygame.image.load(image_path).convert_alpha()
-        #     bar_image = pygame.transform.scale(bar_image, (self.width, self.height))
-        #     self.images.append(bar_image)
+
     def update(self, Value):
         self.actual = Value
         if self.actual > 0 :
             self.actual = self.max - self.actual
             self.rect.width = self.width * (self.actual/self.max)
     def draw(self, screen):
-        #screen.blit(self.images[1], (self.x, self.y), self.rect)
         pygame.draw.rect(screen, self.color1, self.rect_2)
         pygame.draw.rect(screen, self.color2, self.rect)
         pygame.draw.rect(screen, (0,0,0), self.rect_2, 4)
-        #screen.blit(self.images[0], (self.x, self.y))
+
 class Bosslife(Bar):
-    def __init__(self, Value, x, y, width, height, color1, color2):
+    """
+    Represents the health bar of a boss character, with smooth 
+    transitions when health changes.
+
+    Attributes
+    ----------
+    health_ratio : float
+        The ratio of health points to the width of the health bar, used 
+        to scale the bar dynamically.
+    health_change_speed : int
+        The speed at which the health bar transitions visually when 
+        health changes.
+    transition : pygame.Rect
+        A rectangle representing the visual transition area of the 
+        health bar.
+
+    Notes
+    -----
+    This class inherits from the `Bar` class and adds functionality to 
+    handle smooth health bar transitions.
+    """
+    def __init__(
+        self, Value : int, x : float, y : float, width : int, height : int, 
+        color1 : tuple, color2 : tuple
+    ) -> None:
+        """
+        Initializes the class Bosslife with values of atributes.
+
+        Parameters
+        ----------
+        Value : int
+            The initial health value of the boss.
+        x : float
+            The x-coordinate of the health bar on the screen.
+        y : float
+            The y-coordinate of the health bar on the screen.
+        width : int
+            The total width of the health bar.
+        height : int
+            The height of the health bar.
+        color1 : tuple
+            The primary color of the health bar, representing current 
+            health.
+        color2 : tuple
+            The secondary color of the health bar, used for the 
+            transition effect.
+        
+        Returns
+        -------
+        None
+        """
+
         super().__init__(Value, x, y, width, height, color1, color2)
         self.health_ratio = self.max / self.width
         self.health_change_speed = 3
         self.transition = pygame.Rect(self.x, self.y, self.width, self.height)
-    def update(self, Value):
+
+    def update(self, Value : int) -> None:
+        """
+        Updates the width of the boss's health bar based on the current 
+        health value and adjusts the transition effect for smooth 
+        visual changes.
+
+        Parameters
+        ----------
+        Value : int
+            The current health value of the boss.
+
+        Notes
+        -----
+        - The `rect.width` is updated proportionally to the health 
+        value (`Value`).
+        - If the transition bar (`transition.width`) is larger than the 
+        health bar (`rect.width`), it gradually decreases in width by 
+        `health_change_speed` to create a smooth transition effect.
+        """
         self.rect.width = self.width * (Value / self.max)
         if self.transition.width > self.rect.width:
             self.transition.width -= self.health_change_speed 
-    def draw(self, screen):
-        
+    def draw(self, screen : pygame.Surface) -> None:
+        """
+        Draws the boss's health bar on the screen, including the 
+        transition effect and border.
+
+        Parameters
+        ----------
+        screen : pygame.Surface
+            The screen surface where the health bar will be drawn.
+        """
+                
         pygame.draw.rect(screen, self.color2, self.transition)
         pygame.draw.rect(screen, self.color1, self.rect)
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(self.x, self.y, self.width, self.height), 4)
+        pygame.draw.rect(
+            screen, (0, 0, 0), 
+            pygame.Rect(self.x, self.y, self.width, self.height), 4
+        )
