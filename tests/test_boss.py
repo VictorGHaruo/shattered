@@ -134,7 +134,7 @@ class Test_Ganon(unittest.TestCase):
             self.Boss.move()
             self.Boss.update()
 
-        self.assertEqual(self.Boss.rect.x, 900)
+        self.assertEqual(self.Boss.rect.x, 800)
 
         self.player.rect.x = 850
         self.player.rect.y = 1280

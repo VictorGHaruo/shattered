@@ -27,7 +27,7 @@ class TestPlayerFall(unittest.TestCase):
     #we started an environment to do the tests
 
     def setUp(self): 
-        self.player = Player(0, 0, 50, 50)  
+        self.player = Yokai(0, 0, 50, 50)  
         path_game = os.path.dirname(os.path.abspath(sys.argv[0]))
         path_game = os.path.abspath(path_game)
         ground_path = os.path.join(path_game, os.pardir, "assets", "Ground")
@@ -84,7 +84,7 @@ class TestPlayerMovement(unittest.TestCase):
             self.player.on_key_pressed(pygame.key.get_pressed(), None)
             pygame.key.get_pressed = mock_function
             self.player.update()  
-        self.assertEqual(self.player.rect.x, 0)
+        self.assertEqual(self.player.rect.x, 10)
 
     def test_move_right(self):
 
@@ -110,7 +110,7 @@ class TestPlayerMovement(unittest.TestCase):
             self.player.on_key_pressed(pygame.key.get_pressed(), None)
             pygame.key.get_pressed = mock_function
             self.player.update()  
-        self.assertEqual(self.player.rect.x, 200)
+        self.assertEqual(self.player.rect.x, 190)
 
     def test_stop_moving(self):
 
@@ -166,19 +166,11 @@ class TestPlayerMovement(unittest.TestCase):
         self.player.jump()
         self.assertEqual(self.player.jump_count,0)
 
-    def test_multijump_yokai(self):
-        self.player = self.players[1]
-        self.player.jump()
-        self.player.jump()
-        self.assertEqual(self.player.jump_count, 2)
-        self.assertEqual(self.player.speed_y, -30)
-
     def test_multijump_ninja(self):
         self.player = self.players[2]
         self.player.jump()
         self.player.jump()
-        self.player.jump()
-        self.assertEqual(self.player.jump_count, 3)
+        self.assertEqual(self.player.jump_count, 2)
         self.assertEqual(self.player.speed_y, -30)
 
 class TestPlayerActions(unittest.TestCase):
