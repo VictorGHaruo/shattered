@@ -129,6 +129,8 @@ class Player:
         self.action = None
         self.Death = False
         self.points = 0
+        self.max_life = 2000
+        self.life = 0
         
         self.rect = pygame.Rect(x, y, width, height)
         self.rect.x = x
@@ -621,6 +623,8 @@ class Knight(Player):
         self.teste = "K"
         self.jump_count_max = 1
         self.max_life = 2000
+        self.speed_x_max = 9
+        self.speed_x_min = -9
         self.life = self.max_life
         self.rect_color = (255, 0, 0)
         self.shield_width = 5
@@ -760,7 +764,7 @@ class Knight(Player):
         """
 
         if (
-            key_map[pygame.K_l] and self.action != "Hurt" and 
+            key_map[pygame.K_v] and self.action != "Hurt" and 
             self.action != "Death"
         ):
 
@@ -925,8 +929,10 @@ class Yokai(Player):
         self.sub_TAG = "Yokai"
         self.teste = "Y"
         self.max_life = 800
+        self.speed_x_max = 11
+        self.speed_x_min = -11
         self.life = self.max_life
-        self.jump_count_max = 2
+        self.jump_count_max = 1
         self.rect_color = (255, 255, 0)
         self.damage = 20
         self.attack_animation = 5
@@ -1081,7 +1087,7 @@ class Yokai(Player):
 
         """
         if (
-            key_map[pygame.K_l] and self.projectile_cooldown <= 0 and 
+            key_map[pygame.K_v] and self.projectile_cooldown <= 0 and 
             self.action != "Hurt" and self.action != "Death"
         ):
             self.attack_time = 0
@@ -1222,8 +1228,10 @@ class Ninja(Player):
         super().__init__(x, y, width, height)
         self.teste = "N"
         self.max_life = 1200
+        self.speed_x_max = 12
+        self.speed_x_min = -12
         self.life = self.max_life
-        self.jump_count_max = 3
+        self.jump_count_max = 2
         self.rect_color = (255, 255, 255)
         self.range = (
             self.rect.centerx + 30 if self.from_the_front else 
@@ -1363,7 +1371,7 @@ class Ninja(Player):
         """ 
 
         if (
-            key_map[pygame.K_l] and self.attack_cooldown <= 0 and 
+            key_map[pygame.K_v] and self.attack_cooldown <= 0 and 
             not self.action == "Hurt" and self.action != "Death"
         ):
             self.attack = Attack(self.range, self.rect.y, 20, 60, self.damage)
