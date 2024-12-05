@@ -36,24 +36,23 @@ def maping(grounds : list, enemies : list, hero: object) -> None:
     """
     
     grid = [
-        "                                                                                                     I                              CCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-        "                                                                                                     I                              C                          CC",
-        "                       F                                               U           A             A O I                             CC                          CC",
-        "                                                                     TMMMP         TMMMP         TMMMP                             CC                          CC",
-        "                                                                                                                                  CCC                          CC",
-        "                                                         TMMMP                                                                    CCC                          CC",
-        "                                                                   F                                  F                          CCCC                          CC",
-        "                                                                                                                                 CCCC                          CC",
-        "                                      U        A                                                                                CCCCC                          CC",
+        "                                                                                                     I                        I    CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "                                                                                                     I                        I    CC                          CC",
+        "                       F                                               U           A             A O I                        I    CC                          CC",
+        "                                                                     TMMMP         TMMMP         TMMMP                        I   CCC                          CC",
+        "                                                                                                                              I   CCC                          CC",
+        "                                                         TMMMP                                                                I  CCCC                          CC",
+        "                                                                   F                                  F                       I  CCCC                          CC",
+        "                                                                                                                              I CCCCC                          CC",
+        "                                      U        A                                                                              ICCCCCC                          CC",
         "                              EXXXXXXXXXXXXXXXXXD                                                                             CCCCCCC                          CC",
         "                      U       LGGGGGGGGGGGGGGGGGR                                                                             CCCCCCC                          CC",
-        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                                              CC",
+        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                   C                          CC",
         "                              LGGGGGGGGGGGGGGGGGR   TMP       U         U               A                                                                      CC",
         "XXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD        U        A                     B                          CC",
-        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   EXXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGG GGGGGGGGGGGGGGGGGGGGGGGGGGG",
-        "                                                                                                                                                                 ",
-        "                                                                                                                                     G                           ",
+        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   EXXXXXXXXXXXXXXXX  XXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGRSSSLGGRSSSSLGGGRSSSSLGGGGGGGRSSSSLGRSSSLGGGGGGGGGGGGGGGG  GGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "                                                                                                                                     GG                          ",
     ]
     
     path_game = os.path.dirname(os.path.abspath(sys.argv[0]))   
@@ -68,7 +67,7 @@ def maping(grounds : list, enemies : list, hero: object) -> None:
     image_ground_M = os.path.join(Ground_path, "Ground_09.png")
     image_ground_P = os.path.join(Ground_path, "Ground_10.png")
     image_ground_R = os.path.join(Ground_path, "Ground_11.png")
-    image_ground_B = os.path.join(Ground_path, "Box.png")
+    image_ground_B = os.path.join(Ground_path, "Brick.png")
     image_spike_S = os.path.join(Ground_path, "Spikes.png")
     image_obelisk_O = os.path.join(Ground_path, "Obelisk.png")
     image_ground_C = os.path.join(Ground_path, "Brick.png")
@@ -96,7 +95,7 @@ def maping(grounds : list, enemies : list, hero: object) -> None:
                 grounds.append(Spike(j*50, i*50, 50, 50, image_spike_S))
             if grid[i][j] == "B":
                 grounds.append(
-                    Block(j*50, i*50 - 100, 40, 152, image_ground_B)
+                    Block(j*50, i*50 - 50, 50, 102, image_ground_B)
                 )                
             
             for key in keys_ground:

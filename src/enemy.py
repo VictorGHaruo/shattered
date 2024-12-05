@@ -748,6 +748,8 @@ class Flying(Monsters):
     -------
     move() -> None
         Moves the flying enemy horizontally.
+    on_collision(other) -> None
+        Handles collision detection and response for the flying monster.
     update() -> None
         Updates the flying enemy's states.
     draw(screen, camera) -> None
@@ -901,6 +903,39 @@ class Flying(Monsters):
                     self.rect, "Walk", self.actual_flying, "L", 
                     self.fps["Walk"], self.images, self.adj, "F"
                 )
+                
+    def on_collision(self, other: object) -> None:
+        """
+        Handles collision detection and response for the flying monster.
+        If he collides with wall, his move cooldonw restarts.
+
+        Parameters
+        ----------
+        other : object
+            The object that the flying is colliding with. This can be 
+            any object in the game world.
+
+        Returns
+        -------
+        None
+
+        """
+        
+        if (other.TAG == "Ground" and self.rect.colliderect(other)):
+            if( 
+                self.rect.right > other.rect.left and 
+                self.rect.left < other.rect.left
+            ):
+                self.rect.right = other.rect.left
+                self.move_cooldown = 0
+            if( 
+                self.rect.left < other.rect.right and 
+                self.rect.right > other.rect.right
+            ):
+                self.rect.left = other.rect.right
+                self.move_cooldown = 0
+                
+        return super().on_collision(other)
 
     def update(self) -> None:
         """
