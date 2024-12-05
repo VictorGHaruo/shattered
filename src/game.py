@@ -245,7 +245,11 @@ class GameManager:
         if self.camera.boss_fase:
             if len(self.bosses) == 0 and len(self.order) != 0:
                 self.bosses.append(self.order[0])
-                self.bosses_life.append(Bosslife(self.order[0].life, 200, 750, 1000, 40,(0, 255, 0), (255, 0, 0)))
+                self.bosses_life.append(
+                    Bosslife(self.order[0].life, 200, 750, 1000, 
+                             40,(0, 255, 0), (255, 0, 0)
+                    )
+                )
                 del self.order[0]
 
         for ground in self.grounds:

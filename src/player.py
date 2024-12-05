@@ -314,26 +314,29 @@ class Player:
         
         ##Updating X:
         if self.speed_x > 0:
-            # Se no pulo estivar apertando para o outro lado, ao tocar 
-            # no chão zera a velocidade
+            # If the player is pressing the opposite direction while 
+            # jumping, reset the velocity when touching the ground.
+
             if self.to_left:
                 self.speed_x = 0
             self.rect.x += min(self.speed_x, self.speed_x_max) 
         elif self.speed_x < 0:
-            # Se no pulo estivar apertando para o outro lado, ao tocar 
-            # no chão zera a velocidade
+            # If the player is pressing the opposite direction while 
+            # jumping, reset the velocity upon touching the ground.
+
             if self.to_right:
                 self.speed_x = 0
             self.rect.x += max(self.speed_x, self.speed_x_min)
         if self.rect.x <= 0:
             self.rect.x = 0
         
-        # Se tiver no ar is_running é True, para manter constante 
-        # a velocidade
+            # If in the air, is_running is True to maintain constant 
+            # velocity.
+
         if not self.is_running:
             self.speed_x = 0
         
-        ##Updating trade_cooldonw
+        #Updating trade_cooldonw
         if self.trade_cooldown >= 0 or self.invincibility_cooldown >= 0:
             self.trade_cooldown -= 1    
             self.invincibility_cooldown -= 1
@@ -347,7 +350,8 @@ class Player:
                           
     def on_event(self, event: pygame.event.Event, main : object) -> None:
         """
-        Handles user input events and updates the player's state accordingly.
+        Handles user input events and updates the player's state 
+        accordingly.
 
         Parameters
         ----------
@@ -793,7 +797,8 @@ class Knight(Player):
         Parameters
         ----------
         other : GameObject
-            The other object that the player collides with, typically a monster or projectile.
+            The other object that the player collides with, typically a 
+            monster or projectile.
 
         Returns
         -------
@@ -1071,8 +1076,8 @@ class Yokai(Player):
         Parameters
         ----------
         key_map : dict
-            A dictionary that maps each key (as pygame constants) to a boolean indicating whether
-            the key is pressed or not.
+            A dictionary that maps each key (as pygame constants) to a 
+            boolean indicating whether the key is pressed or not.
         
         Returns
         -------

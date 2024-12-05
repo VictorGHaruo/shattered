@@ -76,7 +76,6 @@ class Projectile:
             This method initializes the attributes of the projectile 
             instance.
         """
-        # self.color = (0, 0, 255)  
         self.TAG = "Projectile"
         self.rect = pygame.Rect(x, y, width, height) 
         self.speed_x = speed_x  
@@ -130,7 +129,6 @@ class Projectile:
         """
 
         self.rect.x -= camera.position_x
-        # pygame.draw.rect(screen, self.color, self.rect) 
         if self.image != None:
             screen.blit(self.image, self.rect)
         else:
