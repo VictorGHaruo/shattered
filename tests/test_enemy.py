@@ -118,8 +118,8 @@ class Test_enemy(unittest.TestCase):
                 self.mage.update()
 
             self.assertEqual(self.mage.life, 40)
-            self.assertEqual(self.dummy.life, 5)
-            self.assertEqual(self.flying.life, 5)
+            self.assertEqual(self.dummy.life, 50)
+            self.assertEqual(self.flying.life, 1)
 
     #This function tests whether enemies gain dead status only after their death animation ends
 

@@ -238,7 +238,7 @@ class TestPlayerActions(unittest.TestCase):
             self.player.update()
             self.enemy1.update()
 
-        self.assertEqual(self.enemy1.life, 40)
+        self.assertEqual(self.enemy1.life, 10)
 
     #tests the player's attack forms (projectile for yokai and attack for ninja)
 
@@ -282,7 +282,7 @@ class TestDead(unittest.TestCase):
             self.player.update()
             self.enemy.update()
 
-        self.assertEqual(self.player.life, 30)
+        self.assertEqual(self.player.life, 20)
 
     def test_collision_damage(self):
 

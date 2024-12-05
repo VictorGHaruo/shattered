@@ -83,7 +83,7 @@ class Main:
         self.is_changed = False
         
         #Music init
-        self.volume = 0.15
+        self.volume = 0.3
         music_menu_path = os.path.join(self.assets_path, "Music", "Menu")
         music_num = random.randint(1, 2)
         music_path = os.path.join(music_menu_path, f"M{music_num}.mp3")
