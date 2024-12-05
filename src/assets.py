@@ -360,6 +360,8 @@ class Herolife:
         """
 
         self.actual_life = hero.life
+        self.max_life = hero.max_life
+        self.hearts = self.max_life//self.heart
 
     def draw(self,screen):
         """

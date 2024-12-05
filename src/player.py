@@ -127,8 +127,6 @@ class Player:
         self.sub_TAG = "Player"
         self.teste = "teste"
         self.action = None
-        self.max_life = 2000
-        self.life = self.max_life
         self.Death = False
         self.points = 0
         
@@ -622,6 +620,8 @@ class Knight(Player):
         super().__init__(x, y, width, height)
         self.teste = "K"
         self.jump_count_max = 1
+        self.max_life = 2000
+        self.life = self.max_life
         self.rect_color = (255, 0, 0)
         self.shield_width = 5
         self.shield_height = 70
@@ -760,7 +760,7 @@ class Knight(Player):
         """
 
         if (
-            key_map[pygame.K_v] and self.action != "Hurt" and 
+            key_map[pygame.K_l] and self.action != "Hurt" and 
             self.action != "Death"
         ):
 
@@ -924,6 +924,8 @@ class Yokai(Player):
         super().__init__(x, y, width, height)
         self.sub_TAG = "Yokai"
         self.teste = "Y"
+        self.max_life = 800
+        self.life = self.max_life
         self.jump_count_max = 2
         self.rect_color = (255, 255, 0)
         self.damage = 20
@@ -1079,7 +1081,7 @@ class Yokai(Player):
 
         """
         if (
-            key_map[pygame.K_v] and self.projectile_cooldown <= 0 and 
+            key_map[pygame.K_l] and self.projectile_cooldown <= 0 and 
             self.action != "Hurt" and self.action != "Death"
         ):
             self.attack_time = 0
@@ -1219,6 +1221,8 @@ class Ninja(Player):
         """
         super().__init__(x, y, width, height)
         self.teste = "N"
+        self.max_life = 1200
+        self.life = self.max_life
         self.jump_count_max = 3
         self.rect_color = (255, 255, 255)
         self.range = (
@@ -1359,7 +1363,7 @@ class Ninja(Player):
         """ 
 
         if (
-            key_map[pygame.K_v] and self.attack_cooldown <= 0 and 
+            key_map[pygame.K_l] and self.attack_cooldown <= 0 and 
             not self.action == "Hurt" and self.action != "Death"
         ):
             self.attack = Attack(self.range, self.rect.y, 20, 60, self.damage)

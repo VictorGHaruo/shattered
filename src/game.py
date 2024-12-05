@@ -118,7 +118,7 @@ class GameManager:
         )
         self.bosses_life = []
         self.keys_trade = [
-            "rect", "life", "speed_x", "speed_y", "jump_count", "is_running",
+            "rect", "speed_x", "speed_y", "jump_count", "is_running",
             "on_ground", "to_left", "to_right", "from_the_front",
             "invincibility_time", "projectiles", "touched_obelisk", 
             "can_push_block", "points"
@@ -397,15 +397,15 @@ class GameManager:
         """
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
             change = False
-            if event.key == pygame.K_z:
+            if event.key == pygame.K_h:
                 if self.actual_hero != 0:
                     self.actual_hero = 0
                     change = True
-            if event.key == pygame.K_x:
+            if event.key == pygame.K_j:
                 if self.actual_hero != 1:
                     self.actual_hero = 1
                     change = True
-            if event.key == pygame.K_c:
+            if event.key == pygame.K_k:
                 if self.actual_hero != 2:
                     self.actual_hero = 2
                     change = True
