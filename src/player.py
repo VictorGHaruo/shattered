@@ -125,8 +125,6 @@ class Player:
         self.sub_TAG = "Player"
         self.teste = "teste"
         self.action = None
-        self.max_life = 2000
-        self.life = self.max_life
         self.Death = False
         self.points = 0
         
@@ -620,6 +618,10 @@ class Knight(Player):
         super().__init__(x, y, width, height)
         self.teste = "K"
         self.jump_count_max = 1
+        self.max_life = 2000
+        self.speed_x_max = 9
+        self.speed_x_min = -9
+        self.life = self.max_life
         self.rect_color = (255, 0, 0)
         self.shield_width = 5
         self.shield_height = 70
@@ -922,7 +924,11 @@ class Yokai(Player):
         super().__init__(x, y, width, height)
         self.sub_TAG = "Yokai"
         self.teste = "Y"
-        self.jump_count_max = 2
+        self.max_life = 800
+        self.speed_x_max = 11
+        self.speed_x_min = -11
+        self.life = self.max_life
+        self.jump_count_max = 1
         self.rect_color = (255, 255, 0)
         self.damage = 50
         self.attack_animation = 5
@@ -1217,7 +1223,11 @@ class Ninja(Player):
         """
         super().__init__(x, y, width, height)
         self.teste = "N"
-        self.jump_count_max = 3
+        self.max_life = 1200
+        self.speed_x_max = 12
+        self.speed_x_min = -12
+        self.life = self.max_life
+        self.jump_count_max = 2
         self.rect_color = (255, 255, 255)
         self.range = (
             self.rect.centerx + 30 if self.from_the_front else 
