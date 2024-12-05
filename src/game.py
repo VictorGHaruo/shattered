@@ -39,7 +39,7 @@ class GameManager:
         Hero's health bar object.
     hero_timer : Bar
         Timer for hero switching cooldown.
-    keys_trade : list
+    _keys_trade : list
         Attributes shared among heroes when switching.
     score_text : Score
         Used to show the score in the game screen.
@@ -117,7 +117,7 @@ class GameManager:
             (255, 255, 255), (160, 32, 240)
         )
         self.bosses_life = []
-        self.keys_trade = [
+        self._keys_trade = [
             "rect", "speed_x", "speed_y", "jump_count", "is_running",
             "on_ground", "to_left", "to_right", "from_the_front",
             "invincibility_time", "projectiles", "touched_obelisk", 
@@ -397,15 +397,15 @@ class GameManager:
         """
         if event.type == pygame.KEYDOWN and self.hero.trade_cooldown <= 0:
             change = False
-            if event.key == pygame.K_h:
+            if event.key == pygame.K_z:
                 if self.actual_hero != 0:
                     self.actual_hero = 0
                     change = True
-            if event.key == pygame.K_j:
+            if event.key == pygame.K_x:
                 if self.actual_hero != 1:
                     self.actual_hero = 1
                     change = True
-            if event.key == pygame.K_k:
+            if event.key == pygame.K_c:
                 if self.actual_hero != 2:
                     self.actual_hero = 2
                     change = True
@@ -415,7 +415,7 @@ class GameManager:
 
                 self.hero = self.heros[self.actual_hero]
 
-                for key in self.keys_trade:
+                for key in self._keys_trade:
                     self.hero.__dict__[key] = state_dict[key]
 
                 self.hero.trade_cooldown = self.hero.trade_cooldown_time
