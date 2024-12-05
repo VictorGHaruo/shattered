@@ -47,7 +47,7 @@ def maping(grounds : list, enemies : list, hero: object) -> None:
         "                                      U        A                                                                              ICCCCCC                          CC",
         "                              EXXXXXXXXXXXXXXXXXD                                                                             CCCCCCC                          CC",
         "                      U       LGGGGGGGGGGGGGGGGGR                                                                             CCCCCCC                          CC",
-        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                   C                          CC",
+        "                    TMMMMP    LGGGGGGGGGGGGGGGGGR                                                                                  CC                          CC",
         "                              LGGGGGGGGGGGGGGGGGR   TMP       U         U               A                                                                      CC",
         "XXXXXXXXXXXXXXXD              LGGGGGGGGGGGGGGGGGR        EXXXXXXXXXXXXXXXXXXD           EXXXD        U        A                     B                          CC",
         "GGGGGGGGGGGGGGGR              LGGGGGGGGGGGGGGGGGR        LGGGGGGGGGGGGGGGGGGR   EXXD    LGGGR    EXXXXXXXD    EXD   EXXXXXXXXXXXXXXXX  XXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -95,7 +95,7 @@ def maping(grounds : list, enemies : list, hero: object) -> None:
                 grounds.append(Spike(j*50, i*50, 50, 50, image_spike_S))
             if grid[i][j] == "B":
                 grounds.append(
-                    Block(j*50, i*50 - 50, 50, 102, image_ground_B)
+                    Block(j*50 - 11, i*50 - 50, 61, 102, image_ground_B)
                 )                
             
             for key in keys_ground:

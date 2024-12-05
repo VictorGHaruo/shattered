@@ -32,8 +32,6 @@ class Bosses:
         Maximum allowed vertical speed of the boss.
     speed_x : float
         Current horizontal speed of the boss.
-    life : int
-        Current life points of the boss.
     hero : Player
         Rectangle representing the hero, used for interactions with the 
         boss.
@@ -109,7 +107,6 @@ class Bosses:
         self.speed_y = 0
         self.speed_y_max = 40
         self.speed_x = 0
-        self.life = 2000
         self.hero = hero
         self.projectiles = []
         self.screen_width = pygame.display.Info().current_w
@@ -357,7 +354,7 @@ class Balrog(Bosses):
 
         self.speed_x = 3
         self.gravity = 0
-        self.life = 20
+        self.life = 500
 
         self.probability = 0.5
         self.randomic = 0.5
@@ -394,7 +391,7 @@ class Balrog(Bosses):
             self.all_atks.append(
                 Attack(
                     self.screen_width/self.number_bars * atks, 10 + atks, 
-                    self.screen_width / self.number_bars, 650, 
+                    self.screen_width / self.number_bars, 700, 
                     self.weapon_damage
                 )
             )
@@ -686,6 +683,8 @@ class Ganon(Bosses):
         The width of Ganon's hitbox.
     life : int
         The current life of Ganon.
+    damage : int
+        Damage of Ganon.
     is_dead : bool
         Flag indicating whether Ganon is dead.
     atk_timer : int
@@ -763,7 +762,8 @@ class Ganon(Bosses):
 
         self.color = (160, 32, 240)
 
-        self.life = 20
+        self.life = 1000
+        self.damage = 100
         self.is_dead = False
 
         self.atk_timer = 100
@@ -950,7 +950,7 @@ class Ganon(Bosses):
                     self.new_projectiles = [
                                 Projectile(
                                     self.rect.left -50, self.rect.centery + 47,
-                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    -10, 0, self.TAG, self.damage, 35*2, 14*2, 
                                     self.images["GProjectile"][1]
                                 ),
                                 Projectile(
@@ -960,31 +960,31 @@ class Ganon(Bosses):
                                 ),
                                 Projectile(
                                     self.rect.left -42, self.rect.centery - 54, 
-                                    -10, 0, self.TAG, 20, 35*2, 14*2, 
+                                    -10, 0, self.TAG, self.damage, 35*2, 14*2, 
                                     self.images["GProjectile"][1]
                                 ),
                                 Projectile(
                                     self.rect.left + 5, 
                                     self.rect.centery - 113, -10, 0, self.TAG, 
-                                    20, 35*2, 14*2, 
+                                    self.damage, 35*2, 14*2, 
                                     self.images["GProjectile"][1]
                                 ),
                                 Projectile(
                                     self.rect.left - 37, 
                                     self.rect.centery - 150, -10, 0, self.TAG, 
-                                    20, 35*2, 14*2, 
+                                    self.damage, 35*2, 14*2, 
                                     self.images["GProjectile"][1]
                                 ),
                                 Projectile(
                                     self.rect.left - 33, 
                                     self.rect.centery - 212, -10, 0, self.TAG, 
-                                    20, 35*2, 14*2, 
+                                    self.damage, 35*2, 14*2, 
                                     self.images["GProjectile"][1]
                                 ),                    
                                 Projectile(
                                     self.rect.left - 50, 
                                     self.rect.centery - 257, -10, 0, self.TAG, 
-                                    20, 35*2, 14*2, 
+                                    self.damage, 35*2, 14*2, 
                                     self.images["GProjectile"][1]
                                 ),
                     ]
@@ -1230,6 +1230,7 @@ class Demagorgon(Bosses):
         #hitbox
         self.color = (255, 255, 0)
 
+        self.life = 1500
         self.speed_x = 3
 
         self.attacks = None

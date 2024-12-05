@@ -31,8 +31,6 @@ class Monsters:
         The maximum vertical speed of the monster.
     speed_x : int
         The horizontal speed of the monster.
-    life : int
-        The monster's health points.
     hero : object
         A reference to the hero object, used for interactions.
     immune : bool
@@ -96,7 +94,6 @@ class Monsters:
         self.speed_y = 0
         self.speed_y_max = 40
         self.speed_x = 0
-        self.life = 5
         self.hero = hero
         self.immune = False
         self.to_right = True
@@ -198,11 +195,7 @@ class Monsters:
             self.rect.top < other.rect.top
         ):
                 self.rect.bottom = other.rect.top
-                
-        if other.TAG == "Projectile":
-            if self.rect.colliderect(other):       
-                    self.life -= other.damage
-        
+
         for projectile in self.projectiles:
             if other.TAG == "Ground":
                 if projectile.rect.colliderect(other):
@@ -221,6 +214,8 @@ class Dummy(Monsters):
 
     Attributes
     ----------
+    life : int
+        Life of the monster
     speed_x : int
         The horizontal speed of the dummy.
     init_x : int
@@ -284,6 +279,7 @@ class Dummy(Monsters):
             the player character.
         """
         super().__init__(x, y, width, height, hero)
+        self.life = 50
         self.speed_x = 3
         self.init_x = x
         self.range = 100
@@ -465,6 +461,8 @@ class Mage(Monsters):
         Horizontal speed of the mage.
     life : int
         Health points of the mage.
+    damage : int
+        Demage of his projectile
     projectile_cooldown : int
         Current cooldown state for projectile firing.
     cool_down : int
@@ -527,6 +525,7 @@ class Mage(Monsters):
         self.speed_x = 3
         self.color = (0,0, 255)
         self.life = 60
+        self.damage = 30
         self.projectile_cooldown = 0
         self.cool_down = 100
         
@@ -666,8 +665,8 @@ class Mage(Monsters):
         if self.projectile_cooldown <= 0:
             if self.to_left:
                 new_projectile = Projectile(
-                    self.rect.left, self.rect.centery, - 20, 0, self.TAG, 20, 
-                    50, 30, self.image_projectile_l
+                    self.rect.left, self.rect.centery, - 20, 0, self.TAG, 
+                    self.damage, 50, 30, self.image_projectile_l
                 )
                 self.projectiles.append(new_projectile)
                 self.sprites.assets(
@@ -676,8 +675,8 @@ class Mage(Monsters):
                 )
             else:
                 new_projectile = Projectile(
-                    self.rect.right, self.rect.centery, 20, 0, self.TAG, 20, 
-                    50, 30, self.image_projectile_r
+                    self.rect.right, self.rect.centery, 20, 0, self.TAG, 
+                    self.damage, 50, 30, self.image_projectile_r
                 )
                 self.projectiles.append(new_projectile)
                 self.sprites.assets(
@@ -704,6 +703,8 @@ class Flying(Monsters):
 
     Attributes
     ----------
+    life : int
+        Life of the monster.
     speed_x : int
         Horizontal speed of the flying enemy.
     gravity : int
@@ -780,6 +781,7 @@ class Flying(Monsters):
             Reference to the hero object for interaction.
         """
         super().__init__(x, y, width, height, hero)
+        self.life = 1
         self.speed_x = 3
         self.gravity = 0
 

@@ -163,9 +163,7 @@ class Shield:
     draw(screen) -> None
     """
 
-    def __init__(
-        self, x: float, y: float, width: int, height: int, damage: int
-    ) -> None:
+    def __init__(self, x: float, y: float, width: int, height: int) -> None:
         """
         Initializes the shield instance with the given attributes.
 
@@ -179,8 +177,6 @@ class Shield:
             The width of the shield.
         height : int
             The height of the shield.
-        damage : int
-            The percentage of damage the shield reflects upon collision.
 
         Returns
         -------
@@ -192,8 +188,6 @@ class Shield:
         self.width = width
         self.height = height
         self.rect = pygame.Rect(x, y, self.width, self.height) 
-        self.damage = damage
-        # self.test_color = (100, 100, 100)
     
     def reflect(
         self, user: "Player", other: "Monster", list1: list, list2: list
@@ -226,7 +220,6 @@ class Shield:
             other.speed_x = -other.speed_x
             other.image = pygame.transform.flip(other.image, True, False)
             other.who = user
-            other.damage = other.damage * self.damage
             list1.append(other)
             list2.remove(other)
 

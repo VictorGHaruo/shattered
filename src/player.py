@@ -73,8 +73,6 @@ class Player:
         hurt.
     collision_damage : int
         The damage taken by the player from collisions.
-    damage : int
-        The current damage the player is dealing.
     invincibility_cooldown : int
         The cooldown for the player's invincibility.
     hurt_time : int
@@ -157,7 +155,6 @@ class Player:
         self.trade_cooldown = self.trade_cooldown_time
         self.invincibility_time = 30
         self.collision_damage = 50
-        self.damage = 0
         self.invincibility_cooldown = 0
         self.hurt_time = 5
         self.hurt_cooldown = 0
@@ -194,7 +191,6 @@ class Player:
 
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            #pygame.draw.rect(screen, self.rect_color, self.rect)
 
         for projectile in self.projectiles:
             projectile.draw(screen, camera)
@@ -527,7 +523,7 @@ class Player:
                         not projectile.who == "Yokai" or 
                         not other.sub_TAG == "Ganon"
                     ):
-                            other.life -= self.damage
+                            other.life -= projectile.damage
                     self.projectiles.remove(projectile)
                     del projectile
 
@@ -569,8 +565,6 @@ class Knight(Player):
         The x-position of the Knight's shield, based on facing direction.
     shield_y : int
         The y-position of the Knight's shield.
-    shield_damage : float
-        The damage dealt by the Knight's shield when used.
     shield : object or None
         Placeholder for the shield object.
     sprites : Sprites
@@ -630,7 +624,6 @@ class Knight(Player):
             self.rect.centerx - 15
         )
         self.shield_y = self.rect.y
-        self.shield_damage = 0.7
         self.shield = None  
 
         self.sprites = Sprites()
@@ -770,7 +763,7 @@ class Knight(Player):
                 if self.shield is None: 
                     self.shield = Shield(
                         self.shield_x, self.shield_y, self.shield_width, 
-                        self.shield_height, self.shield_damage
+                        self.shield_height
                     )
                     self.action = "Immune"
 
@@ -808,7 +801,7 @@ class Knight(Player):
         if self.shield is not None:
             if other.TAG == "Monster":
                 for projectile in other.projectiles:
-                    self.damage = self.shield.damage * projectile.damage
+                    self.damage = projectile.damage
                     self.shield.reflect(
                         self.TAG, projectile, self.projectiles, 
                         other.projectiles
@@ -928,7 +921,7 @@ class Yokai(Player):
         self.life = self.max_life
         self.jump_count_max = 2
         self.rect_color = (255, 255, 0)
-        self.damage = 20
+        self.damage = 50
         self.attack_animation = 5
         self.attack_time = 0
         
