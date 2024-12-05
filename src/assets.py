@@ -282,7 +282,8 @@ class Herolife:
     heart : int
         The health value represented by a single heart.
     hearts : int
-        The total number of hearts required to represent the maximum health.
+        The total number of hearts required to represent the maximum
+        health.
     x : int
         The x-coordinate of the health bar.
     y : int

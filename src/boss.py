@@ -114,7 +114,6 @@ class Bosses:
         self.immune = False
         self.death_position = None
         self.touch = False
-        # self.color = (255, 0, 0)
 
     def new_hero(self, hero: object):
         """
@@ -182,7 +181,6 @@ class Bosses:
 
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
-            # pygame.draw.rect(screen, self.color, self.rect)
         for projectile in self.projectiles:
             if not screen.get_rect().colliderect(projectile.rect):
                 self.projectiles.remove(projectile)
@@ -578,7 +576,6 @@ class Balrog(Bosses):
         super().draw(screen, camera)
         if len(self.attacks) != 0:
             for atks in self.attacks:
-                # atks.draw(screen)
                 self.lightning.assets(
                     atks.rect, "Attack", self.actual_balrog, "L", 
                     self.fps["Attack"], self.images, 0, "B"
@@ -1378,7 +1375,6 @@ class Demagorgon(Bosses):
         """
         super().move()
 
-        # self.rect.x = self.rect.x + self.speed_x
         if self.atk_timer < self.atk_cooldown:
             if self.rect.x - self.hero.rect.x <= 0:
                 
