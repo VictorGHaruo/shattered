@@ -1,0 +1,12 @@
+\section{Challenges}  
+The entire game presented numerous challenges, as it was an ambitious project.  
+
+One of the initial hurdles was modularizing the game. Each element within the game interacts with others, making it difficult to develop a system where all components could function simultaneously without conflicts. The solution was to break the game into several distinct modules, ensuring better collaboration and maintainability.  
+
+Developing realistic physics was another significant challenge. This required implementing gravity, velocity on both axes, and terminal velocity. Terminal velocity proved particularly complex because, during jumps, the character would sometimes pass through the ground due to high speeds exceeding the ground’s frame update. To solve this, a maximum velocity limit was introduced, preventing the character from clipping through surfaces.  
+
+Character swapping posed additional difficulties. The game features multiple heroes, each with unique abilities. However, maintaining consistent stats and positions during swaps was essential, which added complexity to the logic.  
+
+Another major challenge involved sprite handling and animations. Initially, characters were represented by rectangles for hitboxes, but incorporating animations required rethinking attack and movement logic. Additionally, the diverse range of characters, enemies, and bosses meant creating a modular system that could animate all of them without redundant code.  
+
+Camera movement also proved challenging. As the character moves, the camera must follow, which requires all objects in the scene to adjust accordingly. This synchronization was complex to implement. Furthermore, interface transitions, such as pausing the game to enter menus, required careful handling to ensure a smooth and seamless experience.  

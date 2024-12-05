@@ -1,0 +1,40 @@
+\section{How to Run}
+
+\subsection{How to play the game?}
+
+\begin{enumerate}[label=\textbullet]
+  \item Create a virtual environment.
+  
+
+  \item At folder root \textit{shattered/} install the dependencies.
+
+  \item Go to \textit{src/} folder and run \textit{main.py}
+
+\end{enumerate}
+
+
+  \begin{minted}[frame=single, bgcolor=lightgray]{bash}
+# In Unix
+$python -m venv venv
+$source venv/bin/activate
+$pip install -r requirements.txt 
+$python3 src/main.py
+\end{minted}
+
+If you are using WSL, the soundtrack may encounter errors due to the absence of an audio mixer. To resolve this, run the following code to install an audio mixer.
+
+\begin{minted}[frame=single, bgcolor=lightgray]{bash}
+$sudo apt update
+$sudo apt install pulseaudio
+\end{minted}
+
+\subsection{How to run unittest?}
+
+\begin{enumerate}[label=\textbullet]
+    \item In root \textit{shattered/} go to \textit{tests/} and run the following line code.
+    
+\end{enumerate}
+
+\begin{minted}[frame=single, bgcolor=lightgray]{bash}
+$ python3 file_name.py
+\end{minted}

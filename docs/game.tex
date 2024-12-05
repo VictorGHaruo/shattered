@@ -1,0 +1,41 @@
+
+\section{About the Game}
+
+Shattered is a 2D platformer where players control three characters—Stella, Erik, and August—who alternate throughout the game. The objective is to defeat all the enemies, unlock the final boss door (obelisk), and defeat the last three enemies. Each boss or enemy defeated rewards players with points, and at the end of the game, the total score accumulated throughout the journey is displayed.
+
+\subsection{How to Play}
+
+Movement is horizontal: use A and D to move left and right, respectively. To attack, press the V key, and to interact with objects (obelisk) in the environment, press F. To switch characters, press Z to switch to August (the Knight), X to switch to Stella (the Yokai), and C to switch to Erik (the Ninja). All characters attack using the V key. Additionally, on Stella pressing  W and V simultaneously causes the character to fire a projectile upwards.
+
+
+\subsection{Mechanics}
+
+In shattered \cite{ground}, the enemies are designed specifically for the unique abilities of each character. As such, each character is essential for progressing through different scenarios in the game.
+\subsubsection{Characters}
+Each character has unique stats that align with their playstyle.
+
+\begin{enumerate}[label=\textbullet]
+    \item \textbf{Erik}: A ninja wielding the Totsuka Katana, Erik excels in close-range combat with high dexterity, giving him great speed and the ability to double jump. However, his health is average. \cite{erik}
+    
+    \item \textbf{Stella}: A Yokai with the Housenka ability, which allows her to shoot fireballs. As a long-range character, Stella has the lowest health but compensates with high agility, enabling her to quickly move to various attack positions. She also has the ability to double jump, making it easier for her to reach high platforms. Her skill is especially useful against flying enemies or those at a great distance. \cite{stella}
+    
+    \item \textbf{August}: A knight equipped with the Yata Mirror, a shield capable of blocking any projectile. Due to his large size, August has low mobility and can only jump once, but he compensates for this with high health. He is best used against enemies that fire numerous projectiles, which are difficult to avoid. \cite{august}
+\end{enumerate}
+
+\subsubsection{Enemies}
+\begin{enumerate}[label=\textbullet]
+    \item Dummy: A basic enemy that walks back and forth, changing direction when it hits a wall or at the end of a platform. It has no attack and only damages the player upon collision. \cite{dummy}
+    
+    \item Mage: This enemy remains stationary, always facing the player and shooting projectiles. It also deals damage upon contact. \cite{mage}
+    
+    \item Flying: A flying enemy that occasionally changes direction and drops projectiles downwards. The player takes damage upon touching it. \cite{flying}
+\end{enumerate}
+
+\subsubsection{Bosses}
+\begin{enumerate}[label=\textbullet]
+    \item Demagorgon: This boss always follows the player. The player takes damage upon contact with the Demagorgon, and its primary attack is a punch. \cite{demagorgon}
+    
+    \item Balrog: The Balrog moves randomly in the air. After a random time interval, it selects a direction and flies in that direction for a set number of frames before choosing a new direction. Its attack consists of lightning strikes falling from the sky. Before attacking, Balrog teleports to a spot where it cannot be harmed. Always follow Balrog to avoid damage. \cite{balrog}
+
+    \item Ganon: Ganon remains stationary at the edges of the screen. When the player approaches, Ganon enters an immune form and teleports to the opposite side of the screen. Ganon is immune to Stella’s fireballs and invulnerable to Erik's sword due to its tough skin. Ganon’s attacks consist of large rocks that are difficult to avoid. \cite{ganon}
+\end{enumerate}
