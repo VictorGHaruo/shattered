@@ -194,10 +194,6 @@ class Player:
 
         """
 
-        if self.invincibility_cooldown >= 0 :
-            self.sprites.draw(screen,128)
-        else:
-            self.sprites.draw(screen)
         if camera.TAG == "Camera":
             self.rect.x -= camera.position_x
             #pygame.draw.rect(screen, self.rect_color, self.rect)
@@ -291,7 +287,7 @@ class Player:
                         self.rect, "Jump", self.actual, "L", 0, self.images, 
                         self.adj, self.teste
                     )
-        
+
     def update(self) -> None:
         """
         Updates the player's state, including movement, gravity, 
@@ -847,6 +843,16 @@ class Knight(Player):
         if self.shield is not None:
             self.shield.update(self.shield_x, self.shield_y)
 
+    def draw(self, screen, camera):
+
+        super().draw(screen, camera)
+
+        if self.invincibility_cooldown >= 0 :
+            self.sprites.draw(screen,128)
+        else:
+            self.sprites.draw(screen)
+        
+
 class Yokai(Player):
     """
     Initializes a Yokai character with specific attributes such as
@@ -1127,6 +1133,15 @@ class Yokai(Player):
             (self.action == "Attack" or self.action == "Attack_2")
         ):
             self.action = None
+
+    def draw(self, screen, camera):
+
+        super().draw(screen, camera)
+
+        if self.invincibility_cooldown >= 0 :
+            self.sprites.draw(screen,128)
+        else:
+            self.sprites.draw(screen)
 
 class Ninja(Player):
     """
@@ -1410,3 +1425,12 @@ class Ninja(Player):
             self.action == "Attack"
         ):
             self.action = None
+
+    def draw(self, screen, camera):
+
+        super().draw(screen, camera)
+
+        if self.invincibility_cooldown >= 0 :
+            self.sprites.draw(screen,128)
+        else:
+            self.sprites.draw(screen)
